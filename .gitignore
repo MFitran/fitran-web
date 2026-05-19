@@ -1,1 +1,3 @@
 .vscode/
+scrape_script/get_linkedin_posts.js
+scrape_script/get_linkedin_posts_output.json
