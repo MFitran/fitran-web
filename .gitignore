@@ -1,3 +1,4 @@
 .vscode/
 assets/scrape_script/get_linkedin_posts.js
 assets/scrape_script/get_github_repos.js
+assets/scrape_script/.env
