@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 30000); // 30 seconds
     });
 
-    fetch('/assets/scrape_script/linkedin_posts.csv')
+    fetch('assets/scrape_script/linkedin_posts.csv')
         .then(response => response.text())
         .then(csvText => {
             const rows = parseCSV(csvText);
@@ -133,7 +133,7 @@ function renderLinkedInPosts(rows) {
             postIdMatch = url.match(/ugcPost-(\d+)/);
         }
         const postId = postIdMatch ? postIdMatch[1] : '';
-        const imgPath = postId ? `/assets/scrape_script/linkedin_post_images/image_${postId}.jpeg` : '/assets/default_linkedin_post_image.jpeg';
+        const imgPath = postId ? `assets/scrape_script/linkedin_post_images/image_${postId}.jpeg` : 'assets/default_linkedin_post_image.jpeg';
 
         // Detect if content needs a read-more toggle (long character count or contains more than 3 lines)
         const isLongText = contentText.length > 150 || contentText.split('\n').length > 3;
@@ -146,7 +146,7 @@ function renderLinkedInPosts(rows) {
         // Use exact DOM construction mirroring the requested styling format
         card.innerHTML = `
             <div class="post-label">${postType}</div>
-            <img class="post-image" src="${imgPath}" alt="LinkedIn Post" onerror="this.onerror=null; this.src='/assets/default_linkedin_post_image.jpeg';">
+            <img class="post-image" src="${imgPath}" alt="LinkedIn Post" onerror="this.onerror=null; this.src='assets/default_linkedin_post_image.jpeg';">
             <p class="post-desc">${escapeHTML(contentText)}</p>
             ${readMoreHTML}
             <div class="post-stats">
