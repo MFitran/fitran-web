@@ -186,7 +186,9 @@ header {
 
 /* --- HERO SECTION LAYOUT (Pengaturan Jarak Khusus Elemen Internal) --- */
 .hero-pic {
-    height: 250px;
+    aspect-ratio: 108 / 25;
+    height: auto;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -422,7 +424,18 @@ img.logo-github {
 }
 
 /* --- RESPONSIVE GRID --- */
+.mobile-title {
+    display: none;
+}
+
 @media (max-width: 768px) {
+    .desktop-title {
+        display: none;
+    }
+    .mobile-title {
+        display: inline;
+    }
+
     .header-content {
         padding: 0 20px; 
     }
