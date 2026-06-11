@@ -373,6 +373,22 @@ footer.contact-footer {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 25px;
+}
+
+.footer-sections {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.footer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 15px;
 }
 
@@ -504,4 +520,192 @@ img.logo-github {
     opacity: 1;
     margin-right: 8px;
     margin-left: 10px;
+}
+
+/* --- GAMES PAGE --- */
+.games-layout {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+}
+
+.games-sidebar {
+    flex: 0 0 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.games-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chat-message {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.bot-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #121212;
+}
+
+.message-content {
+    background: #111111;
+    padding: 10px 15px;
+    border-radius: 12px;
+    border-top-left-radius: 0;
+    font-size: 15px;
+    color: #E0E0E0;
+}
+
+.chat-input-placeholder {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chat-input-placeholder input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #000;
+    color: #888;
+}
+
+.chat-input-placeholder button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #333;
+    color: #888;
+    font-weight: bold;
+}
+
+.leaderboard-search input {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #111;
+    color: #E0E0E0;
+    font-size: 14px;
+    width: 130px;
+}
+
+.leaderboard-list {
+    list-style-position: inside;
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+}
+
+.leaderboard-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #111111;
+}
+
+.leaderboard-list li:last-child {
+    border-bottom: none;
+}
+
+.lb-name {
+    font-weight: bold;
+    color: #E0E0E0;
+}
+
+.lb-score {
+    color: #A0A0A0;
+}
+
+.leaderboard-pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.leaderboard-pagination .next-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #B0B0B0;
+    padding: 6px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.leaderboard-pagination .next-btn:hover {
+    background: #333;
+    color: #FFF;
+}
+
+.vertical-games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+.game-card {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    padding: 20px 24px;
+}
+
+.game-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.game-icon-placeholder {
+    font-size: 36px;
+    margin-bottom: 0;
+}
+
+.game-details h3 {
+    margin-bottom: 5px;
+}
+
+.game-details p {
+    color: #888;
+    font-size: 15px;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .games-layout {
+        flex-direction: column;
+    }
+    .games-sidebar {
+        flex: auto;
+        width: 100%;
+    }
+    .game-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    .game-info {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
