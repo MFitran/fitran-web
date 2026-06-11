@@ -709,3 +709,150 @@ img.logo-github {
         gap: 10px;
     }
 }
+
+.nim-game-box {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 500px; /* Fixed height for the game area */
+    overflow: hidden; /* Hide sticks flying off */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nim-back-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background-color: #222;
+    color: #aaa;
+    text-decoration: none;
+    z-index: 50;
+}
+
+.nim-restart-btn {
+    background-color: #442222;
+    color: #f5c5c5;
+    margin-top: 10px;
+}
+
+.nim-overlay {
+    position: fixed;
+    z-index: 100; /* Above game elements, below header */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Darker overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.nim-overlay-content {
+    background-color: #000;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+.nim-overlay-content h3 {
+    color: #E0E0E0;
+    margin-bottom: 15px;
+}
+
+.nim-overlay-content p {
+    color: #A0A0A0;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.nim-game-area {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nim-table-background {
+    width: 100%;
+    height: 70%; /* Area for sticks */
+    background-image: url('../wood_table.jpeg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden; /* Ensure sticks don't go outside table */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nim-sticks-container {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    /* This container will hold absolutely positioned matchstick images */
+}
+
+.nim-stick {
+    position: absolute;
+    width: 50px; /* Increased size again */
+    height: auto;
+    transform-origin: bottom center; /* For rotation */
+    opacity: 0;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out, left 0.3s, top 0.3s;
+}
+
+.nim-stick.visible {
+    opacity: 1;
+}
+
+.nim-stick.removed {
+    transform: translateY(-200px) scale(0.5) rotate(45deg); /* Fly upward and fade */
+    opacity: 0;
+}
+
+.nim-bottom-panel, #nim-initial-setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.nim-message {
+    color: #E0E0E0;
+    font-size: 18px;
+    min-height: 27px; /* Reserve space to prevent layout shift */
+    width: 100%;
+    text-align: center;
+}
+
+.nim-controls {
+    display: flex;
+    gap: 15px;
+}
+
+#nim-initial-setup p {
+    color: #A0A0A0;
+    font-size: 16px;
+}
+
+#nim-initial-setup input {
+    width: 100px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #000;
+    color: #E0E0E0;
+    text-align: center;
+}

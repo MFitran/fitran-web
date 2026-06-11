@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const profileUsername = document.getElementById('profile-username');
     const profileScore = document.getElementById('profile-score');
+    const profileEmail = document.getElementById('profile-email');
+    const emailForm = document.getElementById('email-form');
+    const emailMessage = document.getElementById('email-message');
 
     // --- State ---
     let currentUser = null;
@@ -26,6 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Supabase client not found. Make sure config.js and leaderboard.js are loaded before auth.js.');
             showAuthMessage('Authentication service unavailable.');
             return;
+        }
+
+        // Check for URL messages from other pages (e.g., password reset)
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message === 'password-changed') {
+            showAuthMessage('Your password has been changed successfully! Please log in.', false);
+            // Clean the URL to prevent the message from showing on refresh
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         if (!localSupabase || !localSupabase.auth) {
@@ -45,22 +57,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (session?.user) {
             // User is logged in. Fetch their profile.
-            const { data: profileData, error } = await localSupabase
-                .from('players')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
+            currentUser = session.user;
+            localStorage.setItem('fitran_player', JSON.stringify(currentUser)); // Store auth.user data
 
-            if (profileData) {
-                currentUser = profileData;
-                localStorage.setItem('fitran_player', JSON.stringify(currentUser));
-                showLoggedView();
-            } else {
-                // Auth session exists but no profile. Log them out.
-                console.error('User authenticated but no profile found. Logging out.');
-                await localSupabase.auth.signOut();
-                showUnloggedView();
-            }
+            // Fetch score from leaderboard table
+            const { data: leaderboardEntry, error: scoreError } = await localSupabase
+                .from('leaderboard')
+                .select('total_score')
+                .eq('player_id', currentUser.id)
+                .maybeSingle();
+
+            if (scoreError) console.error('Error fetching user score:', scoreError);
+            
+            // Add score to currentUser object for display, default to 0 if not found
+            currentUser.score = leaderboardEntry?.total_score || 0;
+
+            // Update last_login in auth.users if needed, or remove this functionality
+            // await localSupabase.auth.admin.updateUserById(currentUser.id, { user_metadata: { last_login: new Date().toISOString() } }); // Requires service_role key or Edge Function
+            showLoggedView();
         } else {
             showUnloggedView();
         }
@@ -68,18 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function showLoggedView() {
         if (unloggedView) unloggedView.style.display = 'none';
         if (loggedView) loggedView.style.display = 'block';
-        if (profileUsername) profileUsername.textContent = currentUser.username;
+        if (profileUsername) profileUsername.textContent = currentUser.user_metadata?.username || 'N/A';
         if (profileScore) profileScore.textContent = currentUser.score || 0;
-
-        // Show a notice if the user is still using a dummy email.
-        // NOTE: You need to add an element with id="profile-email-notice" to your HTML for this to appear.
-        const emailNotice = document.getElementById('profile-email-notice');
-        if (emailNotice && currentUser.email && currentUser.email.endsWith('@fitran.game')) {
-            emailNotice.innerHTML = '<b>Note:</b> Use your own active email for password changes.';
-            emailNotice.style.display = 'block';
-        } else if (emailNotice) {
-            emailNotice.style.display = 'none';
-        }
+        if (profileEmail) profileEmail.value = currentUser.email || '';
     }
 
     function showUnloggedView() {
@@ -98,6 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideAuthMessage() {
         if (authMessage) authMessage.style.display = 'none';
+    }
+
+    // Helper function for email form messages
+    function showEmailMessage(msg, isError = false) {
+        if (!emailMessage) return;
+        emailMessage.textContent = msg;
+        emailMessage.style.color = isError ? '#ff6b6b' : '#4ade80';
+        emailMessage.style.display = 'block';
+        setTimeout(() => { emailMessage.style.display = 'none'; }, 5000);
     }
 
     // --- Event Listeners ---
@@ -124,26 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
             loginBtn.textContent = 'Logging in...';
 
             try {
-                // Step 1: Find the user's email from their username in the public 'players' table.
-                const { data: player, error: playerError } = await localSupabase
-                    .from('players')
-                    .select('email')
-                    .eq('username', username)
-                    .single();
+                // Step 1: Find the user's email from their username using RPC function.
+                const { data: userEmail, error: playerError } = await localSupabase.rpc('get_email_by_username', { p_username: username });
 
-                if (playerError && playerError.code !== 'PGRST116') { // PGRST116 is "No single row"
+                if (playerError) {
                     console.error('Login Step 1 Failed (check RLS policies):', playerError);
                     throw new Error('A server error occurred during login.');
                 }
 
-                if (!player) {
+                if (!userEmail) {
                     // This is a valid case of wrong username. Don't specify if username or password was wrong for security.
                     throw new Error('Invalid login credentials');
                 }
 
                 // Step 2: Use the retrieved email (dummy or real) to sign in with Supabase Auth.
                 const { data: authData, error: authError } = await localSupabase.auth.signInWithPassword({
-                    email: player.email,
+                    email: userEmail,
                     password: password
                 });
 
@@ -153,20 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // After successful login, fetch the full associated profile
-                const { data: profileData, error: profileError } = await localSupabase
-                    .from('players')
-                    .select('*')
-                    .eq('id', authData.user.id)
-                    .single();
-                
-                if (profileError) {
-                    console.error('Login Step 3 Failed (Profile fetch):', profileError);
-                    throw profileError;
-                }
-
-                currentUser = profileData;
+                currentUser = authData.user;
                 localStorage.setItem('fitran_player', JSON.stringify(currentUser));
-                await localSupabase.from('players').update({ last_login: new Date().toISOString() }).eq('id', currentUser.id);
+
+                // Fetch score from leaderboard table
+                const { data: leaderboardEntry, error: scoreError } = await localSupabase
+                    .from('leaderboard')
+                    .select('total_score')
+                    .eq('player_id', currentUser.id)
+                    .maybeSingle();
+
+                if (scoreError) console.error('Error fetching user score on login:', scoreError);
+                currentUser.score = leaderboardEntry?.total_score || 0;
+
                 showLoggedView();
 
             } catch (err) {
@@ -204,14 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Step 1: Check if username is already taken
-                const { data: existingPlayer, error: checkError } = await localSupabase
-                    .from('players')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
+                const { data: usernameExists, error: checkError } = await localSupabase.rpc('username_exists', { p_username: username });
 
-                if (checkError) throw checkError;
-                if (existingPlayer) throw new Error('Username is already taken.');
+                if (checkError) {
+                    console.error('Error checking username existence:', checkError);
+                    throw new Error('Failed to check username availability.');
+                }
+                if (usernameExists) throw new Error('Username is already taken.');
 
                 // Step 2: Create the user in Supabase Auth. Since you don't use email,
                 // we create a "dummy" email from the username. This is required by Supabase
@@ -222,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: password,
                     options: {
                         data: {
-                            display_name: username
+                            username: username
                         }
                     }
                 });
@@ -230,27 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (authError) throw authError;
                 if (!authData.user) throw new Error('Signup did not return a user.');
 
-                // Step 3: Create the associated player profile, linking it via the auth user's ID
-                const { data: profileData, error: profileError } = await localSupabase
-                    .from('players')
-                    .insert([{ 
-                        id: authData.user.id,
-                        username: username,
-                        email: dummyEmail,
-                        created_at: new Date().toISOString(),
-                        last_login: new Date().toISOString()
-                        // DO NOT store the password here. It's now handled by Supabase Auth.
-                    }])
-                    .select()
-                    .single();
+                // Step 3: Update UI. Supabase handles the session automatically.
+                currentUser = authData.user;
+                currentUser.score = 0; // New users start with 0 score
 
-                if (profileError) {
-                    console.error('CRITICAL: Auth user created but profile insertion failed.', profileError);
-                    throw new Error('Could not create your profile. Please contact support.');
-                }
-
-                // Step 4: Update UI. Supabase handles the session automatically.
-                currentUser = profileData;
                 localStorage.setItem('fitran_player', JSON.stringify(currentUser));
                 showLoggedView();
                 showAuthMessage('Account created successfully!', false);
@@ -281,6 +272,54 @@ document.addEventListener('DOMContentLoaded', () => {
             currentUser = null;
             localStorage.removeItem('fitran_player');
             showUnloggedView();
+        });
+    }
+
+    // Update Email
+    if (emailForm) {
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser || !localSupabase) return;
+
+            const newEmail = profileEmail.value.trim();
+            const submitBtn = emailForm.querySelector('button[type="submit"]');
+            
+            if (newEmail === currentUser.email) {
+                showEmailMessage('This is already your current email.', true);
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                // 1. Update the email in Supabase Auth (auth.users)
+                const { data: authData, error: authError } = await localSupabase.auth.updateUser({
+                    email: newEmail
+                });
+                if (authError) throw authError;
+
+                // Update the local state instantly
+                currentUser.email = newEmail;
+                localStorage.setItem('fitran_player', JSON.stringify(currentUser));
+                
+                showEmailMessage('Email update initiated! Please check your NEW email inbox to confirm the change.', false);
+
+            } catch (err) {
+                let message = 'Failed to update email. Please try again.';
+                if (err.message.includes('unique constraint')) {
+                    message = 'This email address is already in use by another player.';
+                }
+                // Add specific error for Supabase Auth email already registered
+                else if (err.message.includes('AuthApiError: Email already registered')) {
+                    message = 'This email address is already registered.';
+                }
+                showEmailMessage(message, true);
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save Email';
+            }
         });
     }
 });

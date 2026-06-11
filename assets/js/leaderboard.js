@@ -25,24 +25,24 @@ async function fetchLeaderboard() {
 
     try {
         let query = window.supabaseClient
-            .from('leaderboard') // TODO: Make sure your table is named 'leaderboard'
-            .select('*', { count: 'exact' });
+            .from('leaderboard')
+            .select('total_score, game_type, user_profiles(username)', { count: 'exact' }); // More specific select
         
         // Filter by game if not 'all'
         if (currentGameFilter !== 'all') {
-            query = query.eq('game_name', currentGameFilter);
+            query = query.eq('game_type', currentGameFilter); // Changed from game_name to game_type
         }
 
         // Search by player name
         if (currentSearch) {
-            query = query.ilike('player_name', `%${currentSearch}%`);
+            query = query.ilike('user_profiles.username', `%${currentSearch}%`); // Changed from players.username to user_profiles.username
         }
 
         // Pagination & Ordering (highest score first)
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
 
-        query = query.order('score', { ascending: false })
+        query = query.order('total_score', { ascending: false }) // Changed from score to total_score
                      .range(from, to);
 
         const { data, error, count } = await query;
@@ -76,11 +76,11 @@ function renderLeaderboard(data) {
         
         const nameSpan = document.createElement('span');
         nameSpan.className = 'lb-name';
-        nameSpan.textContent = `${rank}. ${entry.player_name}`;
+        nameSpan.textContent = `${rank}. ${entry.user_profiles ? entry.user_profiles.username : 'Unknown Player'}`; // Safely access username
 
         const scoreSpan = document.createElement('span');
         scoreSpan.className = 'lb-score';
-        scoreSpan.textContent = `${entry.score.toLocaleString()} pts`;
+        scoreSpan.textContent = `${entry.total_score.toLocaleString()} pts`; // Changed from entry.score to entry.total_score
 
         li.appendChild(nameSpan);
         li.appendChild(scoreSpan);
