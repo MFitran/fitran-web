@@ -1,10 +1,8 @@
 // --- SUPABASE CONFIGURATION ---
-// TODO: Replace with your actual Supabase project URL and anon key
-const SUPABASE_URL = 'https://wwapndvliynmdeejtryz.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_h2mFkHzvYdG9YJxh83FrRQ_w2KkTCtb';
+// Supabase credentials are now loaded from config.js
 
 // Initialize Supabase Client
-window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
 
 // --- LEADERBOARD STATE ---
 let currentPage = 0;
@@ -28,23 +26,23 @@ async function fetchLeaderboard() {
     try {
         let query = window.supabaseClient
             .from('leaderboard') // TODO: Make sure your table is named 'leaderboard'
-            .select('*, players!inner(username)', { count: 'exact' });
+            .select('*', { count: 'exact' });
         
         // Filter by game if not 'all'
         if (currentGameFilter !== 'all') {
-            query = query.eq('game_type', currentGameFilter);
+            query = query.eq('game_name', currentGameFilter);
         }
 
         // Search by player name
         if (currentSearch) {
-            query = query.ilike('players.username', `%${currentSearch}%`);
+            query = query.ilike('player_name', `%${currentSearch}%`);
         }
 
-        // Pagination
+        // Pagination & Ordering (highest score first)
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
 
-        query = query.order('total_score', { ascending: false })
+        query = query.order('score', { ascending: false })
                      .range(from, to);
 
         const { data, error, count } = await query;
@@ -78,13 +76,11 @@ function renderLeaderboard(data) {
         
         const nameSpan = document.createElement('span');
         nameSpan.className = 'lb-name';
-        const playerName = entry.players ? entry.players.username : 'Unknown';
-        nameSpan.textContent = `${rank}. ${playerName}`;
+        nameSpan.textContent = `${rank}. ${entry.player_name}`;
 
         const scoreSpan = document.createElement('span');
         scoreSpan.className = 'lb-score';
-        const scoreValue = entry.total_score || 0;
-        scoreSpan.textContent = `${scoreValue.toLocaleString()} pts`;
+        scoreSpan.textContent = `${entry.score.toLocaleString()} pts`;
 
         li.appendChild(nameSpan);
         li.appendChild(scoreSpan);
@@ -130,8 +126,8 @@ gameFilter.addEventListener('change', (e) => {
 // --- INITIAL LOAD ---
 document.addEventListener('DOMContentLoaded', () => {
     // Check if the keys are placeholders
-    if (SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
-        leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #ffcc00; font-size: 14px;">Supabase not configured. Add URL and Key in leaderboard.js</span></li>';
+    if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.URL) {
+        leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #ffcc00; font-size: 14px;">Supabase not configured. Check config.js</span></li>';
         return;
     }
     

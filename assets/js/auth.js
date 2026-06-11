@@ -19,19 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     function initAuth() {
-        // If leaderboard.js already created a valid client instance, use it.
-        // Otherwise, look for the global window.supabase object loaded via CDN script tag.
-        if (typeof supabase !== 'undefined' && supabase.auth) {
-            localSupabase = supabase;
-        } else if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-            // Backup fallback config using your public settings
-            const supabaseUrl = 'https://wwapndvliynmdeejtryz.supabase.co';
-            const supabaseKey = 'sb_publishable_h2mFkHzvYdG9YJxh83FrRQ_w2KkTCtb';
-            localSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Use the client instance created in leaderboard.js, which uses config.js
+        if (window.supabaseClient) {
+            localSupabase = window.supabaseClient;
+        } else {
+            console.error('Supabase client not found. Make sure config.js and leaderboard.js are loaded before auth.js.');
+            showAuthMessage('Authentication service unavailable.');
+            return;
         }
 
         if (!localSupabase || !localSupabase.auth) {
-            console.error('Supabase Auth client unavailable. Check your CDN script tag in <head>.');
+            console.error('Supabase Auth client is invalid. Check Supabase client initialization.');
             showAuthMessage('Authentication service unavailable.');
             return;
         }
