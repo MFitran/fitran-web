@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const playAgainBtn = document.getElementById('tictactoe-play-again-btn');
 
     // --- AUDIO ---
-    const playerMoveSound = new Audio('assets/draw_x.mp3');
-    const botMoveSound = new Audio('assets/draw_circle.mp3');
-    const winSound = new Audio('assets/win.mp3');
-    const loseSound = new Audio('assets/lose.mp3');
-    const tieSound = new Audio('assets/tie.mp3');
+    const playerMoveSound = new Audio('assets/draw_x.MP3');
+    const botMoveSound = new Audio('assets/draw_circle.MP3');
+    const winSound = new Audio('assets/win.MP3');
+    const loseSound = new Audio('assets/lose.MP3');
+    const tieSound = new Audio('assets/tie.MP3');
 
     // --- GAME STATE ---
     const PLAYER = 'X';

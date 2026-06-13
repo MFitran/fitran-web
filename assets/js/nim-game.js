@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const nimControls = document.getElementById('nim-controls');
     const nimActionBar = document.getElementById('nim-action-bar');
     // --- AUDIO ---
-    const pickSound = new Audio('assets/match_stick_pick.mp3');
-    const winSound = new Audio('assets/win.mp3');
-    const loseSound = new Audio('assets/lose.mp3');
-    const startGameSound = new Audio('assets/start_game.mp3');
+    const pickSound = new Audio('assets/match_stick_pick.MP3');
+    const winSound = new Audio('assets/win.MP3');
+    const loseSound = new Audio('assets/lose.MP3');
+    const startGameSound = new Audio('assets/start_game.MP3');
     // --- GAME STATE ---
     let totalSticks = 0;
     let initialTotalSticks = 21; // Default starting sticks
