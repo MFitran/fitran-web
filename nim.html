@@ -132,29 +132,32 @@
                         <div id="nim-bottom-panel" class="nim-bottom-panel">
                             <div id="nim-initial-setup">
                                 <p>How many sticks do you want to start with?</p>
-                                <input type="number" id="nim-initial-sticks-input" value="21" min="5" max="50">
-                                <button id="nim-start-game-btn" class="post-btn">Start Game</button>
+                                <div class="nim-start-controls">
+                                    <input type="number" id="nim-initial-sticks-input" value="21" min="21" max="50">
+                                    <button id="nim-start-game-btn" class="post-btn">Start Game</button>
+                                </div>
                             </div>
                             <p id="nim-message" class="nim-message" style="display: none;">Your turn. Take 1, 2, or 3 sticks.</p>
-                            <div id="nim-controls" class="nim-controls" style="display: none;">
-                                <button class="post-btn" data-move="1">Take 1</button>
-                                <button class="post-btn" data-move="2">Take 2</button>
-                                <button class="post-btn" data-move="3">Take 3</button>
+                            <div id="nim-action-bar" class="nim-action-bar" style="display: none;">
+                                <button id="nim-restart-btn" class="post-btn nim-restart-btn">Restart</button>
+                                <div id="nim-controls" class="nim-controls">
+                                    <button class="post-btn" data-move="1">Take 1</button>
+                                    <button class="post-btn" data-move="2">Take 2</button>
+                                    <button class="post-btn" data-move="3">Take 3</button>
+                                </div>
                             </div>
-                            <button id="nim-restart-btn" class="post-btn nim-restart-btn" style="display: none;">Restart</button>
                         </div>
                     </div>
                 </div>
                 <div class="box" style="margin-top: 30px;">
-                    <h3>About The Game of Nim</h3>
-                    <p>Nim is a mathematical game of strategy in which two players take turns removing objects from distinct heaps or piles. On each turn, a player must remove at least one object, and may remove any number of objects provided they all come from the same heap.</p>
-                    <p style="margin-top: 10px;">The version you are playing is a variant called "21", where there is only one pile. The rules are:</p>
+                    <h3>About The Game of <span class="rgb-word">Nim</span></h3>
+                    <p>Nim is a mathematical game of strategy in which two players take turns removing objects from a pile. On each turn, a player must remove at least one object, and may remove at most 3 of objects.</p>
+                    <p style="margin-top: 10px;">The version you are playing is a variant called "21". The rules are:</p>
                     <ul style="margin-left: 20px; margin-top: 10px;">
                         <li>A number of sticks are placed on the table.</li>
                         <li>Players can remove 1, 2, or 3 sticks on their turn.</li>
                         <li>The player who is forced to take the last stick loses (this is called a misère game).</li>
                     </ul>
-                    <p style="margin-top: 10px;">The bot uses a winning strategy based on modulo arithmetic. Can you find a way to beat it?</p>
                 </div>
             </div>
         </div>

@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- State ---
     let currentUser = null;
     let localSupabase = null;
+    let scoreSubscription = null; // To manage the realtime subscription
 
     // --- Initialization ---
     function initAuth() {
@@ -65,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .from('leaderboard')
                 .select('total_score')
                 .eq('player_id', currentUser.id)
+                .eq('game_type', 'all')
                 .maybeSingle();
 
             if (scoreError) console.error('Error fetching user score:', scoreError);
@@ -85,6 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (profileUsername) profileUsername.textContent = currentUser.user_metadata?.username || 'N/A';
         if (profileScore) profileScore.textContent = currentUser.score || 0;
         if (profileEmail) profileEmail.value = currentUser.email || '';
+
+        // Start listening for this user's score updates in real-time
+        listenForScoreUpdates();
     }
 
     function showUnloggedView() {
@@ -92,6 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loggedView) loggedView.style.display = 'none';
         if (authForm) authForm.reset();
         hideAuthMessage();
+
+        // Clean up the subscription when the user logs out to prevent memory leaks
+        if (scoreSubscription) {
+            localSupabase.removeChannel(scoreSubscription)
+                .then(() => {
+                    scoreSubscription = null;
+                    console.log('Unsubscribed from score updates.');
+                });
+        }
     }
 
     function showAuthMessage(msg, isError = true) {
@@ -103,6 +117,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideAuthMessage() {
         if (authMessage) authMessage.style.display = 'none';
+    }
+
+    // Listen for realtime changes to the current user's score
+    function listenForScoreUpdates() {
+        // Ensure we don't create duplicate subscriptions
+        if (scoreSubscription || !currentUser || !localSupabase) return;
+
+        scoreSubscription = localSupabase
+            .channel(`public:leaderboard:player_id=eq.${currentUser.id}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'leaderboard',
+                    filter: `player_id=eq.${currentUser.id}`
+                },
+                (payload) => {
+                    console.log('User score change detected!', payload);
+                    // We only care about the 'all' game type for the profile card
+                    if (payload.new && payload.new.game_type === 'all') {
+                        const newScore = payload.new.total_score || 0;
+                        currentUser.score = newScore;
+                        if (profileScore) profileScore.textContent = newScore;
+                        // Also update the score in localStorage to keep it synced
+                        localStorage.setItem('fitran_player', JSON.stringify(currentUser));
+                    }
+                }
+            )
+            .subscribe();
     }
 
     // Helper function for email form messages
@@ -171,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     .from('leaderboard')
                     .select('total_score')
                     .eq('player_id', currentUser.id)
+                    .eq('game_type', 'all')
                     .maybeSingle();
 
                 if (scoreError) console.error('Error fetching user score on login:', scoreError);

@@ -28,10 +28,8 @@ async function fetchLeaderboard() {
             .from('leaderboard')
             .select('total_score, game_type, user_profiles(username)', { count: 'exact' }); // More specific select
         
-        // Filter by game if not 'all'
-        if (currentGameFilter !== 'all') {
-            query = query.eq('game_type', currentGameFilter); // Changed from game_name to game_type
-        }
+        // Always filter by the selected game type for consistent results
+        query = query.eq('game_type', currentGameFilter);
 
         // Search by player name
         if (currentSearch) {
@@ -132,4 +130,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     fetchLeaderboard();
+
+    // --- REALTIME SUBSCRIPTION ---
+    // Listen for any changes in the leaderboard table to make the UI dynamic.
+    const leaderboardSubscription = window.supabaseClient
+        .channel('public:leaderboard') // A descriptive channel name for this subscription
+        .on(
+            'postgres_changes',
+            {
+                event: '*', // Listen for INSERT, UPDATE, and DELETE events
+                schema: 'public',
+                table: 'leaderboard' // The table to monitor
+            },
+            (payload) => {
+                console.log('Realtime change detected in leaderboard!', payload);
+                // When a change occurs, re-fetch the leaderboard data to update the UI.
+                fetchLeaderboard();
+            }
+        )
+        .subscribe();
 });

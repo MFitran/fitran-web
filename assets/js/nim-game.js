@@ -14,15 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const sticksContainer = document.getElementById('nim-sticks-container');
     const nimMessage = document.getElementById('nim-message');
     const nimControls = document.getElementById('nim-controls');
+    const nimActionBar = document.getElementById('nim-action-bar');
+    // --- AUDIO ---
+    const pickSound = new Audio('assets/match_stick_pick.mp3');
+    const winSound = new Audio('assets/win.mp3');
+    const loseSound = new Audio('assets/lose.mp3');
+    const startGameSound = new Audio('assets/start_game.mp3');
     // --- GAME STATE ---
     let totalSticks = 0;
     let initialTotalSticks = 21; // Default starting sticks
     let isPlayerTurn = true;
+    let playerStartedGame = true; // To track who started for record-keeping
     let isGameOver = false;
+    let gameRecord = [];
     const GAME_TYPE = 'nim';
     const WIN_SCORE = 100;
 
-    async function renderSticksSequentially() {
+    function renderSticksSequentially() {
         sticksContainer.innerHTML = ''; // Clear previous sticks
 
         const containerRect = sticksContainer.getBoundingClientRect();
@@ -51,51 +59,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Appear one by one
         for (const stick of stickElements) {
-            await new Promise(resolve => setTimeout(resolve, 50)); // 50ms delay between each stick
             stick.classList.add('visible');
         }
     }
 
-    function animateStickRemoval(count) {
+    async function animateStickRemoval(count) {
         const sticks = Array.from(sticksContainer.querySelectorAll('.nim-stick.visible:not(.removed)'));
         for (let i = 0; i < count; i++) {
             if (sticks.length > 0) {
                 const stickToRemove = sticks.pop(); // Take from the end for simplicity
+
+                if (pickSound) {
+                    pickSound.currentTime = 0;
+                    pickSound.play().catch(e => console.error("Audio play failed:", e));
+                }
+
                 stickToRemove.classList.add('removed');
                 // Remove from DOM after animation
                 stickToRemove.addEventListener('transitionend', () => {
                     stickToRemove.remove();
                 }, { once: true });
+
+                await new Promise(resolve => setTimeout(resolve, 150)); // Halved the delay for a faster feel
             }
         }
     }
 
     function startGame() {
+        if (startGameSound) {
+            startGameSound.play().catch(e => console.error("Audio play failed:", e));
+        }
+
         initialTotalSticks = parseInt(initialSticksInput.value, 10);
-        if (isNaN(initialTotalSticks) || initialTotalSticks < 5 || initialTotalSticks > 50) {
-            alert('Please enter a number of sticks between 5 and 50.');
+        if (isNaN(initialTotalSticks) || initialTotalSticks < 21 || initialTotalSticks > 50) {
+            alert('Please enter a number of sticks between 21 and 50.');
             return;
         }
 
         totalSticks = initialTotalSticks;
-        isPlayerTurn = true;
+        isPlayerTurn = true; // Player always starts
+        playerStartedGame = true;
         isGameOver = false;
+        gameRecord = [`${initialTotalSticks}`];
 
         initialSetupSection.style.display = 'none';
-        restartBtn.style.display = 'block';
-        nimMessage.textContent = `Your turn, ${totalSticks} match sticks left.`;
-        nimMessage.style.color = '#E0E0E0';
+        nimActionBar.style.display = 'flex';
         nimMessage.style.display = 'block';
-        nimControls.style.display = 'flex';
-        nimControls.querySelectorAll('button').forEach(btn => btn.disabled = false);
 
         renderSticksSequentially();
+
+        nimMessage.textContent = 'Your turn.';
+        nimControls.querySelectorAll('button').forEach(btn => btn.disabled = false);
     }
 
-    function playerMove(sticksToRemove) {
+    async function playerMove(sticksToRemove) {
         if (!isPlayerTurn || isGameOver || sticksToRemove > totalSticks || sticksToRemove <= 0) return;
 
-        animateStickRemoval(sticksToRemove);
+        isPlayerTurn = false;
+        nimControls.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+        gameRecord.push(sticksToRemove);
+        await animateStickRemoval(sticksToRemove);
         totalSticks -= sticksToRemove;
 
         if (totalSticks === 0) {
@@ -103,13 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        isPlayerTurn = false;
         nimMessage.textContent = 'Bot is thinking...';
-        nimControls.querySelectorAll('button').forEach(btn => btn.disabled = true);
-        setTimeout(botMove, 1500);
+        setTimeout(botMove, 800); // Faster bot thinking
     }
 
-    function botMove() {
+    async function botMove() {
         // Winning strategy: leave a number of sticks that is 1 mod 4
         const remainder = totalSticks % 4;
         let sticksToTake = 0;
@@ -127,8 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sticksToTake = Math.min(sticksToTake, totalSticks, 3);
         if (sticksToTake === 0) sticksToTake = 1; // Failsafe if totalSticks is 1, 2, or 3
 
+        gameRecord.push(sticksToTake);
         nimMessage.textContent = `Bot takes ${sticksToTake} stick(s).`;
-        animateStickRemoval(sticksToTake);
+        await animateStickRemoval(sticksToTake);
         totalSticks -= sticksToTake;
         setTimeout(() => {
             if (totalSticks === 0) {
@@ -136,20 +159,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             isPlayerTurn = true;
-            nimMessage.textContent = `Your turn, ${totalSticks} match sticks left.`;
+            nimMessage.textContent = `Your turn.`;
             nimControls.querySelectorAll('button').forEach(btn => btn.disabled = false);
-        }, 800);
+        }, 400); // Faster turn transition
+    }
+
+    function formatGameRecord(recordArray) {
+        if (!recordArray || recordArray.length < 1) return '';
+        const initialSticks = recordArray[0];
+        const moves = recordArray.slice(1);
+        let formattedString = `${initialSticks}`;
+        let turnCounter = 1;
+        
+        // The player always starts, so moves are in pairs of (player, bot).
+        // This format numbers each turn pair. e.g., "21 1. 3 1 2. 2 2"
+        for (let i = 0; i < moves.length; i += 2) {
+            const playerMove = moves[i];
+            const botMove = moves[i + 1] !== undefined ? ` ${moves[i + 1]}` : '';
+            formattedString += ` ${turnCounter}. ${playerMove}${botMove}`;
+            turnCounter++;
+        }
+        
+        return formattedString;
+    }
+
+    async function saveMatchRecord(score) {
+        const user = JSON.parse(localStorage.getItem('fitran_player'));
+        if (!window.supabaseClient) {
+            console.log('Supabase client not available. Match record not saved.');
+            return;
+        }
+
+        const recordString = formatGameRecord(gameRecord);
+        const matchData = {
+            player_id: (user && user.id) ? user.id : null,
+            game_type: GAME_TYPE,
+            record: { moves: recordString },
+            score_earned: score
+        };
+
+        try {
+            const { error } = await window.supabaseClient
+                .from('matches')
+                .insert([matchData]);
+
+            if (error) throw error;
+            console.log('Match record saved successfully.');
+        } catch (error) {
+            console.error('Error saving match record:', error);
+        }
     }
 
     async function endGame(playerWon) {
         isGameOver = true;
-        nimControls.style.display = 'none';
+        nimActionBar.style.display = 'none';
         nimMessage.style.display = 'none';
-        restartBtn.style.display = 'none';
+
+        const score = playerWon ? WIN_SCORE : 0;
+        await saveMatchRecord(score);
 
         // Show overlay after a delay
         setTimeout(() => {
             setupOverlay.style.display = 'flex';
+            if (playerWon) {
+                if (winSound) winSound.play().catch(e => console.error("Audio play failed:", e));
+            } else {
+                if (loseSound) loseSound.play().catch(e => console.error("Audio play failed:", e));
+            }
         }, 1000);
         if (playerWon) {
             overlayTitle.textContent = 'You Win!';
@@ -171,20 +247,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        try {
-            const { error } = await window.supabaseClient.rpc('add_score', {
-                p_player_id: user.id,
-                p_game_type: gameType,
-                p_score_earned: score
-            });
+        const gameTypesToUpdate = [gameType, 'all'];
 
-            if (error) throw error;
+        try {
+            for (const type of gameTypesToUpdate) {
+                // Call the new, atomic database function to handle the score update.
+                const { error } = await window.supabaseClient.rpc('increment_score', {
+                    player_id_in: user.id,
+                    game_type_in: type,
+                    score_in: score
+                });
+                if (error) throw error;
+            }
 
             overlayMessage.textContent = `You win! Score of ${score} submitted.`;
             overlayMessage.style.color = '#4ade80';
-            // Optionally, refresh the leaderboard
-            // if (window.fetchLeaderboard) window.fetchLeaderboard();
-
         } catch (error) {
             console.error('Error submitting score:', error);
             overlayMessage.textContent = 'You win! But there was an error submitting your score.';
@@ -197,8 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initialSetupSection.style.display = 'flex';
         sticksContainer.innerHTML = '';
         nimMessage.style.display = 'none';
-        nimControls.style.display = 'none';
-        restartBtn.style.display = 'none';
+        nimActionBar.style.display = 'none';
     }
 
     // --- EVENT LISTENERS ---

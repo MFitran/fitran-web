@@ -306,11 +306,14 @@ header {
     background: #E0E0E0;
     color: #000000;
     padding: 10px;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
-    font-size: 0.9em;
     font-weight: bold;
     transition: transform 0.2s, background-color 0.2s, color 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: inherit; /* Ensure consistent font family */
+    font-size: 16px;
 }
 
 .post-btn:hover {
@@ -714,7 +717,7 @@ img.logo-github {
     position: relative;
     width: 100%;
     max-width: 800px;
-    height: 500px; /* Fixed height for the game area */
+    height: 450px; /* Shrunk height for a more compact view */
     overflow: hidden; /* Hide sticks flying off */
     display: flex;
     flex-direction: column;
@@ -735,7 +738,6 @@ img.logo-github {
 .nim-restart-btn {
     background-color: #442222;
     color: #f5c5c5;
-    margin-top: 10px;
 }
 
 .nim-overlay {
@@ -759,7 +761,6 @@ img.logo-github {
     border: 1px solid #333;
     max-width: 450px;
     width: 90%;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
 }
 
 .nim-overlay-content h3 {
@@ -809,7 +810,7 @@ img.logo-github {
     height: auto;
     transform-origin: bottom center; /* For rotation */
     opacity: 0;
-    transition: transform 0.5s ease-out, opacity 0.5s ease-out, left 0.3s, top 0.3s;
+    transition: transform 0.3s ease-out, opacity 0.25s ease-out, left 0.3s, top 0.3s;
 }
 
 .nim-stick.visible {
@@ -817,11 +818,20 @@ img.logo-github {
 }
 
 .nim-stick.removed {
-    transform: translateY(-200px) scale(0.5) rotate(45deg); /* Fly upward and fade */
     opacity: 0;
 }
 
-.nim-bottom-panel, #nim-initial-setup {
+.nim-bottom-panel {
+    flex: 1; /* Make it take up the remaining vertical space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center the controls within the fixed space */
+    gap: 15px;
+    width: 100%;
+}
+
+#nim-initial-setup {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -830,9 +840,9 @@ img.logo-github {
 }
 
 .nim-message {
-    color: #E0E0E0;
-    font-size: 18px;
-    min-height: 27px; /* Reserve space to prevent layout shift */
+    color: #A0A0A0;
+    font-size: 16px;
+    min-height: 26px; /* Adjusted for new font size */
     width: 100%;
     text-align: center;
 }
@@ -840,6 +850,19 @@ img.logo-github {
 .nim-controls {
     display: flex;
     gap: 15px;
+}
+
+.nim-start-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nim-action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 #nim-initial-setup p {
@@ -855,4 +878,205 @@ img.logo-github {
     background: #000;
     color: #E0E0E0;
     text-align: center;
+}
+
+/* --- TIC TAC TOE GAME --- */
+.tictactoe-game-box {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    min-height: 480px; /* Reduced height to remove excess bottom space */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tictactoe-back-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background-color: #222;
+    color: #aaa;
+    text-decoration: none;
+    z-index: 50;
+}
+
+.tictactoe-restart-btn {
+    background-color: #442222;
+    color: #f5c5c5;
+}
+
+.tictactoe-overlay {
+    position: absolute; /* Changed from fixed to be contained within the game box */
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 20px; /* Match the parent box */
+}
+
+.tictactoe-overlay-content {
+    background-color: #000;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    max-width: 450px;
+    width: 90%;
+}
+
+.tictactoe-overlay-content h3 {
+    color: #E0E0E0;
+    margin-bottom: 15px;
+}
+
+.tictactoe-overlay-content p {
+    color: #A0A0A0;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.tictactoe-game-area {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+}
+
+#tictactoe-message {
+    /* Match nim game message style */
+    color: #A0A0A0;
+    font-size: 16px;
+    min-height: 26px;
+    font-weight: normal; /* h3 is bold by default */
+}
+
+.tictactoe-board-wrapper {
+    padding: 20px;
+    border: 2px solid #333;
+    background-image: url('../paper_background.jpeg');
+    background-size: cover;
+    border-radius: 8px;
+}
+
+.tictactoe-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    position: relative; /* For drawing the winning line */
+}
+
+.tictactoe-cell {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #bdbdbd; /* Lighter grey for grid lines */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background-color: transparent;
+}
+
+/* Remove outer grid borders for a cleaner, hand-drawn look */
+.tictactoe-cell:nth-child(-n+3) { /* Top row */
+    border-top: none;
+}
+
+.tictactoe-cell:nth-child(n+7) { /* Bottom row */
+    border-bottom: none;
+}
+
+.tictactoe-cell:nth-child(3n+1) { /* Left column */
+    border-left: none;
+}
+
+.tictactoe-cell:nth-child(3n) { /* Right column */
+    border-right: none;
+}
+
+.tictactoe-cell:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.tictactoe-winning-line-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* So it doesn't block clicks */
+}
+
+.tictactoe-winning-line {
+    stroke: #222;
+    stroke-width: 5;
+    stroke-linecap: round;
+    /* Animation for drawing the line */
+    stroke-dasharray: 320; /* A value larger than any possible line length (diagonal is ~311) */
+    stroke-dashoffset: 320;
+    animation: draw-win-line 0.8s ease-out forwards;
+}
+
+.tictactoe-cell svg {
+    width: 100%;
+    height: 100%;
+}
+
+.x-line {
+    stroke: #3366CC; /* Blue for player */
+    stroke-width: 8;
+    stroke-linecap: round;
+    /* Length of diagonal is sqrt(40^2 + 40^2) */
+    stroke-dasharray: 57;
+    stroke-dashoffset: 57;
+    animation: draw 0.15s linear forwards;
+}
+
+.x-line2 {
+    animation-delay: 0.15s; /* Draw second line after the first */
+}
+
+.o-circle {
+    stroke: #D93025; /* Red for bot */
+    stroke-width: 8;
+    stroke-linecap: round;
+    fill: transparent;
+    /* Circumference is 2 * PI * 22 */
+    stroke-dasharray: 139;
+    stroke-dashoffset: 139;
+    animation: draw 0.3s linear forwards;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg); /* Start drawing from the top */
+}
+
+@keyframes draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw-win-line {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.tictactoe-bottom-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
 }
