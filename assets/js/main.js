@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.fetchEnvConfig = async function() {
     return {
-        SUPABASE_URL: process.env.SUPABASE_URL,
-        SUPABASE_KEY: process.env.SUPABASE_KEY
+        SUPABASE_URL: "https://wwapndvliynmdeejtryz.supabase.co",
+        SUPABASE_KEY: "sb_publishable_h2mFkHzvYdG9YJxh83FrRQ_w2KkTCtb"
     };
 }
 
