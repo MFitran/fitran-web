@@ -185,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveMatchRecord(score) {
         const user = JSON.parse(localStorage.getItem('fitran_player'));
-        if (!window.supabaseClient) {
+        const client = await window.getSupabaseClient();
+        if (!client) {
             console.log('Supabase client not available. Match record not saved.');
             return;
         }
@@ -199,8 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const { error } = await window.supabaseClient
-                .from('matches')
+            const { error } = await client.from('matches')
                 .insert([matchData]);
 
             if (error) throw error;
@@ -241,7 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function submitScore(gameType, score) {
         const user = JSON.parse(localStorage.getItem('fitran_player'));
-        if (!user || !user.id || !window.supabaseClient) { // Check for supabaseClient
+        const client = await window.getSupabaseClient();
+        if (!user || !user.id || !client) { // Check for supabaseClient
             overlayMessage.textContent = `You win! Score of ${score} not submitted. Please log in on the games page to save your score.`;
             overlayMessage.style.color = '#ffcc00';
             return;
@@ -252,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             for (const type of gameTypesToUpdate) {
                 // Call the new, atomic database function to handle the score update.
-                const { error } = await window.supabaseClient.rpc('increment_score', {
+                const { error } = await client.rpc('increment_score', {
                     player_id_in: user.id,
                     game_type_in: type,
                     score_in: score

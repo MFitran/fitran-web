@@ -294,7 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveMatchRecord(score) {
         const user = JSON.parse(localStorage.getItem('fitran_player'));
-        if (!window.supabaseClient) return;
+        const client = await window.getSupabaseClient();
+        if (!client) return;
 
         const recordString = formatGameRecord(gameRecord);
         const matchData = {
@@ -305,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const { error } = await window.supabaseClient.from('matches').insert([matchData]);
+            const { error } = await client.from('matches').insert([matchData]);
             if (error) throw error;
             console.log('Tic Tac Toe match record saved.');
         } catch (error) {
@@ -315,7 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function submitScore(gameType, score) {
         const user = JSON.parse(localStorage.getItem('fitran_player'));
-        if (!user || !user.id || !window.supabaseClient) {
+        const client = await window.getSupabaseClient();
+        if (!user || !user.id || !client) {
             overlayMessage.textContent = `You win! Score of ${score} not submitted. Please log in to save your score.`;
             overlayMessage.style.color = '#ffcc00';
             return;
@@ -323,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             for (const type of [gameType, 'all']) {
-                const { error } = await window.supabaseClient.rpc('increment_score', {
+                const { error } = await client.rpc('increment_score', {
                     player_id_in: user.id,
                     game_type_in: type,
                     score_in: score

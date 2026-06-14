@@ -1,8 +1,5 @@
 // --- SUPABASE CONFIGURATION ---
-// Supabase credentials are now loaded from config.js
-
-// Initialize Supabase Client
-window.supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
+// Supabase credentials are now loaded dynamically from .env via main.js fetchEnvConfig
 
 // --- LEADERBOARD STATE ---
 let currentPage = 0;
@@ -24,7 +21,10 @@ async function fetchLeaderboard() {
     leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #666;">Loading...</span></li>';
 
     try {
-        let query = window.supabaseClient
+        const client = await window.getSupabaseClient();
+        if (!client) throw new Error("Supabase client not initialized.");
+
+        let query = client
             .from('leaderboard')
             .select('total_score, game_type, user_profiles(username)', { count: 'exact' }); // More specific select
         
@@ -122,10 +122,10 @@ gameFilter.addEventListener('change', (e) => {
 });
 
 // --- INITIAL LOAD ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if the keys are placeholders
-    if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.URL) {
-        leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #ffcc00; font-size: 14px;">Supabase not configured. Check config.js</span></li>';
+document.addEventListener('DOMContentLoaded', async () => {
+    const client = await window.getSupabaseClient();
+    if (!client) {
+        leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #ffcc00; font-size: 14px;">Supabase not configured. Check .env</span></li>';
         return;
     }
     
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- REALTIME SUBSCRIPTION ---
     // Listen for any changes in the leaderboard table to make the UI dynamic.
-    const leaderboardSubscription = window.supabaseClient
+    const leaderboardSubscription = client
         .channel('public:leaderboard') // A descriptive channel name for this subscription
         .on(
             'postgres_changes',

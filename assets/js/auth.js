@@ -22,35 +22,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let scoreSubscription = null; // To manage the realtime subscription
 
     // --- Initialization ---
-    function initAuth() {
-        // Use the client instance created in leaderboard.js, which uses config.js
-        if (window.supabaseClient) {
-            localSupabase = window.supabaseClient;
-        } else {
-            console.error('Supabase client not found. Make sure config.js and leaderboard.js are loaded before auth.js.');
+    async function initAuth() {
+        localSupabase = await window.getSupabaseClient();
+        if (!localSupabase) {
+            console.error('Supabase client not found.');
             showAuthMessage('Authentication service unavailable.');
             return;
         }
 
-        // Check for URL messages from other pages (e.g., password reset)
         const urlParams = new URLSearchParams(window.location.search);
         const message = urlParams.get('message');
         if (message === 'password-changed') {
             showAuthMessage('Your password has been changed successfully! Please log in.', false);
-            // Clean the URL to prevent the message from showing on refresh
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         if (!localSupabase || !localSupabase.auth) {
-            console.error('Supabase Auth client is invalid. Check Supabase client initialization.');
+            console.error('Supabase Auth client is invalid.');
             showAuthMessage('Authentication service unavailable.');
             return;
         }
         checkLoginSession();
     }
 
-    // Run initialization
-    setTimeout(initAuth, 150);
+    initAuth();
 
     // --- Functions ---
     async function checkLoginSession() {

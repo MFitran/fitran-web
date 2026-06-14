@@ -263,17 +263,18 @@ header {
 .post-desc {
     font-size: 0.9em;
     margin: 0;
+}
+
+.post-text-content {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: pre-wrap; /* Preserves newlines natively */
 }
 
-.post-desc.expanded {
+.post-text-content.expanded {
     -webkit-line-clamp: unset;
-    display: block;
 }
 
 .read-more-btn {
@@ -286,6 +287,7 @@ header {
     text-decoration: underline;
     text-align: left;
     align-self: flex-start;
+    margin-top: 8px;
 }
 
 .read-more-btn:hover {
