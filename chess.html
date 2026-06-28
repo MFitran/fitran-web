@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess - fitran</title>
+    <link rel="stylesheet" href="assets/css/style.css?v=2">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <!-- Chessboard CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
+    <style>
+        /* Dark theme tweaks for chessboard */
+        .white-1e1d7 { background-color: #606060; color: #E0E0E0; } /* Dark Gray for light squares */
+        .black-3c85d { background-color: #303030; color: #E0E0E0; } /* Very Dark Gray for dark squares */
+
+        /* Remove chessboard.js default yellow highlight on drag */
+        .highlight1-32417, .highlight2-9c5d2 {
+            -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        /* For highlighting legal moves */
+        .highlight-legal {
+            /* Blue circle in the center of the square */
+            background-image: radial-gradient(circle, rgba(80, 150, 255, 0.5) 25%, transparent 26%);
+            background-position: center;
+        }
+
+        /* For highlighting the selected piece's square */
+        .highlight-selected {
+            background-color: rgba(173, 216, 230, 0.4); /* light blue */
+        }
+
+        /* Let clicks pass through chessboard.js coordinate labels to the square behind them */
+        .notation-322f9 {
+            pointer-events: none;
+        }
+
+        /* Prevent page scroll on mobile when dragging pieces */
+        #board {
+            touch-action: none;
+        }
+
+        /* Chess Tutorial Overlay */
+        .chess-tutorial-overlay {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .chess-tutorial-content {
+            background-color: #000;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #333;
+            max-width: 280px;
+            width: 90%;
+        }
+
+        /* Material Containers */
+        .material-container {
+            width: 100%;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 1.3em;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <!-- Chess Tutorial Popup Overlay -->
+    <div id="chess-tutorial-overlay" class="chess-tutorial-overlay" style="display: none;">
+        <div class="chess-tutorial-content">
+            <video height="100%" width="100%" autoplay loop muted playsinline style="border-radius: 8px; border: none; outline: none;">
+                <source src="assets/how_to_move_chess.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <p style="color: #A0A0A0; font-size: 12px; margin-bottom: 15px; line-height: 1.4;">
+                <span style="font-weight: bold;">How to make a move:</span> Drag and drop the piece you wish to move. Same rule apply for mobile web page.
+            </p>
+            <button id="close-tutorial-btn" class="post-btn" style="width: 100%;">OK</button>
+        </div>
+    </div>
+
+    <!-- Promotion Selection Overlay -->
+    <div id="promotion-overlay" class="chess-tutorial-overlay" style="display: none; background-color: rgba(0, 0, 0, 0.7);">
+        <div id="promotion-choices" style="background: #1a1a1a; padding: 20px; border-radius: 10px; display: flex; gap: 15px; border: 1px solid #333;">
+            <!-- Promotion piece choices will be injected here by JS -->
+        </div>
+    </div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title"> 
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside id="dashboard-sidebar" class="dashboard-sidebar">
+            <div class="sidebar-nav">
+                <a href="games.html" class="sidebar-back">
+                    <span class="sidebar-back__arrow">&#8592;</span>
+                    Back to Games
+                </a>
+                <div style="border-top: 1px solid #181818; margin: 0 0 12px 0;"></div>
+                <p class="menu-label">User Profile</p>
+
+                <!-- Authentication & Profile Container -->
+                <div class="box auth-container" style="padding: 20px; border-radius: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; margin-bottom: 0;">
+                    <!-- Login/Signup View -->
+                    <div id="auth-unlogged" style="display: block;">
+                        <h3 style="margin-bottom: 15px; font-size: 16px;">Player Login</h3>
+                        <form id="auth-form" style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="text" id="auth-username" placeholder="Username" style="padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #E0E0E0; font-size: 14px;" required>
+                            <input type="password" id="auth-password" placeholder="Password" style="padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #E0E0E0; font-size: 14px;" required>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" id="auth-login-btn" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: #E0E0E0; color: #000; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 13px;">Login</button>
+                                <button type="button" id="auth-signup-btn" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #111; color: #B0B0B0; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 13px;">Sign Up</button>
+                            </div>
+                            <div id="auth-message" style="font-size: 13px; color: #ff6b6b; display: none; text-align: center;"></div>
+                            <div style="text-align: center;">
+                                <a href="reset_password.html" style="color: #A0A0A0; font-size: 13px; text-decoration: none;">Forgot Password?</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Logged In Profile View -->
+                    <div id="auth-logged" style="display: none; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 14px; color: #A0A0A0;">
+                                <strong>Username:</strong> <span id="profile-username" style="color: #E0E0E0;">-</span>
+                            </div>
+                            <button id="auth-logout-btn" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #333; background: #111; color: #B0B0B0; font-size: 11px; cursor: pointer; transition: background 0.2s;">Logout</button>
+                        </div>
+                        <div style="font-size: 14px; color: #A0A0A0;">
+                            <strong>Score:</strong> <span id="profile-score" style="color: #E0E0E0;">-</span> 
+                        </div>
+                        <form id="email-form" style="display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
+                            <label for="profile-email" style="font-size: 14px; color: #A0A0A0; display: block;"><strong>Email:</strong></label>
+                            <input type="email" id="profile-email" placeholder="your@email.com" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #E0E0E0; font-size: 14px;" required>
+                            <p style="font-size: 11px; color: #666; line-height: 1.3;">Change to your active email for password reset.</p>
+                            <button type="submit" id="email-save-btn" style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: #E0E0E0; color: #000; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 13px;">Save Email</button>
+                            <div id="email-message" style="font-size: 13px; display: none; text-align: center;"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Game Switcher Menu -->
+                <div class="sidebar-menu">
+                    <p class="menu-label">Play Games</p>
+                    <a href="chess.html" class="menu-item active">♟️ Chess</a>
+                    <a href="nim.html" class="menu-item">🥢 Nim Game</a>
+                    <a href="tictactoe.html" class="menu-item">❌⭕ Tic Tac Toe</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <!-- Chess Game Box -->
+            <div class="box chess-game-box" style="position: relative; display: flex; flex-direction: column; align-items: center; min-height: 480px; padding: 20px 15px;">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                    <div style="display: flex; flex-direction: column; width: 100%; max-width: 400px;">
+                        <div id="top-material" class="material-container" style="margin-bottom: 8px; justify-content: flex-end;"></div>
+                        <div id="board" style="width: 100%; max-width: 400px; margin-bottom: 5px;"></div>
+                        
+                        <div id="bottom-material" class="material-container" style="margin-top: 8px; justify-content: flex-start;"></div>
+
+                        <div id="status" style="color: #888; font-family: monospace; text-align: center; margin-top: 15px; margin-bottom: 10px; font-size: 0.9em; min-height: 1.2em;">Loading Model...</div>
+
+                        <div class="control-panel" style="display: flex; gap: 10px;">
+                            <select id="color-select" style="flex: 1; padding: 8px 16px; font-size: 14px; border-radius: 8px; background: #000; color: #E0E0E0; border: 1px solid #333; font-family: inherit; text-align: center; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23E0E0E0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-13z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.65em auto;">
+                                <option value="w">Play as White</option>
+                                <option value="b">Play as Black</option>
+                            </select>
+                            <button id="start-game-btn" class="post-btn" style="flex: 1;">Start</button>
+                            <button id="undo-btn" class="post-btn" style="flex: 1; display: none; background-color: #4a4a2a; color: #f5f5c5;">Undo (-100 score)</button>
+                            <button id="restart-btn" class="post-btn nim-restart-btn" style="flex: 1; display: none;">Restart</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 200px; max-width: 250px;">
+                        <div class="move-log-container" style="width: 100%; background: #111; border: 1px solid #333; border-radius: 8px; padding: 10px; display: flex; flex-direction: column;">
+                            <h3 style="margin-top: 0; color: #E0E0E0; text-align: center; font-size: 1.2em; border-bottom: 1px solid #333; padding-bottom: 10px;">Move Log</h3>
+                            <div id="move-log" style="flex: 1; overflow-y: auto; max-height: 440px; color: #A0A0A0; font-family: monospace; font-size: 1em; padding-right: 5px; display: flex; flex-direction: column; gap: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-Column Grid: LLM Bot Chat & Leaderboards -->
+            <div class="dashboard-grid-2col">
+                <div class="box interactive-personality" style="margin: 0; border-radius: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; padding: 24px;">
+                    <h3 style="margin-bottom: 15px; font-size: 18px; color: #fff;">Chat with Fitran (Bot)</h3>
+                    <div class="chat-container">
+                        <div class="chat-message bot-message">
+                            <img src="assets/bot_avatar_gemini_generated.png" alt="Fitran Bot" class="bot-avatar">
+                            <div class="message-content">Hello! I'm Fitran's AI assistant. Ready to play some games?</div>
+                        </div>
+                        <div class="chat-input-placeholder">
+                            <input type="text" placeholder="LLM Integration Coming Soon..." disabled>
+                            <button disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box leaderboards" style="margin: 0; border-radius: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="margin: 0; font-size: 18px; color: #fff;">Leaderboards</h3>
+                        <div class="leaderboard-search">
+                            <input type="text" id="leaderboard-search-input" placeholder="Find player..." style="padding: 6px 12px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div class="leaderboard-container">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 id="leaderboard-game-title" style="color: #B0B0B0; margin: 0; font-size: 14px;">Overall Scores</h4>
+                            <select id="leaderboard-game-filter" style="background: #111; color: #E0E0E0; border: 1px solid #333; border-radius: 4px; padding: 4px; font-size: 13px; cursor: pointer;">
+                                <option value="all">All Games</option>
+                                <option value="chess" selected>Chess</option>
+                                <option value="nim">Nim Game</option>
+                                <option value="tictactoe">Tic Tac Toe</option>
+                            </select>
+                        </div>
+                        <ol class="leaderboard-list" id="leaderboard-list" style="margin-bottom: 15px;">
+                            <li><span class="lb-name" style="color: #666;">Loading...</span></li>
+                        </ol>
+                        <div class="leaderboard-pagination" style="display: flex; justify-content: flex-start; align-items: center;">
+                            <button id="leaderboard-prev-btn" class="next-btn" style="margin-right: 10px; padding: 6px 12px; font-size: 13px;" disabled>&larr; Prev</button>
+                            <button id="leaderboard-next-btn" class="next-btn" style="padding: 6px 12px; font-size: 13px;">Next &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Accordion -->
+            <details class="accordion-rules">
+                <summary>About The Game of Chess</summary>
+                <div class="rules-content">
+                    <p>Chess is a board game for two players, called White and Black, each controlling an army of chess pieces in their color. The objective of the game is to checkmate the opponent's king.</p>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <p style="margin-bottom: 12px; color: #A0A0A0; font-size: 15px;">New to chess? Learn all the rules from scratch.</p>
+                        <a href="chess_tutorial.html" style="display: block; width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; background: #E0E0E0; color: #000; font-weight: bold; text-decoration: none; transition: background 0.2s;">Read our Chess Beginner's Guide</a>
+                    </div>
+                </div>
+            </details>
+        </main>
+    </div>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/games-sidebar.js"></script>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/leaderboard.js"></script>
+    <script src="assets/js/auth.js"></script>
+
+    <!-- Chess Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <script src="assets/js/chess.js"></script>
+    
+    <!-- Hybrid Bot Controller -->
+    <script src="assets/js/chess-bot-controller.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tutorialOverlay = document.getElementById('chess-tutorial-overlay');
+            const closeTutorialBtn = document.getElementById('close-tutorial-btn');
+
+            tutorialOverlay.style.display = 'flex';
+
+            closeTutorialBtn.addEventListener('click', () => {
+                tutorialOverlay.style.display = 'none';
+            });
+        });
+        window.addEventListener('resize', () => {
+            if (window.board) {
+                window.board.resize();
+            }
+        });
+    </script>
+</body>
+</html>

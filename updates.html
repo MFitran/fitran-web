@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fitran</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <style>
+        .profile-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+        }
+        .profile-section h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .profile-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .item-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            object-fit: contain;
+            background-color: #1a1a1a;
+            flex-shrink: 0;
+            padding: 2px;
+        }
+        .item-details { display: flex; flex-direction: column; gap: 2px; }
+        .item-title { font-size: 16px; font-weight: bold; margin: 0; color: #E0E0E0; }
+        .item-subtitle, .item-meta { font-size: 14px; color: #A0A0A0; margin: 0; }
+        .skill-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-tag {
+            background-color: #222;
+            color: #B0B0B0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+        .item-list.collapsed .profile-item:nth-child(n+4),
+        .skill-container.collapsed .skill-tag:nth-child(n+21) {
+            display: none;
+        }
+        .see-more-btn {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid #333;
+            color: #B0B0B0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .see-more-btn:hover {
+            background-color: #1a1a1a;
+            border-color: #555;
+            color: #E0E0E0;
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title"> 
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="page-wrap">
+        <main class="container">
+            <section id="linkedin-profile-section" class="box" style="margin-bottom: 50px; display: block;">
+                <!-- LinkedIn Profile will be dynamically injected here -->
+                <p style="text-align: center; color: #666;">Loading profile...</p>
+            </section>
+            <section id="all-updates">
+                <h2 class="section-title">All Updates</h2>
+                <div class="grid-2x2" id="linkedin-posts-container" data-limit="all">
+                    <!-- Posts will be dynamically injected here by main.js -->
+                    <div style="text-align: center; width: 100%; grid-column: span 1; color: #666;">Loading all updates...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const supabase = await window.getSupabaseClient();
+            if (!supabase) {
+                console.error('Supabase client not available for profile loading.');
+                return;
+            }
+
+            // --- Helper functions for rendering profile sections ---
+            function renderExperiences(experiences) {
+                if (!experiences || experiences.length === 0) return '';
+                const limit = 3;
+                const isCollapsible = experiences.length > limit;
+                const items = experiences.map(exp => `
+                    <div class="profile-item">
+                        <img src="${exp.companyLogo?.sizes?.[2]?.url || exp.companyLogo?.url || ''}" alt="${exp.companyName}" class="item-logo" onerror="this.style.display='none'">
+                        <div class="item-details">
+                            <h4 class="item-title">${exp.position}</h4>
+                            <p class="item-subtitle">${exp.companyName} &bull; ${exp.employmentType || ''}</p>
+                            <p class="item-meta">${exp.startDate?.text} - ${exp.endDate?.text} &bull; ${exp.duration}</p>
+                            <p class="item-meta">${exp.location}</p>
+                        </div>
+                    </div>
+                `).join('');
+                const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${experiences.length - limit})</button>` : '';
+                return `<div id="profile-experience" class="profile-section"><h3>Experience</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+            }
+
+            function renderProjects(projects) {
+                if (!projects || projects.length === 0) return '';
+                const limit = 3;
+                const isCollapsible = projects.length > limit;
+                const items = projects.map(proj => `
+                    <div class="profile-item">
+                        <div class="item-details">
+                            <h4 class="item-title">${proj.title}</h4>
+                            <p class="item-meta">${proj.duration}</p>
+                        </div>
+                    </div>
+                `).join('');
+                const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${projects.length - limit})</button>` : '';
+                return `<div id="profile-projects" class="profile-section"><h3>Projects</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+            }
+
+            function renderCertifications(certifications) {
+                if (!certifications || certifications.length === 0) return '';
+                const limit = 3;
+                const isCollapsible = certifications.length > limit;
+                const items = certifications.map(cert => `
+                    <div class="profile-item">
+                        ${cert.issuedByLogo?.url ? `<img src="${cert.issuedByLogo.url}" alt="${cert.issuedBy}" class="item-logo" onerror="this.style.display='none'">` : '<div class="item-logo" style="visibility: hidden;"></div>'}
+                        <div class="item-details">
+                            <h4 class="item-title">${cert.title}</h4>
+                            <p class="item-subtitle">${cert.issuedBy}</p>
+                            <p class="item-meta">${cert.issuedAt}</p>
+                        </div>
+                    </div>
+                `).join('');
+                const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${certifications.length - limit})</button>` : '';
+                return `<div id="profile-certifications" class="profile-section"><h3>Certifications</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+            }
+
+            function renderSkills(skills) {
+                if (!skills || skills.length === 0) return '';
+                const limit = 20;
+                const isCollapsible = skills.length > limit;
+                const items = skills.map(skill => {
+                    const hasPositions = skill.positions && skill.positions.length > 0;
+                    const titleAttr = hasPositions ? `title="Endorsed for: ${skill.positions.join(', ')}"` : '';
+                    return `<span class="skill-tag" ${titleAttr}>${skill.name}</span>`;
+                }).join('');
+                const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${skills.length - limit})</button>` : '';
+                return `<div id="profile-skills" class="profile-section"><h3>Skills</h3><div class="skill-container ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+            }
+
+            function renderLanguages(languages) {
+                if (!languages || languages.length === 0) return '';
+                const uniqueLanguages = [...new Map(languages.map(item => [item.name, item])).values()]; // Remove duplicates like "English"
+                const items = uniqueLanguages.map(lang => `
+                    <div class="profile-item" style="align-items: center;"><div class="item-details"><h4 class="item-title">${lang.name}</h4><p class="item-meta">${lang.proficiency}</p></div></div>`).join('');
+                return `<div id="profile-languages" class="profile-section"><h3>Languages</h3><div class="item-list">${items}</div></div>`;
+            }
+
+            const profileSection = document.getElementById('linkedin-profile-section');
+
+            profileSection.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('see-more-btn')) return;
+                
+                const section = e.target.closest('.profile-section');
+                const list = section.querySelector('.item-list, .skill-container');
+                if (!list) return;
+
+                const isCollapsed = list.classList.contains('collapsed');
+                const totalItems = list.children.length;
+                const limit = parseInt(list.dataset.limit, 10);
+
+                if (isCollapsed) {
+                    list.classList.remove('collapsed');
+                    e.target.textContent = 'See less';
+                } else {
+                    list.classList.add('collapsed');
+                    e.target.textContent = `See more (${totalItems - limit})`;
+                }
+
+                // Content layout shifted: recalculate offset position
+                if (window.initUpdatesSidebarScrollspy) {
+                    setTimeout(window.initUpdatesSidebarScrollspy, 50);
+                }
+            });
+
+            const BUCKET_NAME = 'linkedin-profile';
+            const FILE_NAME = 'profile.json';
+
+            async function loadLinkedInProfile() {
+                try {
+                    const client = window.supabase.createClient(
+                        window.envConfig.SUPABASE_URL,
+                        window.envConfig.SUPABASE_KEY,
+                        { 
+                            auth: { 
+                                persistSession: false,
+                                storageKey: 'sb-linkedin-profile-auth-token'
+                            } 
+                        }
+                    );
+                    const { data, error } = await client.storage.from(BUCKET_NAME).download(FILE_NAME);
+                    if (error) throw error;
+                    
+                    const text = await data.text();
+                    const profile = JSON.parse(text);
+                    renderProfile(profile);
+
+                } catch (error) {
+                    console.error('Error loading LinkedIn profile:', error.message);
+                    profileSection.innerHTML = `<p style="color: #ff6b6b; text-align: center;">Could not load LinkedIn profile data.</p>`;
+                    profileSection.style.display = 'block';
+                }
+            }
+
+            function renderProfile(profile) {
+                if (!profile) return;
+
+                const profilePicUrl = profile.profilePicture?.sizes?.[1]?.url || profile.profilePicture?.url || 'assets/profile_picture.jpg';
+                const coverPicUrl = profile.coverPicture?.sizes?.[0]?.url;
+
+                // Generate HTML for the new sections
+                const experiencesHtml = renderExperiences(profile.experience);
+                const projectsHtml = renderProjects(profile.projects);
+                const certificationsHtml = renderCertifications(profile.certifications);
+                const skillsHtml = renderSkills(profile.skills);
+                const languagesHtml = renderLanguages(profile.languages);
+
+                const html = `
+                    <div id="profile-header" style="position: relative; margin-bottom: 80px;">
+                        ${coverPicUrl ? `<img src="${coverPicUrl}" alt="Cover Photo" style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;">` : '<div style="height: 70px;"></div>'}
+                        <div style="position: absolute; left: 24px; bottom: -60px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
+                            <img src="${profilePicUrl}" alt="${profile.firstName}" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #000; background-color: #111;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 28px;">${profile.firstName} ${profile.lastName}</h2>
+                                <p style="margin: 5px 0 0 0; color: #A0A0A0; font-size: 16px;">${profile.headline}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px;">
+                        <div style="font-size: 15px; color: #888;">
+                            <span>${profile.location?.linkedinText || ''}</span> &bull;
+                            <span>${profile.connectionsCount || 0} connections</span> &bull;
+                            <span>${profile.followerCount || 0} followers</span>
+                        </div>
+                        <a href="${profile.linkedinUrl}" target="_blank" class="post-btn" style="text-decoration: none;">View on LinkedIn</a>
+                    </div>
+                    <div id="profile-about">
+                        <h3 style="margin-bottom: 10px;">About</h3>
+                        <p style="white-space: pre-wrap; font-size: 16px; color: #C0C0C0; line-height: 1.5;">${profile.about || 'No about section provided.'}</p>
+                    </div>
+                    ${experiencesHtml}
+                    ${projectsHtml}
+                    ${certificationsHtml}
+                    ${skillsHtml}
+                    ${languagesHtml}
+                `;
+
+                profileSection.innerHTML = html;
+                profileSection.style.display = 'block';
+
+                // Profile is now fully rendered in the DOM: initialize scrollspy
+                if (window.initUpdatesSidebarScrollspy) {
+                    window.initUpdatesSidebarScrollspy();
+                }
+            }
+
+            loadLinkedInProfile();
+        });
+    </script>
+    <script src="assets/js/updates-sidebar.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

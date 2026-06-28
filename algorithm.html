@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fitran</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <style>
+        .leetcode-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .metric-card .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #E0E0E0;
+            margin: 0;
+            line-height: 1;
+        }
+        .metric-card .metric-label {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #A0A0A0;
+            text-transform: uppercase; 
+            font-weight: normal;
+            letter-spacing: 0.5px;
+            display: block;
+        }
+        .metric-card .difficulty-breakdown {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #A0A0A0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .difficulty-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        .difficulty-badge.easy {
+            background-color: rgba(76, 175, 80, 0.15);
+            color: #81C784;
+        }
+        .difficulty-badge.medium {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #FFD54F;
+        }
+        .difficulty-badge.hard {
+            background-color: rgba(244, 67, 54, 0.15);
+            color: #E57373;
+        }
+        .section-header {
+            margin: 0 0 20px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #F5F5F5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+        }
+        .skills-tag-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .skill-tag {
+            background-color: #1e1e1e;
+            color: #E0E0E0;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .skill-tag .count-badge {
+            background-color: #333;
+            color: #B0B0B0;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+        .submission-items {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 20px;
+        }
+        .submission-items li {
+            padding: 1rem 0;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        .submission-items li:hover {
+            background-color: #111;
+        }
+        .submission-items li:last-child {
+            border-bottom: none;
+        }
+        .submission-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .submission-info a {
+            text-decoration: none;
+            color: #E0E0E0;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .submission-info a:hover {
+            text-decoration: underline;
+        }
+        .submission-date {
+            color: #A0A0A0;
+            font-size: 14px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .lang-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: #222;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Loading Spinner */
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .loader {
+            border: 4px solid #222;
+            border-top: 4px solid #E0E0E0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        .loader-text {
+            color: #888;
+            font-size: 16px;
+        }
+
+        #leetcode-main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Clean 32px standard gap spacing */
+            max-width: 900px; /* Kept concise for better layout reading speed */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Fix mobile responsive borders from metrics updates */
+        @media (max-width: 600px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .metric-card {
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                padding-bottom: 24px;
+            }
+            .metric-card:last-child {
+                border-bottom: none;
+                padding-top: 24px;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title"> 
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" id="leetcode-main-container">
+        <section class="box">
+            <div class="loader-container">
+                <div class="loader"></div>
+                <p class="loader-text">Loading LeetCode profile...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        function renderProfileHeader(data) {
+            if (!data?.profile) return '';
+            const profile = data.profile;
+            const leetcodeUrl = `https://leetcode.com/u/${profile.username}/`;
+            const locationString = [profile.school, profile.country].filter(Boolean).join('  •  ');
+
+            const aboutHtml = profile.about ? `
+                <div class="about-container" style="margin-top: 24px;">
+                    <h4 class="section-header" style="border: none; padding: 0; margin-bottom: 8px;">About</h4>
+                    <p style="white-space: pre-wrap; font-size: 15px; color: #B3B3B3; line-height: 1.6; font-weight: 400; margin: 0;">${profile.about}</p>
+                </div>
+            ` : '';
+
+            return `
+                <div class="leetcode-profile-header">
+                    <img src="${profile.avatar || ''}" alt="LeetCode Avatar" class="profile-avatar" onerror="this.style.display='none'">
+                    <div style="flex-grow: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 26px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px;">${profile.username || 'N/A'}</h3>
+                            <p style="margin: 6px 0 0; color: #8E8E93; font-size: 14px; font-weight: 500;">${locationString}</p>
+                        </div>
+                        ${profile.username ? `<a href="${leetcodeUrl}" target="_blank" class="post-btn" style="text-decoration: none; padding: 8px 16px; font-size: 14px; margin-top: 0;">View on LeetCode</a>` : ''}
+                    </div>
+                </div>
+                ${aboutHtml}
+            `;
+        }
+
+        function renderStatsGrid(data) {
+            if (!data) return '';
+            const solved = data.problemStats?.solved;
+            const contest = data.contestStats;
+            const profile = data.profile;
+
+            const ranking = profile?.ranking;
+            const userCount = profile?.userCount;
+            
+            let rankingText;
+            if (ranking && userCount) {
+                const topPercentage = (ranking / userCount * 100).toFixed(1);
+                rankingText = `Top ${topPercentage}%`;
+            } else if (ranking) {
+                rankingText = `Top #${ranking}`;
+            } else {
+                rankingText = 'Top N/A';
+            }
+
+            return `
+                <div class="box">
+                    <h3 class="section-header" style="border: none; text-align: center; margin-bottom: 24px;">Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card" style="border-right: 1px solid rgba(255, 255, 255, 0.05);">
+                            <p class="metric-value">${solved?.all || '0'}</p>
+                            <span class="metric-label">Problems Solved</span>
+                            <div class="difficulty-breakdown">
+                                <span class="difficulty-badge easy">Easy <b>${solved?.easy || '0'}</b></span>
+                                <span class="difficulty-badge medium">Medium <b>${solved?.medium || '0'}</b></span>
+                                <span class="difficulty-badge hard">Hard <b>${solved?.hard || '0'}</b></span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-value">${Math.round(contest?.rating) || 'N/A'}</p>
+                            <span class="metric-label">Contest Rating</span>
+                            <div class="difficulty-breakdown" style="color: #F5F5F5; font-weight: 500; font-size: 13px;">
+                                <span style="background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 12px;">${rankingText}</span>
+                                <span style="background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 12px;">${contest?.attendedCount || '0'} Attended</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProficiencies(data) {
+            const languages = data.languages || [];
+            const skills = data.skillTags || [];
+
+            if (languages.length === 0 && skills.length === 0) return '';
+
+            const languagesHtml = languages.map(lang => `
+                <div class="skill-tag">
+                    <span>${lang.languageName}</span>
+                    <span class="count-badge">${lang.problemsSolved}</span>
+                </div>
+            `).join('');
+
+            const skillsHtml = skills.map(skill => `
+                <div class="skill-tag">
+                    <span>${skill.tagName}</span>
+                    <span class="count-badge">${skill.problemsSolved}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div class="box">
+                    <h4 class="section-header">Languages</h4>
+                    <div class="skills-tag-grid">
+                        ${languagesHtml}
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <h4 class="section-header">Skills & Concepts</h4>
+                        <div class="skills-tag-grid">
+                            ${skillsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSubmissions(submissions) {
+            if (!submissions || submissions.length === 0) {
+                return '<h4 class="section-header">Recent Submissions</h4><p style="text-align: center; color: #A0A0A0;">No recent submissions found.</p>';
+            }
+
+            const submissionItems = submissions.map(submission => {
+                const problemLink = `https://leetcode.com/problems/${submission.titleSlug}/`;
+                const submissionDate = new Date(parseInt(submission.timestamp) * 1000).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                return `
+                    <li>
+                        <div class="submission-info">
+                            <a href="${problemLink}" target="_blank" title="View problem on LeetCode">${submission.title}</a>
+                            <span class="lang-tag">${submission.lang}</span>
+                        </div>
+                        <div class="submission-date">
+                            ${submissionDate}
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            return `
+                <h4 class="section-header">Recent Submissions</h4>
+                <ul class="submission-items">${submissionItems}</ul>
+            `;
+        }
+
+        async function loadLeetCodeData() {
+            const mainContainer = document.getElementById('leetcode-main-container');
+            try {
+                const client = await window.getSupabaseClient({ 
+                    auth: { 
+                        persistSession: false,
+                        storageKey: 'sb-leetcode-profile-auth-token'
+                    } 
+                });
+                if (!client) throw new Error("Supabase client not initialized");
+                
+                // Download the data file from the 'leetcode-profile' bucket
+                const { data, error } = await client
+                    .storage
+                    .from('leetcode-profile')
+                    .download('leetcode-profile.json');
+
+                if (error) throw error;
+
+                const text = await data.text();
+                const submissionsData = JSON.parse(text);
+                const leetcodePayload = submissionsData[0];
+
+                if (leetcodePayload?.success && leetcodePayload.data) {
+                    const profileHtml = renderProfileHeader(leetcodePayload.data);
+                    const statsHtml = renderStatsGrid(leetcodePayload.data);
+                    const proficienciesHtml = renderProficiencies(leetcodePayload.data);
+                    const submissionsHtml = renderSubmissions(leetcodePayload.data.recentAcSubmissions);
+
+                    mainContainer.innerHTML = `
+                        <section class="box">${profileHtml}</section>
+                        <section>${statsHtml}</section>
+                        <section>${proficienciesHtml}</section>
+                        <section class="box">${submissionsHtml}</section>
+                    `;
+                } else {
+                    throw new Error('LeetCode data is not in the expected format.');
+                }
+            } catch (error) {
+                console.error('Error fetching LeetCode profile:', error);
+                mainContainer.innerHTML = `<section class="box"><p style="text-align: center; color: #ff6b6b;">Error loading LeetCode profile. Check the console for details.</p></section>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadLeetCodeData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - fitran</title>
+    <link rel="stylesheet" href="assets/css/style.css?v=2">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+</head>
+<body class="dashboard-body">
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title"> 
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width: 14px; height: 14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside id="dashboard-sidebar" class="dashboard-sidebar">
+            <div class="sidebar-nav">
+                <a href="games.html" class="sidebar-back">
+                    <span class="sidebar-back__arrow">&#8592;</span>
+                    Back to Games
+                </a>
+                <div style="border-top: 1px solid #181818; margin: 0 0 12px 0;"></div>
+                <p class="menu-label">User Profile</p>
+
+                <!-- Authentication & Profile Container -->
+                <div class="box auth-container" style="padding: 20px; border-radius: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; margin-bottom: 0;">
+                    <!-- Login/Signup View -->
+                    <div id="auth-unlogged" style="display: block;">
+                        <h3 style="margin-bottom: 15px; font-size: 16px;">Player Login</h3>
+                        <form id="auth-form" style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="text" id="auth-username" placeholder="Username" style="padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #E0E0E0; font-size: 14px;" required>
+                            <input type="password" id="auth-password" placeholder="Password" style="padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #E0E0E0; font-size: 14px;" required>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" id="auth-login-btn" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: #E0E0E0; color: #000; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 13px;">Login</button>
+                                <button type="button" id="auth-signup-btn" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #111; color: #B0B0B0; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 13px;">Sign Up</button>
+                            </div>
+                            <div id="auth-message" style="font-size: 13px; color: #ff6b6b; display: none; text-align: center;"></div>
+                            <div style="text-align: center;">
+                                <a href="reset_password.html" style="color: #A0A0A0; font-size: 13px; text-decoration: none;">Forgot Password?</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Logged In Profile View -->
+                    <div id="auth-logged" style="display: none; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 14px; color: #A0A0A0;">
+                                <strong>Username:</strong> <span id="profile-username" style="color: #E0E0E0;">-</span>
+                            </div>
+                            <button id="auth-logout-btn" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #333; background: #111; color: #B0B0B0; font-size: 11px; cursor: pointer; transition: background 0.2s;">Logout</button>
+                        </div>
+                        <div style="font-size: 14px; color: #A0A0A0;">
+                            <strong>Score:</strong> <span id="profile-score" style="color: #E0E0E0;">-</span> 
+                        </div>
+                        <form id="email-form" style="display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
+                            <label for="profile-email" style="font-size: 14px; color: #A0A0A0; display: block;"><strong>Email:</strong></label>
+                            <input type="email" id="profile-email" placeholder="your@email.com" style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #E0E0E0; font-size: 14px;" required>
+                            <p style="font-size: 11px; color: #666; line-height: 1.3;">Change to your active email for password reset.</p>
+                            <button type="submit" id="email-save-btn" style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: #E0E0E0; color: #000; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 13px;">Save Email</button>
+                            <div id="email-message" style="font-size: 13px; display: none; text-align: center;"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Game Switcher Menu -->
+                <div class="sidebar-menu">
+                    <p class="menu-label">Play Games</p>
+                    <a href="chess.html" class="menu-item">♟️ Chess</a>
+                    <a href="nim.html" class="menu-item">🥢 Nim Game</a>
+                    <a href="tictactoe.html" class="menu-item active">❌⭕ Tic Tac Toe</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <!-- Tic Tac Toe Game Box -->
+            <div class="box tictactoe-game-box">
+                <!-- Game Over Overlay -->
+                <div id="tictactoe-game-over-overlay" class="tictactoe-overlay" style="display: none;">
+                    <div class="tictactoe-overlay-content">
+                        <h3 id="tictactoe-overlay-title">Game Over!</h3>
+                        <p id="tictactoe-overlay-message">You lose!</p>
+                        <button id="tictactoe-play-again-btn" class="post-btn">Play Again</button>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div id="tictactoe-game-area" class="tictactoe-game-area">
+                    <div class="tictactoe-board-wrapper">
+                        <div id="tictactoe-board" class="tictactoe-board">
+                            <!-- Cells will be generated by JS -->
+                        </div>
+                    </div>
+                    <div class="tictactoe-bottom-panel">
+                        <h3 id="tictactoe-message">Your turn (X)</h3>
+                        <button id="tictactoe-restart-btn" class="post-btn tictactoe-restart-btn">Restart</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-Column Grid: LLM Bot Chat & Leaderboards -->
+            <div class="dashboard-grid-2col">
+                <div class="box interactive-personality" style="margin: 0; border-radius: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; padding: 24px;">
+                    <h3 style="margin-bottom: 15px; font-size: 18px; color: #fff;">Chat with Fitran (Bot)</h3>
+                    <div class="chat-container">
+                        <div class="chat-message bot-message">
+                            <img src="assets/bot_avatar_gemini_generated.png" alt="Fitran Bot" class="bot-avatar">
+                            <div class="message-content">Hello! I'm Fitran's AI assistant. Ready to play some games?</div>
+                        </div>
+                        <div class="chat-input-placeholder">
+                            <input type="text" placeholder="LLM Integration Coming Soon..." disabled>
+                            <button disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box leaderboards" style="margin: 0; border-radius: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="margin: 0; font-size: 18px; color: #fff;">Leaderboards</h3>
+                        <div class="leaderboard-search">
+                            <input type="text" id="leaderboard-search-input" placeholder="Find player..." style="padding: 6px 12px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div class="leaderboard-container">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 id="leaderboard-game-title" style="color: #B0B0B0; margin: 0; font-size: 14px;">Overall Scores</h4>
+                            <select id="leaderboard-game-filter" style="background: #111; color: #E0E0E0; border: 1px solid #333; border-radius: 4px; padding: 4px; font-size: 13px; cursor: pointer;">
+                                <option value="all">All Games</option>
+                                <option value="chess">Chess</option>
+                                <option value="nim">Nim Game</option>
+                                <option value="tictactoe" selected>Tic Tac Toe</option>
+                            </select>
+                        </div>
+                        <ol class="leaderboard-list" id="leaderboard-list" style="margin-bottom: 15px;">
+                            <li><span class="lb-name" style="color: #666;">Loading...</span></li>
+                        </ol>
+                        <div class="leaderboard-pagination" style="display: flex; justify-content: flex-start; align-items: center;">
+                            <button id="leaderboard-prev-btn" class="next-btn" style="margin-right: 10px; padding: 6px 12px; font-size: 13px;" disabled>&larr; Prev</button>
+                            <button id="leaderboard-next-btn" class="next-btn" style="padding: 6px 12px; font-size: 13px;">Next &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Accordion -->
+            <details class="accordion-rules">
+                <summary>About The Game of Tic Tac Toe</summary>
+                <div class="rules-content">
+                    <p>Tic-tac-toe is a classic paper-and-pencil game for two players who take turns marking the spaces in a three-by-three grid with X or O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row is the winner.</p>
+                </div>
+            </details>
+        </main>
+    </div>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/games-sidebar.js"></script>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/leaderboard.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/tictactoe-game.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+name: Update LeetCode Submissions
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch: # Allows the workflow to be triggered manually from the Actions tab
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Your project's package.json files specify node >=20.0.0
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run LeetCode data update script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          APIFY_API_GET_LEETCODE: ${{ secrets.APIFY_API_GET_LEETCODE}}
+        run: node scraper/update_leetcode_data.js

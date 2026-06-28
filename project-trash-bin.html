@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Automatic Trash Bin | Fitran</title>
+    <meta name="description" content="Bare-metal C++ firmware and hardware prototype for a touchless smart trash bin utilizing register-level ATmega328P optimization, dual HC-SR04 ultrasonic sensors, and an SG90 servo.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <style>
+        /* --- PROJECT-SPECIFIC PREMIUM STYLES --- */
+        .project-card {
+            background: transparent;
+            border: 1px solid #121212;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        .project-section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #fff;
+            border-bottom: 1px solid #222;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tech-badge {
+            display: inline-block;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            color: #b0b0b0;
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 20px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .tech-badge:hover {
+            border-color: #3366cc;
+            color: #fff;
+        }
+        .prob-sol-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            .prob-sol-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .ps-card {
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid #151515;
+            padding: 24px;
+            border-radius: 12px;
+        }
+        .ps-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        .ps-card p {
+            font-size: 15px;
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+
+        /* --- RESPONSIVE GRIDS --- */
+        .responsive-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .responsive-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .media-gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .media-gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* --- SIMULATOR WIDGET STYLING --- */
+        .math-explorer-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .math-explorer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .widget-container {
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+            min-height: auto;
+        }
+        .slider-group {
+            margin-bottom: 18px;
+        }
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .slider-group input[type="range"] {
+            width: 100%;
+            accent-color: #3366cc;
+            background: #222;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        /* Power switch styling */
+        .power-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #1c1c1c;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+        .switch-lbl {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 600;
+        }
+        .voltage-display {
+            font-family: monospace;
+            font-size: 13px;
+            color: #888;
+        }
+        .voltage-display span {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        #simulator-canvas-container {
+            background: #020202;
+            border: 1px solid #121212;
+            border-radius: 8px;
+            width: 100%;
+            aspect-ratio: 500 / 260;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Virtual Serial Monitor */
+        .serial-monitor {
+            background: #000;
+            border: 1px solid #1c1c1c;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: #33ff33;
+            padding: 12px;
+            height: 160px;
+            overflow-y: auto;
+            margin-top: 15px;
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.15);
+        }
+        .serial-monitor {
+            scrollbar-width: thin;
+            scrollbar-color: #222 transparent;
+        }
+        .serial-line {
+            line-height: 1.4;
+            white-space: pre-wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            padding: 2px 0;
+        }
+        .serial-line .timestamp {
+            color: #888;
+            margin-right: 8px;
+        }
+        .serial-line .system-offline {
+            color: #ff3333;
+        }
+        .serial-line .action {
+            color: #33a6ff;
+        }
+
+        .sim-btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .sim-btn {
+            flex: 1;
+            background: #111;
+            border: 1px solid #222;
+            color: #ccc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .sim-btn:hover {
+            border-color: #3366cc;
+            color: #fff;
+            background: rgba(51, 102, 204, 0.1);
+        }
+        .sim-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* --- CODE HIGHLIGHTING BLOCK --- */
+        pre.code-block {
+            background: #020202;
+            border: 1px solid #121212;
+            padding: 18px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: #a9b7c6;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+        pre.code-block code {
+            color: #e0e0e0;
+        }
+        .c-comment { color: #57a64a; }
+        .c-keyword { color: #569cd6; }
+        .c-string { color: #d69d85; }
+        .c-function { color: #dcdcaa; }
+        .c-variable { color: #9cdcfe; }
+        .c-type { color: #4ec9b0; }
+        .c-number { color: #b5cea8; }
+
+        /* Registers Table styling */
+        .register-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .register-table th, .register-table td {
+            border: 1px solid #222;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        .register-table th {
+            background: #0a0a0a;
+            color: #fff;
+            font-weight: 600;
+        }
+        .register-table td code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #3366cc;
+        }
+
+        #page-wrap {
+            overflow-x: hidden;
+        }
+        @media (max-width: 768px) {
+            .project-card {
+                padding: 24px 16px;
+            }
+            .math-explorer-grid {
+                grid-template-columns: 1fr;
+            }
+            .widget-container {
+                padding: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title">
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width:12px;height:12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="page-wrap">
+        <main class="container">
+
+            <!-- Hero & Title Section -->
+            <section class="project-card">
+                <h1 style="font-size:32px;font-weight:700;margin-bottom:10px;color:#fff;">Responsive Automatic Trash Bin</h1>
+                <h2 style="font-size:18px;font-weight:normal;color:#a0a0a0;margin-bottom:20px;line-height:1.5;">A smart touchless waste receptacle utilizing register-level ATmega328P configurations, dual HC-SR04 ultrasonic sensors, a center-pivoted swivel SG90 servo motor lid-drive, and multi-state RGB LED warnings.</h2>
+                
+                <div style="margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <a href="https://github.com/MFitran/responsive-automatic-trash-bin-main" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 0; padding: 6px 14px; font-size: 13px;">
+                        <img src="assets/github_logo.png" alt="GitHub" style="width: 14px; height: 14px; background: transparent; filter: invert(1);">
+                        Go to GitHub Repository
+                    </a>
+                </div>
+
+                <div class="responsive-grid-2" style="margin-top: 25px; margin-bottom: 10px;">
+                    <!-- Tech Stack card -->
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Hardware & Tech Stack</h4>
+                        <div>
+                            <span class="tech-badge">Arduino Uno</span>
+                            <span class="tech-badge">C++ (ATmega328P Registers)</span>
+                            <span class="tech-badge">HC-SR04 Sonar</span>
+                            <span class="tech-badge">SG90 Servo</span>
+                            <span class="tech-badge">RGB LEDs</span>
+                            <span class="tech-badge">ADC Input Switch</span>
+                            <span class="tech-badge">PWM Controls</span>
+                        </div>
+                    </div>
+                    <!-- Skills & Competencies capsule list card -->
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Skills & Competencies</h4>
+                        <div>
+                            <span class="tech-badge">Direct Register Control</span>
+                            <span class="tech-badge">Phase Correct PWM</span>
+                            <span class="tech-badge">Rolling Average Filter</span>
+                            <span class="tech-badge">State Machine Design</span>
+                            <span class="tech-badge">Hardware Prototyping</span>
+                            <span class="tech-badge">ADC Signal Sampling</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Challenge and Solution details -->
+                <div class="prob-sol-grid" style="margin-top: 20px;">
+                    <div class="ps-card">
+                        <h3 class="rgb-word">The Challenge</h3>
+                        <p>
+                            Physical waste bin contact acts as a vector for pathogens, and bins are frequently neglected until overflow occurs. Furthermore, standard Arduino library frameworks like <code>Servo.h</code> and <code>analogRead()</code> introduce significant polling latency, resource blockages, and high flash overhead, which degrades the responsiveness required for safety lockouts and real-time sensor cycles.
+                        </p>
+                    </div>
+                    <div class="ps-card">
+                        <h3 class="rgb-word">The Engineered Solution</h3>
+                        <p>
+                            A dual-sensor smart bin running bare-metal register manipulation for minimal processor overhead. An external ultrasonic sensor measures user hand distance, while a second sensor monitors internal bin fill level. An analog system switch controls status. Direct register read/write overrides standard abstractions to optimize sensor trigger loops, LED toggling, and servo PWM angles.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Architecture Section -->
+            <section class="project-card">
+                <div class="project-section-title">
+                    System Architecture
+                </div>
+                <p style="font-size: 15px; color: #b0b0b0; line-height: 1.6; margin-bottom: 15px;">
+                    The system is engineered around direct ATmega328P micro-controller register operations to minimize instruction latency. The block interactions operate as follows:
+                </p>
+                <div class="responsive-grid-2">
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14.5px; color: #fff; margin-bottom: 8px;">Sensor Signal Flow</h4>
+                        <p style="font-size: 13.5px; color: #aaa; line-height: 1.55;">
+                            Dual ultrasonic triggers run in sequential order. 10μs trigger pulses are sent directly via <code>PORTB</code> write lines. Echo pulse durations are measured and filtered through a rolling 5-sample noise-rejection filter.
+                        </p>
+                    </div>
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14.5px; color: #fff; margin-bottom: 8px;">Actuator & Feedback Drive</h4>
+                        <p style="font-size: 13.5px; color: #aaa; line-height: 1.55;">
+                            Timer 1 hardware registers run a Phase Correct PWM signal driving the SG90 servo. PWM angles update inside <code>OCR1A</code>. Indicator warning lights use <code>PORTC</code> outputs to toggle red/green colors.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Microprocessor Register Layout -->
+            <section class="project-card">
+                <div class="project-section-title">
+                    Low-Level Register Configurations
+                </div>
+                <p style="font-size: 15px; color: #b0b0b0; line-height: 1.6; margin-bottom: 15px;">
+                    This firmware bypasses the high abstraction overhead of default Arduino commands in favor of direct ATmega328P micro-controller register operations.
+                </p>
+                <table class="register-table">
+                    <thead>
+                        <tr>
+                            <th>Register</th>
+                            <th>Purpose in Automatic Trash Bin</th>
+                            <th>Concrete Implementation Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DDRB</code> / <code>DDRC</code></td>
+                            <td>Data Direction Registers</td>
+                            <td>Sets pin 9 (TRIG1) and pin 13 (TRIG2) to output, and pin 10 (ECHO1) and pin 12 (ECHO2) to input. Configures analog inputs and LEDs.</td>
+                        </tr>
+                        <tr>
+                            <td><code>PORTB</code> / <code>PORTC</code></td>
+                            <td>Port Output Registers</td>
+                            <td>Directly pulls trigger pins HIGH for 10 microseconds to fire ultrasonic bursts, and toggles Red/Green LEDs on and off.</td>
+                        </tr>
+                        <tr>
+                            <td><code>PINC</code></td>
+                            <td>Port Input Register (C)</td>
+                            <td>Reads analog values for <code>SWITCH_PIN (A3)</code>. Reads voltage levels directly to evaluate offline status thresholds.</td>
+                        </tr>
+                        <tr>
+                            <td><code>TCCR1A</code> / <code>TCCR1B</code></td>
+                            <td>Timer/Counter1 Control Registers</td>
+                            <td>Configures Phase Correct PWM mode on Timer 1 to drive the servo motor PWM signal at 50Hz, enabling high precision movement.</td>
+                        </tr>
+                        <tr>
+                            <td><code>OCR1A</code></td>
+                            <td>Output Compare Register 1A</td>
+                            <td>Directly updated to control the servo duty cycle. Moves the servo shaft to 120° (lid open) or 180° (lid closed).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Physical Prototype & Wiring Diagrams -->
+            <section class="project-card">
+                <div class="project-section-title">
+                    Electrical Schematic & Assembly
+                </div>
+                <p style="font-size: 15px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px;">
+                    The system architecture integrates sensors, switches, and actuators centered around the ATmega328P microprocessor.
+                </p>
+                <div class="media-gallery-grid">
+                    <div class="ps-card" style="text-align: center;">
+                        <h4 style="color:#fff; font-size: 14px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Circuit Schematic Diagram</h4>
+                        <img src="assets/trash_bin_schematic.jpg" alt="Trash Bin Schematic Diagram" style="max-width:100%; border-radius:8px; border:1px solid #222; max-height:280px; object-fit:contain; background:#111;">
+                        <p style="font-size:12px; color:#666; margin-top:8px;">Schematic outlining the ultrasonic sensor triggers, servo control lines, and switch wiring.</p>
+                    </div>
+                    <div class="ps-card" style="text-align: center;">
+                        <h4 style="color:#fff; font-size: 14px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Hardware Wiring & Cabling</h4>
+                        <img src="assets/trash_bin_cabling.jpg" alt="Trash Bin Hardware Wiring" style="max-width:100%; border-radius:8px; border:1px solid #222; max-height:280px; object-fit:contain; background:#111;">
+                        <p style="font-size:12px; color:#666; margin-top:8px;">Breadboard connection model and system power supply routing.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Physical Prototype Gallery -->
+            <section class="project-card">
+                <div class="project-section-title">
+                    Physical Prototype States
+                </div>
+                <p style="font-size: 15px; color: #b0b0b0; line-height: 1.6; margin-bottom: 20px;">
+                    Prototype built using structural cardboard, a micro servo SG90, two HC-SR04 sonar units, and an indicator LED module.
+                </p>
+                <div class="media-gallery-grid">
+                    <div class="ps-card" style="text-align: center;">
+                        <h4 style="color:#fff; font-size: 14px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Prototype - Closed State</h4>
+                        <img src="assets/trash_bin_closed.jpg" alt="Trash Bin Closed State" style="max-width:100%; border-radius:8px; border:1px solid #222; max-height:300px; object-fit:contain; background:#111;">
+                        <p style="font-size:12px; color:#666; margin-top:8px;">Standby position. Servo OCR1A at 180° holding lid flat. LED is off.</p>
+                    </div>
+                    <div class="ps-card" style="text-align: center;">
+                        <h4 style="color:#fff; font-size: 14px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Prototype - Opened State</h4>
+                        <img src="assets/trash_bin_opened.jpg" alt="Trash Bin Opened State" style="max-width:100%; border-radius:8px; border:1px solid #222; max-height:300px; object-fit:contain; background:#111;">
+                        <p style="font-size:12px; color:#666; margin-top:8px;">Active trigger. Servo OCR1A rotated to 120° tilting lid open. LED glows green.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive State Machine Simulator -->
+            <section class="project-card">
+                <div class="project-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        Interactive State Machine Simulator
+                    </div>
+                    <span style="font-size:11px; color:#aaa; background:#111; border:1px solid #222; padding:4px 10px; border-radius:20px;">Virtual ATmega328P Engine</span>
+                </div>
+                
+                <div class="math-explorer-grid">
+                    <!-- Left: Canvas visualizer and Quick Actions -->
+                    <div>
+                        <div id="simulator-canvas-container">
+                            <svg id="sim-svg" width="100%" height="100%" viewBox="0 0 500 260">
+                                <!-- Background grid -->
+                                <line x1="0" y1="230" x2="500" y2="230" stroke="#1a1a1a" stroke-width="2" />
+                                
+                                <!-- Floor line -->
+                                <rect x="0" y="230" width="500" height="30" fill="#050505" />
+
+                                <!-- Sensor Beams (Object Detection) -->
+                                <g id="sonar-beam-outer" opacity="0">
+                                    <path d="M 170,80 C 130,65 130,115 170,100" fill="none" stroke="#33a6ff" stroke-width="1.5" stroke-dasharray="3,3" />
+                                    <path d="M 155,75 C 110,55 110,125 155,105" fill="none" stroke="#33a6ff" stroke-width="1.5" stroke-dasharray="3,3" />
+                                    <path d="M 140,70 C 90,45 90,135 140,110" fill="none" stroke="#33a6ff" stroke-width="1.5" stroke-dasharray="3,3" />
+                                </g>
+
+                                <!-- Sensor Beams (Inner Trash Height) -->
+                                <g id="sonar-beam-inner" opacity="0.4">
+                                    <line x1="280" y1="95" x2="280" y2="180" id="inner-beam-line" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="4,4" />
+                                </g>
+
+                                <!-- Trash Bin Body -->
+                                <rect x="210" y="90" width="120" height="140" rx="6" fill="#0d0d0d" stroke="#222" stroke-width="2" />
+                                <!-- Trash Bin Inner chamber border for visibility -->
+                                <rect x="216" y="96" width="108" height="130" fill="#030303" />
+
+                                <!-- Dynamic Trash Fill height -->
+                                <rect id="trash-level-rect" x="218" y="226" width="104" height="0" fill="rgba(85,85,85,0.85)" rx="2" />
+                                <g id="trash-particles"></g>
+
+                                <!-- Ultrasonic Sensor - Object (Outside-left) -->
+                                <rect x="198" y="76" width="12" height="24" rx="2" fill="#333" stroke="#555" stroke-width="1" />
+                                <circle cx="204" cy="82" r="3.5" fill="#444" stroke="#666" stroke-width="0.5" />
+                                <circle cx="204" cy="94" r="3.5" fill="#444" stroke="#666" stroke-width="0.5" />
+
+                                <!-- Ultrasonic Sensor - Level (Inside-top-right) -->
+                                <g transform="rotate(90 295 93)">
+                                    <rect x="289" y="81" width="12" height="24" rx="2" fill="#333" stroke="#555" stroke-width="1" />
+                                    <circle cx="295" cy="87" r="3.5" fill="#444" stroke="#666" stroke-width="0.5" />
+                                    <circle cx="295" cy="99" r="3.5" fill="#444" stroke="#666" stroke-width="0.5" />
+                                </g>
+
+                                <!-- Servo SG90 Housing (Centered at the middle of the lid: x=263, y=74) -->
+                                <rect x="263" y="74" width="14" height="20" fill="#0055ff" stroke="#0033cc" stroke-width="1" />
+                                <circle cx="270" cy="84" r="3" fill="#fff" />
+
+                                <!-- RGB LED Module (Moved to left side to prevent collision) -->
+                                <circle cx="230" cy="74" r="6" id="rgb-led-lens" fill="#333" stroke="#444" stroke-width="1.5" />
+                                <circle cx="230" cy="74" r="10" id="rgb-led-glow" fill="none" opacity="0.3" />
+
+                                <!-- Dynamic Swivel Lid Group (NO transform-origin in inline styles to prevent double offset bugs. Controlled entirely via JS rotate with absolute center 270, 84) -->
+                                <g id="bin-lid-group" style="transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                                    <!-- Symmetrical Swivel Lid Panel -->
+                                    <rect x="208" y="81" width="124" height="6" rx="3" fill="#292929" stroke="#1f1f1f" stroke-width="1" />
+                                    <!-- Symmetrical design highlights -->
+                                    <rect x="218" y="83" width="40" height="2" fill="#444" />
+                                    <rect x="282" y="83" width="40" height="2" fill="#444" />
+                                    <!-- Center axle cap overlay -->
+                                    <circle cx="270" cy="84" r="5.5" fill="#555" stroke="#222" stroke-width="1" />
+                                </g>
+
+                                <!-- Simple Object (movable on X axis, represented as a clean Orange Sphere) -->
+                                <g id="object-element" transform="translate(100, 0)">
+                                    <circle cx="30" cy="85" r="13" fill="#ff7733" stroke="#cc4400" stroke-width="1.5" />
+                                    <circle cx="26" cy="81" r="3.5" fill="#ffa475" opacity="0.6" />
+                                    <!-- Sonar reflection hit dot -->
+                                    <circle cx="43" cy="85" r="4" id="object-sonar-hit" fill="#33a6ff" opacity="0" />
+                                </g>
+
+                                <!-- Text HUD Overlays -->
+                                <text x="15" y="25" fill="#666" font-size="10" font-family="monospace">SYSTEM STATUS:</text>
+                                <text x="110" y="25" id="hud-system-status" fill="#ff3333" font-size="10" font-weight="bold" font-family="monospace">OFFLINE</text>
+
+                                <text x="15" y="42" fill="#666" font-size="10" font-family="monospace">LID POSITION:</text>
+                                <text x="110" y="42" id="hud-lid-pos" fill="#bbb" font-size="10" font-family="monospace">180° (CLOSED)</text>
+
+                                <text x="280" y="25" fill="#666" font-size="10" font-family="monospace">CAPACITY:</text>
+                                <text x="350" y="25" id="hud-capacity" fill="#33cc66" font-size="10" font-weight="bold" font-family="monospace">USABLE</text>
+                            </svg>
+                        </div>
+                        
+                        <div class="sim-btn-row">
+                            <button class="sim-btn" id="btn-toss" onclick="tossTrash()">Toss Orange Ball (+15%)</button>
+                            <button class="sim-btn" id="btn-empty" onclick="emptyTrash()">Empty Trash Bin (0%)</button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Controls parameters & Serial monitor -->
+                    <div class="widget-container" style="display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <!-- Power Switch Slider (Voltage-based analog value) -->
+                            <div class="power-container">
+                                <span class="switch-lbl">Power Switch (A3 Input)</span>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div class="voltage-display"><span id="switch-voltage">0.0</span> V</div>
+                                    <!-- A custom toggle button to mimic switch -->
+                                    <input type="checkbox" id="power-toggle" style="width: 36px; height: 18px; cursor:pointer;" onchange="updatePower(this.checked)">
+                                </div>
+                            </div>
+
+                            <!-- Slider: Object distance -->
+                            <div class="slider-group">
+                                <label>
+                                    <span>Object Proximity (Outer Sonar)</span>
+                                    <span style="font-family:monospace;font-weight:bold;color:#33a6ff;"><span id="object-dist-display">60</span> cm</span>
+                                </label>
+                                <input type="range" id="slider-object-dist" min="5" max="80" step="1" value="60" oninput="updateObjectDistance(this.value)">
+                            </div>
+
+                            <!-- Slider: Trash Level -->
+                            <div class="slider-group">
+                                <label>
+                                    <span>Trash Level (Capacity)</span>
+                                    <span style="font-family:monospace;font-weight:bold;color:#ffaa00;"><span id="trash-pct-display">0</span>% (<span id="trash-dist-display">40</span> cm)</span>
+                                </label>
+                                <input type="range" id="slider-trash-pct" min="0" max="100" step="1" value="0" oninput="updateTrashLevel(this.value)">
+                            </div>
+                        </div>
+
+                        <!-- Virtual Terminal -->
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1c1c1c; padding-bottom:4px; margin-bottom:4px;">
+                                <span style="font-size:11px; text-transform:uppercase; color:#666; font-weight:700; letter-spacing:1px;">Arduino Serial Monitor (9600 bps)</span>
+                                <span style="font-size:10px; color:#33ff33; font-family:monospace;">● connected</span>
+                            </div>
+                            <div class="serial-monitor" id="serial-output"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Explorer -->
+            <section class="project-card">
+                <div class="project-section-title">
+                    Bare-Metal Firmware Implementation
+                </div>
+                <p style="font-size:15px; color:#b0b0b0; line-height:1.6; margin-bottom:25px;">
+                    The microcontroller firmware is structured into four main operational blocks. Breaking the source code down reveals how register adjustments and digital feedback processes operate:
+                </p>
+
+                <!-- Part 1 -->
+                <div style="margin-bottom: 35px;">
+                    <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">1. System Definitions & Register Initialization</h3>
+                    <p style="font-size:14.5px; color:#aaa; line-height:1.6; margin-bottom:12px;">
+                        This section declares system I/O pin mappings and initializes system operations. Rather than executing slow runtime lookups, the <code>setup()</code> routine directly defines pins as input/output using the microcontroller data registers. It also hooks up the SG90 servo motor to PWM pin 11, sets Timer 1 registers (TCCR1A, TCCR1B) to run high-precision Phase Correct PWM, and defaults the lid angle to closed (180°).
+                    </p>
+                    <pre class="code-block"><code class="code-block-part">#include &lt;Servo.h&gt;
+
+#define RGB_RED A5         // Register DDRC digunakan untuk menetapkan pin ini sebagai output
+#define RGB_GREEN A4       // Register DDRC digunakan untuk menetapkan pin ini sebagai output
+#define TRIG1_PIN 9        // Register DDRB digunakan untuk menetapkan pin ini sebagai output
+#define ECHO1_PIN 10       // Register DDRB digunakan untuk menetapkan pin ini sebagai input
+#define TRIG2_PIN 13       // Register DDRB digunakan untuk menetapkan pin ini sebagai output
+#define ECHO2_PIN 12       // Register DDRB digunakan untuk menetapkan pin ini sebagai input
+#define SERVO_PIN 11       // Register Timer1 (TCCR1A, TCCR1B) digunakan untuk mengontrol PWM
+#define SWITCH_PIN A3      // Register DDRC digunakan untuk menetapkan pin ini sebagai input
+
+Servo myServo;
+
+bool isOpen = false; // Status untuk melacak apakah servo pada tutup sampah terbuka atau tertutup
+
+void setup() {
+  // Monitor Serial
+  Serial.begin(9600);
+
+  // Switch on/off
+  pinMode(SWITCH_PIN, INPUT); // DDRC digunakan untuk menetapkan SWITCH_PIN sebagai input
+
+  // LED RGB
+  pinMode(RGB_RED, OUTPUT);   // DDRC digunakan untuk menetapkan RGB_RED sebagai output
+  pinMode(RGB_GREEN, OUTPUT); // DDRC digunakan untuk menetapkan RGB_GREEN sebagai output
+
+  // Sensor luar
+  pinMode(TRIG1_PIN, OUTPUT); // DDRB digunakan untuk menetapkan TRIG1_PIN sebagai output
+  pinMode(ECHO1_PIN, INPUT);  // DDRB digunakan untuk menetapkan ECHO1_PIN sebagai input
+
+  // Sensor dalam
+  pinMode(TRIG2_PIN, OUTPUT); // DDRB digunakan untuk menetapkan TRIG2_PIN sebagai output
+  pinMode(ECHO2_PIN, INPUT);  // DDRB digunakan untuk menetapkan ECHO2_PIN sebagai input
+
+  // Servo
+  myServo.attach(SERVO_PIN);  // TCCR1A dan TCCR1B digunakan untuk menghasilkan sinyal PWM
+  myServo.write(180);         // Mengatur register OCR1A untuk menggerakkan servo ke posisi tertutup
+
+  digitalWrite(RGB_RED, LOW);  // PORTC digunakan untuk mematikan LED merah
+  digitalWrite(RGB_GREEN, LOW); // PORTC digunakan untuk mematikan LED hijau
+}</code></pre>
+                </div>
+
+                <!-- Part 2 -->
+                <div style="margin-bottom: 35px;">
+                    <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">2. Low-Level Distance Calculation</h3>
+                    <p style="font-size:14.5px; color:#aaa; line-height:1.6; margin-bottom:12px;">
+                        This function runs manual ultrasonic trigger pulses. To calculate distance, it pulls the trigger pin LOW to clear it, spikes it HIGH for 10 microseconds using port registers, and pulls it LOW again. Timer 0 microsecond ticks measure the incoming response echo duration using <code>pulseIn()</code>, which is then divided by 58.2 to scale duration into a centimeter measurement.
+                    </p>
+                    <pre class="code-block"><code class="code-block-part">int calculateDistance(int trigPin, int echoPin) {
+  long duration;
+  int distance;
+
+  // Reset pin trigger
+  digitalWrite(trigPin, LOW); // PORTx digunakan untuk mengatur pin trigger ke LOW
+  delayMicroseconds(2);       // Delay berbasis Timer0 (TCCR0A, TCCR0B)
+
+  // Mengaktifkan pin trigger HIGH selama 10 mikrodetik
+  digitalWrite(trigPin, HIGH); // PORTx digunakan untuk mengatur pin trigger ke HIGH
+  delayMicroseconds(10);       // Delay berbasis Timer0
+  digitalWrite(trigPin, LOW);  // PORTx digunakan untuk mengatur pin trigger ke LOW
+
+  // Mengukur durasi sinyal pantulan dari pin echo
+  duration = pulseIn(echoPin, HIGH); // Timer1 digunakan untuk menghitung durasi
+
+  // Menghitung jarak sensor HCSR-04 (cm)
+  distance = duration * 0.034 / 2;
+
+  return distance;
+}</code></pre>
+                </div>
+
+                <!-- Part 3 -->
+                <div style="margin-bottom: 35px;">
+                    <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">3. Proximity and Capacity Filtering</h3>
+                    <p style="font-size:14.5px; color:#aaa; line-height:1.6; margin-bottom:12px;">
+                        To prevent erratic mechanical lid behavior from sonar scatter and noise, the firmware runs rolling average filters. It queries each sensor 5 times at 5ms intervals. If the external average hand proximity is under 30 cm, it returns <code>true</code>. For the inner sensor, if the trash fill average clearance distance falls under 10 cm, the bin evaluates as full.
+                    </p>
+                    <pre class="code-block"><code class="code-block-part">// Fungsi untuk mendeteksi keberadaan tangan
+bool detectHand() {
+  const int numReadings = 5; // Jumlah pembacaan untuk rata-rata
+  int total = 0;
+
+  for (int i = 0; i < numReadings; i++) {
+    total += calculateDistance(TRIG1_PIN, ECHO1_PIN);
+    delay(5); // Delay berbasis Timer0 (TCCR0A, TCCR0B)
+  }
+
+  int averageDistance = total / numReadings;
+
+  // Tampilkan jarak tangan yang terdeteksi di Monitor Serial
+  Serial.print("Jarak Deteksi Tangan: ");
+  Serial.print(averageDistance);
+  Serial.println(" cm");
+
+  return averageDistance < 30; // Tangan terdeteksi jika jarak rata-rata kurang dari 30 cm
+}
+
+// Fungsi untuk mengecek apakah tempat sampah penuh
+bool isTrashBinFull() {
+  const int numReadings = 5; // Jumlah pembacaan untuk rata-rata
+  int total = 0;
+
+  for (int i = 0; i < numReadings; i++) {
+    total += calculateDistance(TRIG2_PIN, ECHO2_PIN);
+    delay(5); // Delay berbasis Timer0 (TCCR0A, TCCR0B)
+  }
+
+  int averageDistance = total / numReadings;
+
+  // Tampilkan jarak tempat sampah penuh di Monitor Serial
+  Serial.print("Jarak Sampah Penuh: ");
+  Serial.print(averageDistance);
+  Serial.println(" cm");
+
+  return averageDistance < 10; // Tempat sampah penuh jika jarak rata-rata kurang dari 10 cm
+}</code></pre>
+                </div>
+
+                <!-- Part 4 -->
+                <div style="margin-bottom: 10px;">
+                    <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">4. Controller State Control Loop</h3>
+                    <p style="font-size:14.5px; color:#aaa; line-height:1.6; margin-bottom:12px;">
+                        The main execution loop manages the system's operating states. If the system switch analog input (PINC) reads below 620 units (about 3.0V), the loop logs "System offline", forces the servo to 180° to keep the lid closed, and returns immediately. If online and the bin is full, it flashes the red alert LED when motion is detected and refuses to open. If online and not full, it opens the lid (rotating servo to 120° and activating the green status LED) whenever an approaching object triggers the proximity sensor.
+                    </p>
+                    <pre class="code-block"><code class="code-block-part">void loop() {
+  if(analogRead(SWITCH_PIN) < 620) { // PINC digunakan untuk membaca nilai analog dari SWITCH_PIN
+    Serial.print(analogRead(SWITCH_PIN));
+    Serial.println(" System offline");
+    delay(1000); // Delay berbasis Timer0
+
+    if (isOpen) { // Hanya tutup jika sedang terbuka
+      myServo.write(180);  // Menutup servo, memengaruhi register OCR1A
+      isOpen = false;      // Memperbarui status
+      delay(1000);         // Delay berbasis Timer0
+    }
+
+    return;
+  }
+
+  if (isTrashBinFull()) {
+    // Tunjukkan bahwa tempat sampah penuh dengan LED merah
+    if (detectHand()) {
+      digitalWrite(RGB_RED, HIGH); // PORTC digunakan untuk menghidupkan LED merah
+      delay(1000);                 // Delay berbasis Timer0
+      digitalWrite(RGB_RED, LOW);  // PORTC digunakan untuk mematikan LED merah
+    }
+
+    // Pastikan servo tertutup
+    if (isOpen) {
+      myServo.write(180); // Tutup servo, memengaruhi register OCR1A
+      isOpen = false;
+    }
+  } else {
+    // Cek deteksi tangan
+    if (detectHand()) {
+      if (!isOpen) { // Hanya akan terbuka jika servo belum terbuka
+        myServo.write(120);        // Membuka servo, memengaruhi register OCR1A
+        digitalWrite(RGB_GREEN, HIGH); // PORTC digunakan untuk menghidupkan LED hijau
+        isOpen = true;             // Memperbarui status
+        delay(1000);               // Delay berbasis Timer0
+        digitalWrite(RGB_GREEN, LOW);  // PORTC digunakan untuk mematikan LED hijau
+      }
+    } else {
+      if (isOpen) { // Hanya tutup jika sedang terbuka
+        myServo.write(180);  // Menutup servo, memengaruhi register OCR1A
+        isOpen = false;      // Memperbarui status
+        delay(1000);         // Delay berbasis Timer0
+      }
+    }
+  }
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- GitHub Repository Card -->
+            <section class="project-card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px 20px; margin-top: 30px; border-style: dashed; border-color: rgba(51, 102, 204, 0.3); background: rgba(51, 102, 204, 0.02);">
+                <h3 style="font-size: 20px; color: #fff; margin: 0; font-weight: 600;">Explore the Codebase</h3>
+                <p style="font-size: 14.5px; color: #aaa; max-width: 520px; margin: 0 auto; line-height: 1.6;">
+                    Access the complete Arduino wiring layout, mechanical design documentation, and register configuration codebases on GitHub.
+                </p>
+                <div style="margin-top: 10px;">
+                    <a href="https://github.com/MFitran/responsive-automatic-trash-bin-main" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 36px; font-size: 17px; border-radius: 12px; font-weight: 700; border-color: #3366cc; color: #fff; background: transparent; transition: all 0.2s ease-in-out;" onmouseover="this.style.borderColor='#5588ff'; this.style.backgroundColor='rgba(51, 102, 204, 0.12)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#3366cc'; this.style.backgroundColor='transparent'; this.style.transform='none';">
+                        <img src="assets/github_logo.png" alt="GitHub" style="width: 20px; height: 20px; background: transparent; filter: invert(1);">
+                        Go to GitHub Repository
+                    </a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/sidebar.js?v=20260623"></script>
+    <script src="assets/js/main.js"></script>
+
+    <!-- SIMULATOR JAVASCRIPT STATE ENGINE -->
+    <script>
+        // System variables
+        let isPowerOn = false;
+        let objectDistance = 60; // cm
+        let trashLevelPct = 0; // %
+        let isLidOpen = false;
+        
+        // Element references
+        const powerToggle = document.getElementById('power-toggle');
+        const switchVoltageDisplay = document.getElementById('switch-voltage');
+        const sliderObject = document.getElementById('slider-object-dist');
+        const objectDisplay = document.getElementById('object-dist-display');
+        const sliderTrash = document.getElementById('slider-trash-pct');
+        const trashPctDisplay = document.getElementById('trash-pct-display');
+        const trashDistDisplay = document.getElementById('trash-dist-display');
+        const serialOutput = document.getElementById('serial-output');
+
+        // SVG references
+        const objectEl = document.getElementById('object-element');
+        const lidGroup = document.getElementById('bin-lid-group');
+        const trashLevelRect = document.getElementById('trash-level-rect');
+        const sonarOuter = document.getElementById('sonar-beam-outer');
+        const objectSonarHit = document.getElementById('object-sonar-hit');
+        const ledLens = document.getElementById('rgb-led-lens');
+        const ledGlow = document.getElementById('rgb-led-glow');
+
+        // HUD references
+        const hudSystem = document.getElementById('hud-system-status');
+        const hudLid = document.getElementById('hud-lid-pos');
+        const hudCapacity = document.getElementById('hud-capacity');
+
+        // Timer loops
+        let stateUpdateInterval = null;
+        let serialInterval = null;
+        let flashRedInterval = null;
+
+        // Log message buffer
+        function addSerialLog(msg, isErr = false, isAction = false) {
+            const time = new Date();
+            const timeStr = time.toLocaleTimeString([], { hour12: false, fractionalSecondDigits: 3 }).replace(/\s/g, '');
+            
+            let classStr = 'serial-line';
+            if (isErr) classStr += ' system-offline';
+            if (isAction) classStr += ' action';
+
+            const line = document.createElement('div');
+            line.className = classStr;
+            line.innerHTML = `<span class="timestamp">[${timeStr}]</span>${msg}`;
+            
+            serialOutput.appendChild(line);
+            
+            // Limit log lines to 100
+            while (serialOutput.children.length > 100) {
+                serialOutput.removeChild(serialOutput.firstChild);
+            }
+            
+            // Auto scroll to bottom
+            serialOutput.scrollTop = serialOutput.scrollHeight;
+        }
+
+        // Initialize elements
+        function initSimulator() {
+            powerToggle.checked = false;
+            updatePower(false);
+            
+            // Initial render
+            renderSVGState();
+            addSerialLog("ATmega328P processor initialized.", false, true);
+            addSerialLog("Direct register mapping loaded: PORTB, PORTC, DDRB, DDRC initialized.", false, false);
+        }
+
+        function updatePower(on) {
+            isPowerOn = on;
+            switchVoltageDisplay.innerText = on ? "5.0" : "0.0";
+            
+            if (on) {
+                hudSystem.innerText = "ONLINE";
+                hudSystem.style.fill = "#33cc66";
+                addSerialLog("[SYSTEM] Switch A3 voltage > 620 units. System online.", false, true);
+                
+                // Start state evaluation loops
+                startLoops();
+            } else {
+                hudSystem.innerText = "OFFLINE";
+                hudSystem.style.fill = "#ff3333";
+                addSerialLog("302 System offline", true, false);
+                
+                // Force close lid
+                if (isLidOpen) {
+                    isLidOpen = false;
+                    addSerialLog("[PWM] System shut down. Force OCR1A rotation to 180° (Lid closed)", true, false);
+                }
+                
+                stopLoops();
+                renderSVGState();
+            }
+        }
+
+        function startLoops() {
+            stopLoops(); // Clear existing loops
+
+            // Evaluation Loop: runs every 500ms (to match sensor check delay)
+            stateUpdateInterval = setInterval(() => {
+                evaluateState();
+            }, 500);
+        }
+
+        function stopLoops() {
+            if (stateUpdateInterval) clearInterval(stateUpdateInterval);
+            if (flashRedInterval) {
+                clearInterval(flashRedInterval);
+                flashRedInterval = null;
+            }
+            // Turn off LED glow
+            ledLens.style.fill = "#333";
+            ledGlow.style.fill = "none";
+        }
+
+        function updateObjectDistance(val) {
+            objectDistance = parseInt(val);
+            objectDisplay.innerText = objectDistance;
+            
+            // Move orange sphere object in SVG: distance goes from 5cm to 80cm
+            // Map 5cm -> X coordinate 180, 80cm -> X coordinate 40
+            const maxVal = 80;
+            const minVal = 5;
+            const minX = 40;
+            const maxX = 180;
+            
+            // Linear mapping
+            const pct = (objectDistance - minVal) / (maxVal - minVal);
+            const xPos = minX + (1 - pct) * (maxX - minX);
+            
+            objectEl.setAttribute('transform', `translate(${xPos}, 0)`);
+            
+            if (isPowerOn) {
+                // Flash sensor line visual hit
+                if (objectDistance < 30) {
+                    sonarOuter.setAttribute('opacity', '0.85');
+                    objectSonarHit.setAttribute('opacity', '1');
+                } else {
+                    sonarOuter.setAttribute('opacity', '0.05');
+                    objectSonarHit.setAttribute('opacity', '0');
+                }
+            } else {
+                sonarOuter.setAttribute('opacity', '0');
+                objectSonarHit.setAttribute('opacity', '0');
+            }
+        }
+
+        function updateTrashLevel(val) {
+            trashLevelPct = parseInt(val);
+            trashPctDisplay.innerText = trashLevelPct;
+            
+            // Map 0% -> 40cm, 100% -> 5cm (as height fills up, distance from sensor at top decreases)
+            const capacityDistance = Math.round(40 - (trashLevelPct / 100) * 35);
+            trashDistDisplay.innerText = capacityDistance;
+
+            if (capacityDistance < 10) {
+                hudCapacity.innerText = "FULL";
+                hudCapacity.style.fill = "#ff3333";
+            } else {
+                hudCapacity.innerText = "USABLE";
+                hudCapacity.style.fill = "#33cc66";
+            }
+
+            renderSVGState();
+        }
+
+        // Toss orange ball
+        function tossTrash() {
+            if (trashLevelPct < 100) {
+                const newVal = Math.min(100, trashLevelPct + 15);
+                sliderTrash.value = newVal;
+                updateTrashLevel(newVal);
+                if (isPowerOn) {
+                    addSerialLog(`[ACTION] Orange ball thrown in. Fill level increased to ${newVal}%`, false, true);
+                }
+            }
+        }
+
+        // Empty trash
+        function emptyTrash() {
+            sliderTrash.value = 0;
+            updateTrashLevel(0);
+            if (isPowerOn) {
+                addSerialLog("[ACTION] Trash bin emptied. Capacity reset.", false, true);
+            }
+        }
+
+        function evaluateState() {
+            if (!isPowerOn) return;
+
+            const isFull = (40 - (trashLevelPct / 100) * 35) < 10;
+            const objectDetected = objectDistance < 30;
+
+            // Log ultrasonic polling results
+            addSerialLog(`Jarak Deteksi Tangan: ${objectDistance} cm`);
+            addSerialLog(`Jarak Sampah Penuh: ${Math.round(40 - (trashLevelPct / 100) * 35)} cm`);
+
+            if (isFull) {
+                // If full, red alert if object detected, lid stays closed
+                if (objectDetected) {
+                    addSerialLog("WARNING: Bin is FULL. Refusing to open lid.", true, false);
+                    triggerRedLedFlash();
+                }
+                
+                if (isLidOpen) {
+                    isLidOpen = false;
+                    addSerialLog("[PWM] OCR1A updated. Rotating back to 180° (Lid closed due to FULL limit)", true, false);
+                }
+            } else {
+                // Trash is usable, standard motion trigger
+                if (objectDetected) {
+                    if (!isLidOpen) {
+                        isLidOpen = true;
+                        addSerialLog("[PWM] OCR1A set to 120° (Lid opened successfully)", false, true);
+                        triggerGreenLedPulse();
+                    }
+                } else {
+                    if (isLidOpen) {
+                        isLidOpen = false;
+                        addSerialLog("[PWM] OCR1A set to 180° (Lid closed)", false, false);
+                    }
+                }
+            }
+
+            renderSVGState();
+        }
+
+        function triggerGreenLedPulse() {
+            // LED goes Green (PORTC Pin A4 High)
+            ledLens.style.fill = "#33cc66";
+            ledGlow.style.fill = "#33cc66";
+            
+            // LED shuts off after 1 second as in the loop
+            setTimeout(() => {
+                if (isPowerOn && isLidOpen) {
+                    ledLens.style.fill = "#225522"; // dim down
+                    ledGlow.style.fill = "none";
+                }
+            }, 1000);
+        }
+
+        function triggerRedLedFlash() {
+            // LED goes Red (PORTC Pin A5 High)
+            if (flashRedInterval) return; // already flashing
+            
+            let flashCount = 0;
+            flashRedInterval = setInterval(() => {
+                if (flashCount % 2 === 0) {
+                    ledLens.style.fill = "#ff3333";
+                    ledGlow.style.fill = "#ff3333";
+                } else {
+                    ledLens.style.fill = "#333";
+                    ledGlow.style.fill = "none";
+                }
+                flashCount++;
+                if (flashCount >= 4) {
+                    clearInterval(flashRedInterval);
+                    flashRedInterval = null;
+                }
+            }, 250);
+        }
+
+        function renderSVGState() {
+            // Update Lid Rotation
+            if (isPowerOn && isLidOpen) {
+                // Rotate lid counter-clockwise: negative rotation (-45 degrees) around middle pivot (270, 84)
+                lidGroup.setAttribute('transform', 'rotate(-45 270 84)');
+                hudLid.innerText = "120° (OPENED)";
+                hudLid.style.fill = "#33cc66";
+            } else {
+                // Closed position: 0deg rotation
+                lidGroup.setAttribute('transform', 'rotate(0 270 84)');
+                hudLid.innerText = "180° (CLOSED)";
+                hudLid.style.fill = "#666";
+            }
+
+            // Update Trash Rect height
+            const maxHeight = 106;
+            const targetHeight = (trashLevelPct / 100) * maxHeight;
+            const targetY = 226 - targetHeight;
+            
+            trashLevelRect.setAttribute('height', targetHeight);
+            trashLevelRect.setAttribute('y', targetY);
+            
+            // Color trash based on status
+            if ((40 - (trashLevelPct / 100) * 35) < 10) {
+                trashLevelRect.setAttribute('fill', 'rgba(235, 64, 52, 0.8)'); // Reddish if full
+            } else {
+                trashLevelRect.setAttribute('fill', 'rgba(85, 85, 85, 0.85)'); // Grey normally
+            }
+
+            // Render random trash items inside
+            const particlesG = document.getElementById('trash-particles');
+            particlesG.innerHTML = '';
+            
+            const numParticles = Math.floor(trashLevelPct / 12);
+            for (let i = 0; i < numParticles; i++) {
+                const rx = 224 + Math.random() * 80;
+                const ry = 224 - Math.random() * targetHeight;
+                const radius = 3 + Math.random() * 5;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', rx);
+                circle.setAttribute('cy', ry);
+                circle.setAttribute('r', radius);
+                circle.setAttribute('fill', Math.random() > 0.5 ? '#666' : '#999');
+                particlesG.appendChild(circle);
+            }
+
+            // If offline, turn off indicator lights
+            if (!isPowerOn) {
+                ledLens.style.fill = "#333";
+                ledGlow.style.fill = "none";
+                sonarOuter.setAttribute('opacity', '0');
+            }
+        }
+
+        // Initialize code explorer styling on load
+        function styleCodeBlocks() {
+            const codeParts = document.querySelectorAll('.code-block-part');
+            codeParts.forEach(block => {
+                let text = block.innerHTML;
+
+                // Highlight preprocessor and libs
+                text = text.replace(/(#include &lt;.*&gt;|#define [A-Z0-9_]+ [a-zA-Z0-9_]+)/g, '<span class="c-keyword">$1</span>');
+                
+                // Keywords
+                const keywords = ['bool ', 'int ', 'void ', 'long ', 'float ', 'const ', 'setup()', 'loop()', 'if', 'else', 'return', 'for ', 'while '];
+                keywords.forEach(kw => {
+                    const regex = new RegExp('\\b' + kw, 'g');
+                    text = text.replace(regex, '<span class="c-keyword">' + kw + '</span>');
+                });
+
+                // Functions
+                const funcs = ['calculateDistance', 'detectHand', 'isTrashBinFull', 'analogRead', 'digitalWrite', 'pinMode', 'delayMicroseconds', 'delay', 'pulseIn', 'myServo.attach', 'myServo.write', 'Serial.begin', 'Serial.print', 'Serial.println'];
+                funcs.forEach(f => {
+                    const regex = new RegExp('\\b' + f, 'g');
+                    text = text.replace(regex, '<span class="c-function">' + f + '</span>');
+                });
+
+                // Comments
+                text = text.replace(/(\/\/.*)/g, '<span class="c-comment">$1</span>');
+
+                block.innerHTML = text;
+            });
+        }
+
+        // Run
+        window.addEventListener('DOMContentLoaded', () => {
+            initSimulator();
+            styleCodeBlocks();
+            updateObjectDistance(60);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+// --- SUPABASE CONFIGURATION ---
+// Supabase credentials are now loaded dynamically from .env via main.js fetchEnvConfig
+
+// --- LEADERBOARD STATE ---
+let currentPage = 0;
+const ITEMS_PER_PAGE = 5;
+let currentSearch = '';
+let currentGameFilter = 'all';
+
+// --- DOM ELEMENTS ---
+const leaderboardList = document.getElementById('leaderboard-list');
+const searchInput = document.getElementById('leaderboard-search-input');
+const gameFilter = document.getElementById('leaderboard-game-filter');
+const gameTitle = document.getElementById('leaderboard-game-title');
+const prevBtn = document.getElementById('leaderboard-prev-btn');
+const nextBtn = document.getElementById('leaderboard-next-btn');
+
+// --- FETCH DATA ---
+async function fetchLeaderboard() {
+    // Show loading state
+    leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #666;">Loading...</span></li>';
+
+    try {
+        const client = await window.getSupabaseClient();
+        if (!client) throw new Error("Supabase client not initialized.");
+
+        let query = client
+            .from('leaderboard')
+            .select('total_score, game_type, user_profiles(username)', { count: 'exact' }); // More specific select
+        
+        // Always filter by the selected game type for consistent results
+        query = query.eq('game_type', currentGameFilter);
+
+        // Search by player name
+        if (currentSearch) {
+            query = query.ilike('user_profiles.username', `%${currentSearch}%`); // Changed from players.username to user_profiles.username
+        }
+
+        // Pagination & Ordering (highest score first)
+        const from = currentPage * ITEMS_PER_PAGE;
+        const to = from + ITEMS_PER_PAGE - 1;
+
+        query = query.order('total_score', { ascending: false }) // Changed from score to total_score
+                     .range(from, to);
+
+        const { data, error, count } = await query;
+
+        if (error) {
+            throw error;
+        }
+
+        renderLeaderboard(data);
+        updatePaginationButtons(count);
+
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error.message);
+        leaderboardList.innerHTML = `<li><span class="lb-name" style="color: #ff6b6b;">Error loading data.</span></li>`;
+    }
+}
+
+// --- RENDER DATA ---
+function renderLeaderboard(data) {
+    leaderboardList.innerHTML = ''; // Clear current list
+
+    if (!data || data.length === 0) {
+        leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #666;">No players found.</span></li>';
+        return;
+    }
+
+    data.forEach((entry, index) => {
+        const li = document.createElement('li');
+        
+        const rank = currentPage * ITEMS_PER_PAGE + index + 1;
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'lb-name';
+        nameSpan.textContent = `${rank}. ${entry.user_profiles ? entry.user_profiles.username : 'Unknown Player'}`; // Safely access username
+
+        const scoreSpan = document.createElement('span');
+        scoreSpan.className = 'lb-score';
+        scoreSpan.textContent = `${entry.total_score.toLocaleString()} pts`; // Changed from entry.score to entry.total_score
+
+        li.appendChild(nameSpan);
+        li.appendChild(scoreSpan);
+        
+        leaderboardList.appendChild(li);
+    });
+}
+
+// --- PAGINATION & EVENT HANDLERS ---
+function updatePaginationButtons(totalCount) {
+    prevBtn.disabled = currentPage === 0;
+    
+    // Disable next button if we've reached the end
+    const hasMore = (currentPage + 1) * ITEMS_PER_PAGE < totalCount;
+    nextBtn.disabled = !hasMore;
+}
+
+prevBtn.addEventListener('click', () => {
+    if (currentPage > 0) {
+        currentPage--;
+        fetchLeaderboard();
+    }
+});
+
+nextBtn.addEventListener('click', () => {
+    currentPage++;
+    fetchLeaderboard();
+});
+
+searchInput.addEventListener('input', (e) => {
+    currentSearch = e.target.value;
+    currentPage = 0; // Reset to first page on search
+    fetchLeaderboard();
+});
+
+gameFilter.addEventListener('change', (e) => {
+    currentGameFilter = e.target.value;
+    gameTitle.textContent = e.target.options[e.target.selectedIndex].text + ' Scores';
+    currentPage = 0; // Reset to first page on filter
+    fetchLeaderboard();
+});
+
+// --- INITIAL LOAD ---
+document.addEventListener('DOMContentLoaded', async () => {
+    const client = await window.getSupabaseClient();
+    if (!client) {
+        leaderboardList.innerHTML = '<li><span class="lb-name" style="color: #ffcc00; font-size: 14px;">Supabase not configured. Check .env</span></li>';
+        return;
+    }
+
+    // Always default to "All Games" on page load, but keep the filter visible and functional.
+    if (gameFilter) gameFilter.value = 'all';
+    if (gameTitle) gameTitle.textContent = 'All-Time Scores';
+    currentGameFilter = 'all'; // Ensure state matches the UI
+
+    fetchLeaderboard();
+
+    // --- REALTIME SUBSCRIPTION ---
+    // Listen for any changes in the leaderboard table to make the UI dynamic.
+    const leaderboardSubscription = client
+        .channel('public:leaderboard') // A descriptive channel name for this subscription
+        .on(
+            'postgres_changes',
+            {
+                event: '*', // Listen for INSERT, UPDATE, and DELETE events
+                schema: 'public',
+                table: 'leaderboard' // The table to monitor
+            },
+            (payload) => {
+                console.log('Realtime change detected in leaderboard!', payload);
+                // When a change occurs, re-fetch the leaderboard data to update the UI.
+                fetchLeaderboard();
+            }
+        )
+        .subscribe();
+});

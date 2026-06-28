@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects | Fitran</title>
+    <meta name="description" content="A portfolio of engineering and machine learning projects by Muhammad Fitran Ramadhan — predictive maintenance, control systems, and decision support.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <style>
+        .projects-hero {
+            padding: 60px 0 30px 0;
+            text-align: center;
+        }
+        .projects-hero h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .projects-hero p {
+            font-size: 16px;
+            color: #888;
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 40px 0 80px 0;
+        }
+        .proj-card {
+            background: transparent;
+            border: 1px solid #121212;
+            border-radius: 20px;
+            padding: 28px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: border-color 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .proj-card:hover:not(.proj-card--soon) {
+            border-color: #3366cc;
+            transform: translateY(-3px);
+        }
+        .proj-card--soon {
+            opacity: 0.55;
+            cursor: default;
+        }
+        .proj-card__num {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #444;
+        }
+        .proj-card__title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+        .proj-card__subtitle {
+            font-size: 13px;
+            color: #666;
+        }
+        .proj-card__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .proj-card__badge {
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: #111;
+            border: 1px solid #222;
+            color: #aaa;
+        }
+        .proj-card__status {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+        .status-dot--live { background: #33cc66; box-shadow: 0 0 6px #33cc6688; }
+        .status-dot--soon { background: #ffaa00; }
+        .proj-card__arrow {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            font-size: 20px;
+            color: #333;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .proj-card:hover:not(.proj-card--soon) .proj-card__arrow {
+            color: #3366cc;
+            transform: translateX(3px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title">
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="projects-hero">
+            <h1>Projects</h1>
+            <p>Data-driven engineering and computational systems projects</p>
+        </div>
+
+        <div class="projects-grid">
+
+            <!-- Project 01 -->
+            <a href="project-ml-weibull.html" class="proj-card">
+                <div class="proj-card__num">01 &mdash; Predictive Maintenance</div>
+                <div class="proj-card__title">Hybrid ML-Weibull for Remaining Useful Life Prediction</div>
+                <div class="proj-card__subtitle">Bridging statistical reliability models and edge-cloud telemetry for dynamic RUL estimation on tires and turbofan engines.</div>
+                <div class="proj-card__tags">
+                    <span class="proj-card__badge">Python</span>
+                    <span class="proj-card__badge">XGBoost</span>
+                    <span class="proj-card__badge">LightGBM</span>
+                    <span class="proj-card__badge">lifelines</span>
+                    <span class="proj-card__badge">ESP32-S3</span>
+                    <span class="proj-card__badge">C-MAPSS</span>
+                </div>
+                <div class="proj-card__status">
+                    <span class="status-dot status-dot--live"></span>
+                    <span style="color:#33cc66;font-weight:600;">Live</span>
+                </div>
+                <span class="proj-card__arrow">&#8250;</span>
+            </a>
+
+            <!-- Project 02 -->
+            <a href="project-big-data-nyc-taxi.html" class="proj-card">
+                <div class="proj-card__num">02 &mdash; Big Data & ML</div>
+                <div class="proj-card__title">Big Data Analytics and ML Fare Prediction for NYC Taxi Data</div>
+                <div class="proj-card__subtitle">Predicting fare amounts using big data pipelines and machine learning models trained on millions of taxi trip records.</div>
+                <div class="proj-card__tags">
+                    <span class="proj-card__badge">Spark</span>
+                    <span class="proj-card__badge">PySpark</span>
+                    <span class="proj-card__badge">Regression</span>
+                    <span class="proj-card__badge">Big Data</span>
+                    <span class="proj-card__badge">Random Forest</span>
+                    <span class="proj-card__badge">MLlib</span>
+                </div>
+                <div class="proj-card__status">
+                    <span class="status-dot status-dot--live"></span>
+                    <span style="color:#33cc66;font-weight:600;">Live</span>
+                </div>
+                <span class="proj-card__arrow">&#8250;</span>
+            </a>
+
+            <!-- Project 03 -->
+            <a href="project-fuzzy.html" class="proj-card">
+                <div class="proj-card__num">03 &mdash; Decision Support</div>
+                <div class="proj-card__title">Fuzzy System for Determining Project Priorities</div>
+                <div class="proj-card__subtitle">A fuzzy inference system that evaluates and ranks project proposals based on multi-criteria decision attributes.</div>
+                <div class="proj-card__tags">
+                    <span class="proj-card__badge">Python</span>
+                    <span class="proj-card__badge">numpy</span>
+                    <span class="proj-card__badge">matplotlib</span>
+                    <span class="proj-card__badge">Fuzzy Logic</span>
+                    <span class="proj-card__badge">Mamdani FIS</span>
+                    <span class="proj-card__badge">Decision Support</span>
+                </div>
+                <div class="proj-card__status">
+                    <span class="status-dot status-dot--live"></span>
+                    <span style="color:#33cc66;font-weight:600;">Live</span>
+                </div>
+                <span class="proj-card__arrow">&#8250;</span>
+            </a>
+
+            <!-- Project 04 -->
+            <a href="project-security-system.html" class="proj-card">
+                <div class="proj-card__num">04 &mdash; Cybersecurity</div>
+                <div class="proj-card__title">Security System: Penetration Testing and Defense</div>
+                <div class="proj-card__subtitle">Conducting vulnerability assessments, penetration testing, and implementing active firewall configurations to secure systems.</div>
+                <div class="proj-card__tags">
+                    <span class="proj-card__badge">Kali Linux</span>
+                    <span class="proj-card__badge">Nmap</span>
+                    <span class="proj-card__badge">Metasploit</span>
+                    <span class="proj-card__badge">Cybersecurity</span>
+                    <span class="proj-card__badge">Penetration Testing</span>
+                    <span class="proj-card__badge">Firewalls</span>
+                </div>
+                <div class="proj-card__status">
+                    <span class="status-dot status-dot--live"></span>
+                    <span style="color:#33cc66;font-weight:600;">Live</span>
+                </div>
+                <span class="proj-card__arrow">&#8250;</span>
+            </a>
+
+            <!-- Project 05 -->
+            <a href="project-pid-door.html" class="proj-card">
+                <div class="proj-card__num">05 &mdash; Control Systems</div>
+                <div class="proj-card__title">Automatic Sliding Door PID System Control</div>
+                <div class="proj-card__subtitle">Tuned closed-loop PID control system on Arduino Uno using a VL53L0X Time-of-Flight laser sensor for smooth door transitions.</div>
+                <div class="proj-card__tags">
+                    <span class="proj-card__badge">Arduino</span>
+                    <span class="proj-card__badge">C++</span>
+                    <span class="proj-card__badge">PID Control</span>
+                    <span class="proj-card__badge">VL53L0X Laser</span>
+                    <span class="proj-card__badge">SG90 Servo</span>
+                    <span class="proj-card__badge">HC-SR04 Sonar</span>
+                </div>
+                <div class="proj-card__status">
+                    <span class="status-dot status-dot--live"></span>
+                    <span style="color:#33cc66;font-weight:600;">Live</span>
+                </div>
+                <span class="proj-card__arrow">&#8250;</span>
+            </a>
+
+            <!-- Project 06 -->
+            <a href="project-trash-bin.html" class="proj-card">
+                <div class="proj-card__num">06 &mdash; IoT & Embedded</div>
+                <div class="proj-card__title">Responsive Automatic Trash Bin</div>
+                <div class="proj-card__subtitle">A smart, IoT-enabled trash bin with motion-activated lid controls and fill-level monitoring systems.</div>
+                <div class="proj-card__tags">
+                    <span class="proj-card__badge">Arduino</span>
+                    <span class="proj-card__badge">C++</span>
+                    <span class="proj-card__badge">HC-SR04</span>
+                    <span class="proj-card__badge">SG90 Servo</span>
+                    <span class="proj-card__badge">IoT</span>
+                    <span class="proj-card__badge">Embedded Systems</span>
+                </div>
+                <div class="proj-card__status">
+                    <span class="status-dot status-dot--live"></span>
+                    <span style="color:#33cc66;font-weight:600;">Live</span>
+                </div>
+                <span class="proj-card__arrow">&#8250;</span>
+            </a>
+
+        </div>
+    </main>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

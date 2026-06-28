@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Sliding Door PID System Control | Fitran</title>
+    <meta name="description" content="PID controller design and simulation for an automatic sliding door mechanism with real-time sensor feedback and performance analysis.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <style>
+        /* --- PROJECT-SPECIFIC PREMIUM STYLES --- */
+        .project-card {
+            background: transparent;
+            border: 1px solid #121212;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        .project-section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #fff;
+            border-bottom: 1px solid #222;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tech-badge {
+            display: inline-block;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            color: #b0b0b0;
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 20px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .tech-badge:hover {
+            border-color: #3366cc;
+            color: #fff;
+        }
+        .prob-sol-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .prob-sol-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .ps-card {
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid #151515;
+            padding: 24px;
+            border-radius: 12px;
+        }
+        .ps-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        .ps-card p {
+            font-size: 15px;
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+
+        /* --- RESPONSIVE GRIDS --- */
+        .responsive-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .responsive-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .system-design-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 768px) {
+            .system-design-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .servo-char-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .servo-char-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .media-gallery-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .media-gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* --- SIMULATOR WIDGET STYLING --- */
+        .math-explorer-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .math-explorer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .widget-container {
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+            min-height: auto;
+        }
+        .slider-group {
+            margin-bottom: 15px;
+        }
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .slider-group input[type="range"] {
+            width: 100%;
+            accent-color: #3366cc;
+            background: #222;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        .chart-area {
+            background: #000;
+            border: 1px solid #151515;
+            border-radius: 8px;
+            margin-top: 15px;
+            padding: 8px;
+            width: 100%;
+            aspect-ratio: 400 / 210;
+            position: relative;
+            overflow: hidden;
+        }
+        #door-canvas-container {
+            background: #020202;
+            border: 1px solid #121212;
+            border-radius: 8px;
+            width: 100%;
+            aspect-ratio: 500 / 160;
+            position: relative;
+            overflow: hidden;
+        }
+        .sim-controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .sim-controls-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        .sim-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+            border-top: 1px solid #1c1c1c;
+            padding-top: 15px;
+        }
+        @media (max-width: 768px) {
+            .sim-metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            .sim-metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #aaa;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* --- RESULTS GALLERY & TABLES --- */
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+        @media (max-width: 768px) {
+            .findings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .finding-card {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid #151515;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .finding-card h3 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .result-table-wrap {
+            overflow-x: auto;
+            margin-top: 15px;
+            border: 1px solid #151515;
+            border-radius: 8px;
+        }
+        table.result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+        table.result-table th, table.result-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #151515;
+        }
+        table.result-table th {
+            background: #080808;
+            color: #fff;
+            font-weight: 600;
+        }
+        table.result-table td {
+            color: #ccc;
+        }
+        table.result-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* --- CODE HIGHLIGHTING BLOCK --- */
+        pre.code-block {
+            background: #020202;
+            border: 1px solid #121212;
+            padding: 18px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: #a9b7c6;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+        pre.code-block code {
+            color: #e0e0e0;
+        }
+        .c-comment { color: #57a64a; }
+        .c-keyword { color: #569cd6; }
+        .c-string { color: #d69d85; }
+        .c-function { color: #dcdcaa; }
+        .c-variable { color: #9cdcfe; }
+        .c-type { color: #4ec9b0; }
+        .c-number { color: #b5cea8; }
+
+        /* Equation wrapper scroll */
+        .MathJax_Display, mjx-container[display="true"] {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            display: block !important;
+            padding: 10px 0;
+        }
+
+        /* Prevent overflow elements */
+        #page-wrap {
+            overflow-x: hidden;
+        }
+        @media (max-width: 768px) {
+            .project-card {
+                padding: 24px 16px;
+            }
+        }
+        .math-explorer-grid > div {
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        #preset-select {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        @media (max-width: 768px) {
+            .widget-container {
+                padding: 12px !important;
+            }
+            .math-explorer-grid {
+                gap: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .widget-container {
+                padding: 8px !important;
+            }
+            .sim-btn-row {
+                flex-direction: column;
+                gap: 8px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title">
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width:12px;height:12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="page-wrap">
+        <main class="container">
+
+            <!-- Hero & Title Section -->
+            <section class="project-card">
+                <h1 style="font-size:32px;font-weight:700;margin-bottom:10px;color:#fff;">Automatic Sliding Door PID System Control</h1>
+                <h2 style="font-size:18px;font-weight:normal;color:#a0a0a0;margin-bottom:20px;line-height:1.5;">Tuned closed-loop PID control system on Arduino Uno using a VL53L0X Time-of-Flight laser sensor for smooth, oscillation-free automatic sliding door mechanics.</h2>
+                
+                <div style="margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <a href="https://github.com/MFitran/Tugas-Besar-Sistem-Kendal-Mekanika_Automatic-Sliding-Door" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 0; padding: 6px 14px; font-size: 13px;">
+                        <img src="assets/github_logo.png" alt="GitHub" style="width: 14px; height: 14px; background: transparent; filter: invert(1);">
+                        Go to GitHub Repository
+                    </a>
+                </div>
+
+                <div class="responsive-grid-2" style="margin-top: 25px; margin-bottom: 10px;">
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Hardware & Tech Stack</h4>
+                        <div>
+                            <span class="tech-badge">Arduino Uno</span>
+                            <span class="tech-badge">C++ (Arduino IDE)</span>
+                            <span class="tech-badge">VL53L0X Laser Sensor</span>
+                            <span class="tech-badge">SG90 Micro Servo</span>
+                            <span class="tech-badge">HC-SR04 Ultrasonic</span>
+                            <span class="tech-badge">Control Loop Feedback</span>
+                        </div>
+                    </div>
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Skills & Competencies</h4>
+                        <div>
+                            <span class="tech-badge">Feedback Loops</span>
+                            <span class="tech-badge">Discrete PID Tuning</span>
+                            <span class="tech-badge">Transient Analysis</span>
+                            <span class="tech-badge">Laser Ranging</span>
+                            <span class="tech-badge">Sensor Calibration</span>
+                            <span class="tech-badge">I2C Bus Protocol</span>
+                            <span class="tech-badge">Systems Engineering</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="prob-sol-grid">
+                    <div class="ps-card">
+                        <h3 class="rgb-word">The Problem</h3>
+                        <p>Standard sliding doors utilize simple, open-loop threshold triggers that operate the motor at a constant binary velocity (full-on or full-off). This causes abrupt mechanical starting and stopping, leading to excessive wear on the gear mechanisms, loud noise, mechanical vibrations, and potential safety hazards for users when the door slams shut.</p>
+                    </div>
+                    <div class="ps-card">
+                        <h3 class="rgb-word">The PID Solution</h3>
+                        <p>A closed-loop Proportional-Integral-Derivative (PID) controller is implemented on an Arduino Uno. By measuring the door's current position using a high-precision VL53L0X Time-of-Flight laser sensor, the controller adjusts the servo angle in real time to minimize position error. This ensures a smooth, decelerating profile as the door approaches its setpoints (52mm for open, 269mm for closed), achieving optimal damping and zero mechanical slamming.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Design & Hardware -->
+            <section class="project-card" id="system-design">
+                <h2 class="project-section-title">Closed-Loop System Architecture</h2>
+                <p style="font-size: 16px; color: #ccc; margin-bottom: 25px;">
+                    The system operates as a closed-loop negative feedback control loop. An ultrasonic sensor (HC-SR04) acts as an external trigger to detect arriving people. Once triggered, the target setpoint steps from 269 mm (Closed) to 52 mm (Opened). The feedback loop continuously regulates the door position to match this setpoint.
+                </p>
+
+                <div class="system-design-grid">
+                    <div class="ps-card" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                        <h3 style="margin-bottom: 15px; font-size:18px;">Feedback Loop Components</h3>
+                        <ul style="color: #aaa; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                            <li><strong>Input (Setpoint):</strong> Target door position (52 mm open / 269 mm closed).</li>
+                            <li><strong>Controller (Arduino):</strong> Calculates PID algorithm output to compute the required correction.</li>
+                            <li><strong>Actuator (SG90 Servo):</strong> Converts the electrical control signal (servo angle command) into mechanical force.</li>
+                            <li><strong>Plant (Sliding Door):</strong> The physical door moving along its sliding frame.</li>
+                            <li><strong>Sensor Feedback (VL53L0X V2):</strong> Real-time laser ranging sensor measuring the door's actual position in millimeters.</li>
+                        </ul>
+                    </div>
+                    <div style="text-align: center; background: rgba(10,10,10,0.5); border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px;">
+                        <img src="assets/block_diagram_pid_door.jpeg" alt="Sistem Kendali Loop Tertutup PID" style="max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #222;">
+                        <div style="font-size: 12px; color: #666; margin-top: 10px;">Figure 1: Closed-loop control block diagram.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mathematical Modeling -->
+            <section class="project-card" id="math-modeling">
+                <h2 class="project-section-title">Mathematical Modeling & Transfer Function</h2>
+                <div class="responsive-grid-2">
+                    <div class="ps-card" style="height: 100%; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box;">
+                        <h3 style="font-size: 18px; margin-bottom: 12px; color: #fff;">Controller Algorithm (PID)</h3>
+                        <p style="font-size: 14px; color: #aaa; margin-bottom: 15px; line-height: 1.6;">
+                            The PID controller calculates the control output \(u(t)\) in real-time by analyzing the error signal \(e(t)\) between the setpoint and the door's current position:
+                        </p>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid #1a1a1a; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                            \[
+                            u(t) = K_p e(t) + K_i \int_{0}^{t} e(\tau)d\tau + K_d \frac{de(t)}{dt}
+                            \]
+                        </div>
+                        <p style="font-size: 13.5px; color: #888; line-height: 1.5; margin: 0;">
+                            Where \(e(t) = \text{Setpoint} - \text{CurrentPosition}\). The system discretizes this control loop on the Arduino Uno with a sampling rate of \(\Delta t = 50\text{ ms}\).
+                        </p>
+                    </div>
+                    <div class="ps-card" style="height: 100%; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box;">
+                        <h3 style="font-size: 18px; margin-bottom: 12px; color: #fff;">Mechanical Transfer Function</h3>
+                        <p style="font-size: 14px; color: #aaa; margin-bottom: 20px; line-height: 1.6;">
+                            The sliding door is driven by a rotary servo motor through a physical linkage mechanism. To calibrate the plant, the ratio of linear door position (\(\text{mm}\)) to angular servo input (\(\text{degrees}\)) was experimentally measured:
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="border-left: 3px solid #3366cc; padding-left: 15px; background: rgba(0,0,0,0.15); padding-top: 8px; padding-bottom: 8px; border-radius: 0 6px 6px 0;">
+                                <span style="font-weight: 600; color: #fff; font-size:14px; display:block; margin-bottom: 4px;">When Closing (269 mm Setpoint):</span>
+                                <span style="font-size: 13px; color: #aaa; display: block; line-height: 1.5;">
+                                    Input = \(142^{\circ}\) \(\rightarrow\) Output = \(269\text{ mm}\) &nbsp;|&nbsp; 
+                                    \(TF_{\text{close}} = \frac{269\text{ mm}}{142^{\circ}} \approx 1.894\text{ mm/degree}\)
+                                </span>
+                            </div>
+                            <div style="border-left: 3px solid #3366cc; padding-left: 15px; background: rgba(0,0,0,0.15); padding-top: 8px; padding-bottom: 8px; border-radius: 0 6px 6px 0;">
+                                <span style="font-weight: 600; color: #fff; font-size:14px; display:block; margin-bottom: 4px;">When Opening (52 mm Setpoint):</span>
+                                <span style="font-size: 13px; color: #aaa; display: block; line-height: 1.5;">
+                                    Input = \(27^{\circ}\) \(\rightarrow\) Output = \(52\text{ mm}\) &nbsp;|&nbsp; 
+                                    \(TF_{\text{open}} = \frac{52\text{ mm}}{27^{\circ}} \approx 1.926\text{ mm/degree}\)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Live Interactive PID Simulator -->
+            <section class="project-card" id="pid-simulator">
+                <h2 class="project-section-title">Live Interactive PID Closed-Loop Simulator</h2>
+                <p style="font-size: 16px; color: #ccc; margin-bottom: 20px;">
+                    Test the closed-loop system dynamics in real time. Adjust the controller gains (\(K_p, K_i, K_d\)) or choose one of the predefined presets to see how it affects the door's movement and transient responses. You can click <strong>Open Door</strong> or <strong>Close Door</strong> to trigger setpoint transitions!
+                </p>
+
+                <!-- Simulator Widget Container -->
+                <div class="box widget-container">
+                    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid #222; padding-bottom:12px; margin-bottom:20px;">
+                        <h3 style="color:#fff; font-size:18px; font-weight:700; display:flex; align-items:center; gap:8px;">
+                            <span style="display:inline-block; width:10px; height:10px; background:#33cc66; border-radius:50%; animation: pulse-glow 1.5s infinite;"></span>
+                            Real-Time Physical Simulation
+                        </h3>
+                        <span style="font-size:11px; color:#aaa; background:#111; border:1px solid #222; padding:4px 10px; border-radius:20px;">Sampling rate: 50ms</span>
+                    </div>
+                    
+                    <div class="math-explorer-grid">
+                        <!-- Left: Controls & Visualizer -->
+                        <div style="display:flex; flex-direction:column; gap:20px;">
+                            <!-- Door Visualizer Canvas -->
+                            <div id="door-canvas-container">
+                                <svg id="door-svg" width="100%" height="100%" viewBox="0 0 500 160">
+                                    <!-- Background grid -->
+                                    <line x1="0" y1="130" x2="500" y2="130" stroke="#1c1c1c" stroke-width="2" />
+                                    
+                                    <!-- Left Wall Frame -->
+                                    <rect x="0" y="20" width="80" height="110" fill="#0d0d0d" stroke="#1a1a1a" stroke-width="2" />
+                                    <rect x="70" y="20" width="10" height="110" fill="#151515" />
+                                    <!-- Ultrasonic Sensor -->
+                                    <rect x="68" y="70" width="12" height="20" rx="2" fill="#333" stroke="#444" stroke-width="1" />
+                                    <circle cx="74" cy="75" r="3" fill="#555" />
+                                    <circle cx="74" cy="85" r="3" fill="#555" />
+                                    
+                                    <!-- Right Wall Pocket -->
+                                    <rect x="360" y="20" width="140" height="110" fill="#0d0d0d" stroke="#1a1a1a" stroke-width="2" />
+                                    <!-- Laser Sensor -->
+                                    <rect x="355" y="50" width="10" height="14" fill="#3a0000" stroke="#cc3333" stroke-width="1" />
+                                    <circle cx="355" cy="57" r="2.5" fill="#ff3333" />
+                                    
+                                    <!-- Laser beam line (dynamic) -->
+                                    <line id="laser-beam" x1="355" y1="57" x2="260" y2="57" stroke="#33ff66" stroke-dasharray="3,3" stroke-width="1.5" />
+                                    
+                                    <!-- Sliding Door (dynamic position) -->
+                                    <g id="sliding-door-group">
+                                        <!-- Door panel -->
+                                        <rect x="0" y="24" width="220" height="104" rx="4" fill="rgba(51, 102, 204, 0.12)" stroke="#3366cc" stroke-width="2.5" />
+                                        <!-- Internal details of door -->
+                                        <rect x="10" y="32" width="95" height="88" rx="2" fill="none" stroke="rgba(51, 102, 204, 0.2)" stroke-width="1" />
+                                        <rect x="115" y="32" width="95" height="88" rx="2" fill="none" stroke="rgba(51, 102, 204, 0.2)" stroke-width="1" />
+                                        <!-- Door Handle -->
+                                        <rect x="5" y="65" width="4" height="22" rx="1" fill="#3366cc" />
+                                    </g>
+                                    
+                                    <!-- HUD Text Overlays -->
+                                    <text x="250" y="145" id="hud-door-pos" fill="#bbb" font-size="11" text-anchor="middle" font-family="monospace">Door position: --- mm</text>
+                                </svg>
+                            </div>
+                            
+                            <!-- Control inputs panel -->
+                            <div class="sim-controls-grid">
+                                <!-- PID sliders -->
+                                <div style="display:flex; flex-direction:column; gap:12px;">
+                                    <h4 style="color:#fff; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; border-bottom:1px solid #1c1c1c; padding-bottom:6px;">Controller Tuning</h4>
+                                    <div class="slider-group">
+                                        <label><span>Kp (Proportional Gain)</span><span id="kp-val" style="color:#fff;font-family:monospace;font-weight:bold;">0.80</span></label>
+                                        <input type="range" id="slider-kp" min="0" max="3" step="0.05" value="0.8">
+                                    </div>
+                                    <div class="slider-group">
+                                        <label><span>Ki (Integral Gain)</span><span id="ki-val" style="color:#fff;font-family:monospace;font-weight:bold;">0.015</span></label>
+                                        <input type="range" id="slider-ki" min="0" max="0.08" step="0.001" value="0.015">
+                                    </div>
+                                    <div class="slider-group">
+                                        <label><span>Kd (Derivative Gain)</span><span id="kd-val" style="color:#fff;font-family:monospace;font-weight:bold;">0.60</span></label>
+                                        <input type="range" id="slider-kd" min="0" max="2" step="0.05" value="0.6">
+                                    </div>
+                                </div>
+                                
+                                <!-- Presets and actions -->
+                                <div style="display:flex; flex-direction:column; gap:12px;">
+                                    <h4 style="color:#fff; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; border-bottom:1px solid #1c1c1c; padding-bottom:6px;">Simulation Settings</h4>
+                                    
+                                    <div style="display:flex; flex-direction:column; gap:4px;">
+                                        <label style="color:#888; font-size:11px; text-transform:uppercase;">Controller Preset</label>
+                                        <select id="preset-select" style="background:#090909; color:#fff; border:1px solid #222; padding:8px; border-radius:6px; font-size:13px; outline:none; cursor:pointer; font-family:'Inter', sans-serif;">
+                                            <option value="tuned">Tuned Optimal (Kp=0.8, Ki=0.015, Kd=0.6)</option>
+                                            <option value="untuned">Untuned Ziegler (Kp=1.2, Ki=0.02, Kd=0.8)</option>
+                                            <option value="p-only">Proportional Only (Kp=0.6, Ki=0, Kd=0)</option>
+                                            <option value="unstable">Unstable/Oscillating (Kp=2.5, Ki=0.06, Kd=0.15)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="sim-btn-row" style="display:flex; gap:10px; margin-top:8px;">
+                                        <button id="btn-open" class="post-btn" style="flex:1; margin-top:0; padding:8px; font-size:12px; text-align:center; cursor:pointer; background:#111; border-color:#2a2a2a;">Open Door</button>
+                                        <button id="btn-close" class="post-btn" style="flex:1; margin-top:0; padding:8px; font-size:12px; text-align:center; cursor:pointer; background:#111; border-color:#2a2a2a;">Close Door</button>
+                                    </div>
+                                    
+                                    <div style="margin-top:8px;">
+                                        <button id="btn-disturb" class="post-btn" style="width:100%; margin-top:0; padding:8px; font-size:12px; text-align:center; cursor:pointer; background:rgba(255, 51, 102, 0.05); border-color:rgba(255, 51, 102, 0.2); color:#ff3366;">Inject Impulse (Disturbance)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right: Graph Rendering -->
+                        <div style="display:flex; flex-direction:column; gap:12px; min-width:0;">
+                            <h4 style="color:#fff; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; border-bottom:1px solid #1c1c1c; padding-bottom:6px; margin-bottom:10px;">Real-Time Transient Response</h4>
+                            <div class="chart-area">
+                                <svg id="sim-chart" width="100%" height="100%" viewBox="0 0 400 210">
+                                    <!-- Axes & labels will be generated here -->
+                                </svg>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item"><span class="legend-color" style="background:#ff3366;"></span>Setpoint (mm)</div>
+                                <div class="legend-item"><span class="legend-color" style="background:#3366cc;"></span>Actual Position (mm)</div>
+                                <div class="legend-item"><span class="legend-color" style="background:#33cc66;"></span>Servo Command (°)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transient performance stats readout -->
+                    <div class="sim-metrics-grid">
+                        <div class="ps-card" style="padding:10px; background:rgba(5,5,5,0.3); text-align:center; border:1px solid #121212;">
+                            <div style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Delay Time (Td)</div>
+                            <div id="metric-td" style="font-size:16px; color:#fff; font-weight:700; margin-top:4px; font-family:monospace;">--</div>
+                        </div>
+                        <div class="ps-card" style="padding:10px; background:rgba(5,5,5,0.3); text-align:center; border:1px solid #121212;">
+                            <div style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Rise Time (Tr)</div>
+                            <div id="metric-tr" style="font-size:16px; color:#fff; font-weight:700; margin-top:4px; font-family:monospace;">--</div>
+                        </div>
+                        <div class="ps-card" style="padding:10px; background:rgba(5,5,5,0.3); text-align:center; border:1px solid #121212;">
+                            <div style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Peak Time (Tp)</div>
+                            <div id="metric-tp" style="font-size:16px; color:#fff; font-weight:700; margin-top:4px; font-family:monospace;">--</div>
+                        </div>
+                        <div class="ps-card" style="padding:10px; background:rgba(5,5,5,0.3); text-align:center; border:1px solid #121212;">
+                            <div style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Settling Time (Ts)</div>
+                            <div id="metric-ts" style="font-size:16px; color:#fff; font-weight:700; margin-top:4px; font-family:monospace;">--</div>
+                        </div>
+                        <div class="ps-card" style="padding:10px; background:rgba(5,5,5,0.3); text-align:center; border:1px solid #121212;">
+                            <div style="font-size:10px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Steady Error (Ess)</div>
+                            <div id="metric-ess" style="font-size:16px; color:#fff; font-weight:700; margin-top:4px; font-family:monospace;">--</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Empirical Results & Analysis -->
+            <section class="project-card" id="results">
+                <h2 class="project-section-title">Experimental Results & Transient Analysis</h2>
+                <p style="font-size: 16px; color: #ccc;">
+                    The system performance was analyzed under two configuration states: <strong>before tuning</strong> (using standard Ziegler-Nichols estimates) and <strong>after manual fine-tuning</strong>. Time-domain transient parameters were measured from high-speed slow-motion camera footage.
+                </p>
+
+                <!-- Transient Comparison Table -->
+                <div class="result-table-wrap">
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Target Position</th>
+                                <th>Kp</th>
+                                <th>Ki</th>
+                                <th>Kd</th>
+                                <th>Delay Time (\(T_d\))</th>
+                                <th>Rise Time (\(T_r\))</th>
+                                <th>Peak Time (\(T_p\))</th>
+                                <th>Settling Time (\(T_s\))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: rgba(255, 51, 102, 0.02);">
+                                <td>52 mm (Open) [Untuned]</td>
+                                <td>1.2</td>
+                                <td>0.020</td>
+                                <td>0.8</td>
+                                <td>140 ms</td>
+                                <td>300 ms</td>
+                                <td>340 ms</td>
+                                <td style="color: #ff3366; font-weight: 600;">4240 ms</td>
+                            </tr>
+                            <tr style="background: rgba(51, 102, 204, 0.02);">
+                                <td>52 mm (Open) [Tuned]</td>
+                                <td>0.8</td>
+                                <td>0.015</td>
+                                <td>0.6</td>
+                                <td>160 ms</td>
+                                <td>290 ms</td>
+                                <td>710 ms</td>
+                                <td style="color: #33cc66; font-weight: 600;">1040 ms</td>
+                            </tr>
+                            <tr style="background: rgba(255, 51, 102, 0.02);">
+                                <td>269 mm (Close) [Untuned]</td>
+                                <td>1.2</td>
+                                <td>0.020</td>
+                                <td>0.8</td>
+                                <td>180 ms</td>
+                                <td>380 ms</td>
+                                <td>430 ms</td>
+                                <td style="color: #ff3366; font-weight: 600;">1960 ms</td>
+                            </tr>
+                            <tr style="background: rgba(51, 102, 204, 0.02);">
+                                <td>269 mm (Close) [Tuned]</td>
+                                <td>0.8</td>
+                                <td>0.015</td>
+                                <td>0.6</td>
+                                <td>130 ms</td>
+                                <td>400 ms</td>
+                                <td>430 ms</td>
+                                <td style="color: #33cc66; font-weight: 600;">1030 ms</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Transient Curves Grid -->
+                <div class="findings-grid">
+                    <div class="finding-card">
+                        <h3>Opening Dynamics (52 mm Setpoint)</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+                            <div>
+                                <img src="assets/transient_response_open_untuned.png" alt="Untuned Open" style="width: 100%; border-radius: 6px; border: 1px solid #222;">
+                                <div style="font-size: 11px; color:#666; text-align:center; margin-top:5px;">Untuned (\(T_s = 4.24\text{s}\))</div>
+                            </div>
+                            <div>
+                                <img src="assets/transient_response_open_tuned.png" alt="Tuned Open" style="width: 100%; border-radius: 6px; border: 1px solid #222;">
+                                <div style="font-size: 11px; color:#666; text-align:center; margin-top:5px;">Tuned (\(T_s = 1.04\text{s}\))</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 13px; color: #aaa;">
+                            <strong>Analysis:</strong> The untuned system suffered from prolonged structural limit-cycles and high settling times due to sensor noise feeding back into excessive proportional/integral gains. Lowering \(K_p\) to 0.8 and \(K_d\) to 0.6 successfully damped out the oscillations.
+                        </p>
+                    </div>
+                    
+                    <div class="finding-card">
+                        <h3>Closing Dynamics (269 mm Setpoint)</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+                            <div>
+                                <img src="assets/transient_response_close_untuned.png" alt="Untuned Close" style="width: 100%; border-radius: 6px; border: 1px solid #222;">
+                                <div style="font-size: 11px; color:#666; text-align:center; margin-top:5px;">Untuned (\(T_s = 1.96\text{s}\))</div>
+                            </div>
+                            <div>
+                                <img src="assets/transient_response_close_tuned.png" alt="Tuned Close" style="width: 100%; border-radius: 6px; border: 1px solid #222;">
+                                <div style="font-size: 11px; color:#666; text-align:center; margin-top:5px;">Tuned (\(T_s = 1.03\text{s}\))</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 13px; color: #aaa;">
+                            <strong>Analysis:</strong> For closing, the tuned parameters cut down the settling time by 47.4% (from 1960ms down to 1030ms). The steady-state error dropped to near-zero, proving that the manual tuning achieved highly efficient damping.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Servo Analysis -->
+                <div class="servo-char-grid">
+                    <div>
+                        <h3 style="color:#fff; font-size:18px; margin-bottom: 12px;">Servo Motor Characterization</h3>
+                        <p style="font-size: 14px; color:#aaa; margin-bottom: 15px;">
+                            To ensure precise linear movement mapping, the SG90 micro-servo was characterized at different PWM duty cycles. The output average voltage and measured rotation angles show a highly linear response curve, validating our constant Transfer Function model.
+                        </p>
+                        <div class="result-table-wrap" style="margin-top:0;">
+                            <table class="result-table" style="font-size: 12px;">
+                                <thead>
+                                    <tr>
+                                        <th>Duty Cycle (%)</th>
+                                        <th>Measured Voltage (Avg)</th>
+                                        <th>Output Rotation (Deg)</th>
+                                        <th>Response Time (ms)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>5%</td><td>0.25 V</td><td>0°</td><td>20 ms</td></tr>
+                                    <tr><td>6%</td><td>0.30 V</td><td>36°</td><td>20 ms</td></tr>
+                                    <tr><td>8%</td><td>0.40 V</td><td>108°</td><td>20 ms</td></tr>
+                                    <tr><td>10%</td><td>0.50 V</td><td>180°</td><td>20 ms</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align:center; background: rgba(10,10,10,0.5); border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px;">
+                        <img src="assets/servo_output_diagram.png" alt="Servo Calibration Diagram" style="max-width: 100%; height: auto; border-radius: 6px;">
+                        <div style="font-size: 11px; color:#666; margin-top: 8px;">Figure 2: Calibration plot of average voltage versus output degrees.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Arduino Source Code -->
+            <section class="project-card" id="code-implementation">
+                <h2 class="project-section-title">Arduino C++ Source Code</h2>
+                <p style="font-size: 16px; color: #ccc;">
+                    Below is the core control loop implementation deployed on the Arduino Uno microcontroller, separated into logical modules with detailed technical explanations.
+                </p>
+
+                <!-- Part 1: Libraries and Definitions -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">1. Libraries, Pin Definitions & PID Constants</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        This section includes the required headers for I2C communication (<code>Wire.h</code>), servo motor control (<code>Servo.h</code>), and the Adafruit VL53L0X laser ranging library. Pins are assigned for the ultrasonic sensor trigger/echo and servo PWM lines. The optimal tuned control constants (\(K_p = 0.8\), \(K_i = 0.015\), \(K_d = 0.6\)) are declared globally.
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">#include</span> <span class="c-string">&lt;Wire.h&gt;</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;Servo.h&gt;</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;Adafruit_VL53L0X.h&gt;</span>
+
+<span class="c-keyword">#define</span> TRIG_PIN <span class="c-number">4</span>
+<span class="c-keyword">#define</span> ECHO_PIN <span class="c-number">5</span>
+<span class="c-keyword">#define</span> SERVO_PIN <span class="c-number">9</span>
+
+<span class="c-type">Servo</span> slidingDoorServo;
+<span class="c-type">Adafruit_VL53L0X</span> lox = <span class="c-type">Adafruit_VL53L0X</span>();
+<span class="c-keyword">bool</span> isOpen = <span class="c-number">0</span>;
+<span class="c-type">VL53L0X_RangingMeasurementData_t</span> measure;
+
+<span class="c-comment">// Tuned optimal PID Constants</span>
+<span class="c-keyword">float</span> kp = <span class="c-number">0.8</span>;
+<span class="c-keyword">float</span> ki = <span class="c-number">0.015</span>;
+<span class="c-keyword">float</span> kd = <span class="c-number">0.6</span>;</code></pre>
+                </div>
+
+                <!-- Part 2: System Initialization -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">2. System Initialization (setup)</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        The <code>setup()</code> routine initializes the 9600 baud serial port for tracking logs, defines digital I/O modes for the HC-SR04 pins, initializes the VL53L0X sensor over the I2C bus, and attaches the servo motor. The door is commanded to the default closed state (rotary servo angle mapped to 142&deg;).
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">void</span> <span class="c-function">setup</span>() {
+  <span class="c-type">Serial</span>.<span class="c-function">begin</span>(<span class="c-number">9600</span>);
+  <span class="c-function">pinMode</span>(TRIG_PIN, OUTPUT);
+  <span class="c-function">pinMode</span>(ECHO_PIN, INPUT);
+
+  <span class="c-keyword">if</span> (!lox.<span class="c-function">begin</span>()) {
+    <span class="c-type">Serial</span>.<span class="c-function">println</span>(<span class="c-string">"Failed to initialize VL53L0X!"</span>);
+    <span class="c-keyword">while</span> (<span class="c-number">1</span>);
+  }
+  slidingDoorServo.<span class="c-function">attach</span>(SERVO_PIN);
+  slidingDoorServo.<span class="c-function">write</span>(<span class="c-number">142</span>); <span class="c-comment">// Default closed position (angle mapped)</span>
+}</code></pre>
+                </div>
+
+                <!-- Part 3: Laser Ranging -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">3. Laser Ranging Feedback (doorPos)</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        This function performs a real-time distance measurement using the Time-of-Flight (ToF) laser sensor. It queries the sensor, checks if the ranging status flag is valid (filtering out-of-range sensor dropouts), and returns the raw distance in millimeters.
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">int</span> <span class="c-function">doorPos</span>() {
+  lox.<span class="c-function">rangingTest</span>(&amp;measure, <span class="c-keyword">false</span>);
+  <span class="c-keyword">if</span> (measure.RangeStatus != <span class="c-number">4</span>) {
+    <span class="c-keyword">return</span> measure.RangeMilliMeter;
+  } <span class="c-keyword">else</span> <span class="c-keyword">return</span> -<span class="c-number">1</span>;
+}</code></pre>
+                </div>
+
+                <!-- Part 4: PID Control Loop -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">4. Closed-Loop PID Control Loop</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        The core <code>PIDControl()</code> routine implements the discrete-time PID algorithm. It runs inside a <code>while</code> loop that active-monitors the distance error until the door settles inside a <code>&plusmn;3 mm</code> deadband around the target setpoint. It computes error, accumulates integral error, takes derivative error changes, and adds the feedforward <code>setpoint</code> term to offset steady-state gravity/friction. The resulting output in millimeters is scaled and constrained to fit the servo's physical range (23&deg; to 160&deg;).
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">void</span> <span class="c-function">PIDControl</span>(<span class="c-keyword">int</span> setpoint, <span class="c-keyword">float</span>* previousError, <span class="c-keyword">float</span>* integral) {
+  <span class="c-keyword">int</span> currentPosition = <span class="c-function">doorPos</span>();
+
+  <span class="c-keyword">while</span>(setpoint &lt; currentPosition - <span class="c-number">3</span> || setpoint &gt; currentPosition + <span class="c-number">3</span>) {
+    <span class="c-keyword">if</span> (currentPosition == -<span class="c-number">1</span>) <span class="c-keyword">return</span>;
+
+    <span class="c-keyword">float</span> error = setpoint - currentPosition;
+    *integral += error;
+    <span class="c-keyword">float</span> derivative = error - (*previousError);
+
+    <span class="c-comment">// Compute output position in mm</span>
+    <span class="c-keyword">float</span> output = (kp * error + (ki * (*integral)) + (kd * derivative)) + setpoint;
+    *previousError = error;
+
+    <span class="c-comment">// Map mm output back to rotary servo degrees and constrain</span>
+    <span class="c-keyword">int</span> servoInput = <span class="c-function">constrain</span>(output * <span class="c-number">142</span> / <span class="c-number">274</span>, <span class="c-number">23</span>, <span class="c-number">160</span>);
+    slidingDoorServo.<span class="c-function">write</span>(servoInput);
+
+    currentPosition = <span class="c-function">doorPos</span>();
+    <span class="c-function">delay</span>(<span class="c-number">50</span>); <span class="c-comment">// Control loop interval</span>
+  }
+}</code></pre>
+                </div>
+
+                <!-- Part 5: Open/Close Actions -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">5. Opening & Closing Handlers</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        These wrapper functions trigger the control routine with target setpoints: 52 mm for opening and 269 mm for closing. They initialize the local error tracking variables to zero, ensuring each step response begins with clean initial conditions.
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">void</span> <span class="c-function">PIDopen</span>() {
+  <span class="c-type">float</span> prevErr = <span class="c-number">0</span>, integ = <span class="c-number">0</span>;
+  <span class="c-function">PIDControl</span>(<span class="c-number">52</span>, &amp;prevErr, &amp;integ);
+  <span class="c-function">delay</span>(<span class="c-number">250</span>);
+}
+
+<span class="c-keyword">void</span> <span class="c-function">PIDclose</span>() {
+  <span class="c-type">float</span> prevErr = <span class="c-number">0</span>, integ = <span class="c-number">0</span>;
+  <span class="c-function">PIDControl</span>(<span class="c-number">269</span>, &amp;prevErr, &amp;integ);
+  <span class="c-function">delay</span>(<span class="c-number">250</span>);
+}</code></pre>
+                </div>
+
+                <!-- Part 6: Sonar Distance Reading -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">6. Sonar Distance Reading (getDistance)</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        This helper reads the HC-SR04 ultrasonic sensor. It sends a short high pulse (10 microseconds) to trigger the sonar transmitter, reads the duration of the return echo via <code>pulseIn()</code>, and converts the time delay into distance in millimeters based on the speed of sound.
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">int</span> <span class="c-function">getDistance</span>() {
+  <span class="c-function">digitalWrite</span>(TRIG_PIN, LOW);
+  <span class="c-function">delayMicroseconds</span>(<span class="c-number">2</span>);
+  <span class="c-function">digitalWrite</span>(TRIG_PIN, HIGH);
+  <span class="c-function">delayMicroseconds</span>(<span class="c-number">10</span>);
+  <span class="c-function">digitalWrite</span>(TRIG_PIN, LOW);
+  <span class="c-keyword">int</span> duration = <span class="c-function">pulseIn</span>(ECHO_PIN, HIGH);
+  <span class="c-keyword">int</span> distance = duration * <span class="c-number">0.344</span> / <span class="c-number">2</span>;
+  <span class="c-keyword">return</span> distance;
+}</code></pre>
+                </div>
+
+                <!-- Part 7: Main Executive Loop -->
+                <div style="margin-top: 25px; margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">7. Main Program Loop (loop)</h3>
+                    <p style="font-size: 14.5px; color: #aaa; margin-bottom: 12px; line-height: 1.6;">
+                        The primary executive loop runs every 100ms. It checks the ultrasonic sensor's distance reading. If a person is detected within the 115 mm proximity range, it initiates the <code>PIDopen()</code> transition. Otherwise, if the door is open and no one is in proximity, it initiates <code>PIDclose()</code>.
+                    </p>
+                    <pre class="code-block"><code><span class="c-keyword">void</span> <span class="c-function">loop</span>() {  
+  <span class="c-keyword">if</span>(<span class="c-function">getDistance</span>() &lt; <span class="c-number">115</span>) { <span class="c-comment">// Ultrasonic threshold trigger</span>
+    <span class="c-keyword">if</span>(!isOpen) <span class="c-function">PIDopen</span>(), isOpen = <span class="c-number">1</span>;
+  } <span class="c-keyword">else</span> {
+    <span class="c-keyword">if</span>(isOpen) <span class="c-function">PIDclose</span>(), isOpen = <span class="c-number">0</span>;
+  }
+  <span class="c-function">delay</span>(<span class="c-number">100</span>);
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Video & Documentation -->
+            <section class="project-card" id="media-gallery">
+                <h2 class="project-section-title">Video Demonstration & Hardware Setup</h2>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size:18px; color:#fff; margin-bottom: 15px;">Live Demonstration Video</h3>
+                    <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; border:1px solid #151515;">
+                        <iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" src="https://www.youtube.com/embed/FKXibIXa-74" title="PID Sliding Door Demonstration" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <div class="media-gallery-grid">
+                    <div class="ps-card" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                        <h3 style="margin-bottom: 12px; font-size:18px;">Physical Construction</h3>
+                        <p style="font-size: 14px; color: #aaa; margin-bottom: 10px;">
+                            The experimental prototype was constructed using an acrylic sliding door panel sliding on guide rails, directly driven by a micro SG90 servo motor linked to an mechanical arm.
+                        </p>
+                        <p style="font-size: 14px; color: #888;">
+                            <strong>Technical evaluation:</strong> The hardware responded cleanly under optimal PID constants. However, minor sensor communication dropouts can occur if the I2C SCL/SDA jumper cables are not firmly secured to the Arduino board, which can lead to a brief system freeze. Ensuring soldered or locked terminal connections is recommended for industrial applications.
+                        </p>
+                    </div>
+                    <div style="text-align:center; background: rgba(10,10,10,0.5); border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px;">
+                        <img src="assets/pid_door_rangkaian.png" alt="Prototype Rangkaian Elektronik" style="max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #222;">
+                        <div style="font-size: 12px; color: #666; margin-top: 10px;">Figure 3: Hardware schematic wiring setup.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GitHub Repository Card -->
+            <section class="project-card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px 20px; margin-top: 30px; border-style: dashed; border-color: rgba(51, 102, 204, 0.3); background: rgba(51, 102, 204, 0.02);">
+                <h3 style="font-size: 20px; color: #fff; margin: 0; font-weight: 600;">Explore the Codebase</h3>
+                <p style="font-size: 14.5px; color: #aaa; max-width: 520px; margin: 0 auto; line-height: 1.6;">
+                    Access the complete C++ firmware program, VL53L0X Time-of-Flight sensor integrations, SG90 servo motor control loops, and HC-SR04 ultrasonic threshold controllers on GitHub.
+                </p>
+                <div style="margin-top: 10px;">
+                    <a href="https://github.com/MFitran/Tugas-Besar-Sistem-Kendal-Mekanika_Automatic-Sliding-Door" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 36px; font-size: 17px; border-radius: 12px; font-weight: 700; border-color: #3366cc; color: #fff; background: transparent; transition: all 0.2s ease-in-out;" onmouseover="this.style.borderColor='#5588ff'; this.style.backgroundColor='rgba(51, 102, 204, 0.12)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#3366cc'; this.style.backgroundColor='transparent'; this.style.transform='none';">
+                        <img src="assets/github_logo.png" alt="GitHub" style="width: 20px; height: 20px; background: transparent; filter: invert(1);">
+                        Go to GitHub Repository
+                    </a>
+                </div>
+            </section>
+
+        </main>
+    </div><!-- /#page-wrap -->
+
+    <!-- Load MathJax for rendering LaTeX equations -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Interactive Simulator Javascript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State variables
+            let kp = 0.8;
+            let ki = 0.015;
+            let kd = 0.6;
+            
+            let pos = 269.0; // Current position (mm)
+            let target = 269.0; // Setpoint (mm)
+            let lastTarget = 269.0;
+            let currentTheta = 142.0; // Servo angle
+            
+            let integral = 0.0;
+            let prevError = 0.0;
+            
+            // Simulation timing
+            const dt = 0.02; // step duration in seconds (50 FPS)
+            let simInterval = null;
+            
+            // History for graphing
+            const maxHistory = 150; // 3 seconds of data
+            let history = [];
+            for (let i = 0; i < maxHistory; i++) {
+                history.push({ setpoint: 269, pos: 269, angle: 142, rawPos: 269 });
+            }
+            
+            // Transient response tracking
+            let tracking = false;
+            let tStart = 0;
+            let yStart = 269.0;
+            let yTarget = 269.0;
+            
+            let tDelay = null;
+            let tRise10 = null;
+            let tRise90 = null;
+            let tPeak = null;
+            let peakVal = 269.0;
+            let tSettle = null;
+            let settleSteps = 0;
+            
+            // DOM Elements
+            const sliderKp = document.getElementById('slider-kp');
+            const sliderKi = document.getElementById('slider-ki');
+            const sliderKd = document.getElementById('slider-kd');
+            const valKp = document.getElementById('kp-val');
+            const valKi = document.getElementById('ki-val');
+            const valKd = document.getElementById('kd-val');
+            
+            const presetSelect = document.getElementById('preset-select');
+            
+            const btnOpen = document.getElementById('btn-open');
+            const btnClose = document.getElementById('btn-close');
+            const btnDisturb = document.getElementById('btn-disturb');
+            
+            const hudDoorPos = document.getElementById('hud-door-pos');
+            
+            const mDelay = document.getElementById('metric-td');
+            const mRise = document.getElementById('metric-tr');
+            const mPeak = document.getElementById('metric-tp');
+            const mSettle = document.getElementById('metric-ts');
+            const mEss = document.getElementById('metric-ess');
+            
+            // SVG Elements
+            const svgDoor = document.getElementById('sliding-door-group');
+            const svgLaser = document.getElementById('laser-beam');
+            const chartSvg = document.getElementById('sim-chart');
+            
+            // Presets mapping
+            const presets = {
+                tuned: { kp: 0.8, ki: 0.015, kd: 0.6 },
+                untuned: { kp: 1.2, ki: 0.02, kd: 0.8 },
+                'p-only': { kp: 0.6, ki: 0.0, kd: 0.0 },
+                unstable: { kp: 2.5, ki: 0.06, kd: 0.15 }
+            };
+            
+            // Setup controls
+            function updateGainLabels() {
+                valKp.innerText = kp.toFixed(2);
+                valKi.innerText = ki.toFixed(3);
+                valKd.innerText = kd.toFixed(2);
+            }
+            
+            sliderKp.addEventListener('input', (e) => {
+                kp = parseFloat(e.target.value);
+                updateGainLabels();
+                presetSelect.value = 'custom';
+            });
+            sliderKi.addEventListener('input', (e) => {
+                ki = parseFloat(e.target.value);
+                updateGainLabels();
+                presetSelect.value = 'custom';
+            });
+            sliderKd.addEventListener('input', (e) => {
+                kd = parseFloat(e.target.value);
+                updateGainLabels();
+                presetSelect.value = 'custom';
+            });
+            
+            presetSelect.addEventListener('change', (e) => {
+                const sel = e.target.value;
+                if (presets[sel]) {
+                    kp = presets[sel].kp;
+                    ki = presets[sel].ki;
+                    kd = presets[sel].kd;
+                    
+                    sliderKp.value = kp;
+                    sliderKi.value = ki;
+                    sliderKd.value = kd;
+                    updateGainLabels();
+                }
+            });
+            
+            btnOpen.addEventListener('click', () => {
+                triggerStepChange(52.0);
+            });
+            
+            btnClose.addEventListener('click', () => {
+                triggerStepChange(269.0);
+            });
+            
+            btnDisturb.addEventListener('click', () => {
+                // Inject mechanical disturbance/impulse (push the door by 40mm)
+                pos = Math.max(20, Math.min(300, pos + (Math.random() > 0.5 ? 40 : -40)));
+            });
+            
+            function triggerStepChange(newSetpoint) {
+                if (target !== newSetpoint) {
+                    target = newSetpoint;
+                    // Reset controller state for a clean step-response starting condition
+                    integral = 0.0;
+                    prevError = 0.0;
+                    
+                    // Reset transient tracking
+                    tracking = true;
+                    tStart = Date.now();
+                    yStart = pos;
+                    yTarget = target;
+                    
+                    tDelay = null;
+                    tRise10 = null;
+                    tRise90 = null;
+                    tPeak = null;
+                    peakVal = pos;
+                    tSettle = null;
+                    settleSteps = 0;
+                    
+                    mDelay.innerText = "--";
+                    mRise.innerText = "--";
+                    mPeak.innerText = "--";
+                    mSettle.innerText = "--";
+                }
+            }
+            
+            // Core physical loop simulation
+            function simulationStep() {
+
+                // Track step target transition trigger
+                if (target !== lastTarget) {
+                    triggerStepChange(target);
+                    lastTarget = target;
+                }
+                
+                // Get delayed position (sensor reading delay of 80ms = 4 frames)
+                let feedbackPos = history.length > 4 ? (history[history.length - 1 - 4].rawPos !== undefined ? history[history.length - 1 - 4].rawPos : pos) : pos;
+                
+                // PID control math using delayed feedback
+                let error = target - feedbackPos;
+                integral += error * dt;
+                
+                // Anti-windup clamping limit
+                integral = Math.max(-10, Math.min(10, integral));
+                
+                let derivative = (error - prevError) / dt;
+                prevError = error;
+                
+                // Slider mapping (gains tuned for 50Hz PID with feedback delay & friction)
+                let kp_sim = kp * 1.5;
+                let ki_sim = ki * 30.0;
+                let kd_sim = kd * 0.12;
+                
+                // Control output = required door position in mm
+                let output = (kp_sim * error) + (ki_sim * integral) + (kd_sim * derivative) + target;
+                
+                // Mapped control output to rotary command degree: theta = output * 142 / 274
+                let servoInput = (output * 142.0) / 274.0;
+                servoInput = Math.max(23.0, Math.min(160.0, servoInput)); // constrained to hardware boundary
+                
+                // Servo mechanical limitation speed modeling (SG90 max velocity: 60 degrees in 0.12s -> 500 deg/sec)
+                let maxRate = 500.0 * dt; // max change in degrees per simulator frame
+                let diffTheta = servoInput - currentTheta;
+                diffTheta = Math.max(-maxRate, Math.min(maxRate, diffTheta));
+                currentTheta += diffTheta;
+                
+                // Plant model: servo angle maps to commanded linear position
+                let pos_servo = (currentTheta * 274.0) / 142.0;
+                
+                // Force from servo linkage to door
+                let displacement = pos_servo - pos;
+                
+                // Coulomb friction deadband of 1.2 mm
+                let friction = 1.2; 
+                if (Math.abs(displacement) < friction) {
+                    displacement = 0;
+                } else {
+                    displacement -= Math.sign(displacement) * friction;
+                }
+                
+                // First-order lag
+                let alpha = 0.15; // time constant = 133ms
+                pos += displacement * alpha;
+                pos = Math.max(10.0, Math.min(300.0, pos));
+                
+                // Add minor random high frequency noise to model the laser readings
+                let measuredPos = pos + (Math.random() - 0.5) * 0.5;
+                measuredPos = Math.max(10.0, Math.min(300.0, measuredPos));
+                
+                // Update history
+                history.shift();
+                history.push({
+                    setpoint: target,
+                    pos: measuredPos,
+                    angle: currentTheta,
+                    rawPos: pos
+                });
+                
+                // Tracking calculations
+                if (tracking) {
+                    let elapsed = (Date.now() - tStart) / 1000.0;
+                    let totalChange = yTarget - yStart;
+                    
+                    if (Math.abs(totalChange) > 10) {
+                        let currentChange = pos - yStart;
+                        let ratio = currentChange / totalChange;
+                        
+                        // 1. Delay Time: time to reach 50%
+                        if (ratio >= 0.5 && tDelay === null) {
+                            tDelay = elapsed;
+                            mDelay.innerText = (tDelay * 1000).toFixed(0) + " ms";
+                        }
+                        
+                        // 2. Rise Time: 10% to 90%
+                        if (ratio >= 0.1 && tRise10 === null) {
+                            tRise10 = elapsed;
+                        }
+                        if (ratio >= 0.9 && tRise90 === null) {
+                            tRise90 = elapsed;
+                            let tr = tRise90 - tRise10;
+                            mRise.innerText = (tr * 1000).toFixed(0) + " ms";
+                        }
+                        
+                        // 3. Peak overshoot tracking
+                        if (totalChange < 0) { // Opening (269 -> 52)
+                            if (pos < peakVal) {
+                                peakVal = pos;
+                                // If position drops below setpoint, we have overshoot
+                                if (pos < yTarget) {
+                                    tPeak = elapsed;
+                                    let overshootPct = Math.abs(pos - yTarget) / Math.abs(totalChange) * 100;
+                                    mPeak.innerText = (tPeak * 1000).toFixed(0) + " ms (" + overshootPct.toFixed(1) + "%)";
+                                }
+                            }
+                        } else { // Closing (52 -> 269)
+                            if (pos > peakVal) {
+                                peakVal = pos;
+                                if (pos > yTarget) {
+                                    tPeak = elapsed;
+                                    let overshootPct = Math.abs(pos - yTarget) / Math.abs(totalChange) * 100;
+                                    mPeak.innerText = (tPeak * 1000).toFixed(0) + " ms (" + overshootPct.toFixed(1) + "%)";
+                                }
+                            }
+                        }
+                        
+                        // 4. Settling Time: stays within +-5mm of target
+                        if (Math.abs(pos - yTarget) <= 5.0) {
+                            settleSteps++;
+                            if (settleSteps > 20 && tSettle === null) { // stays settled for 400ms
+                                tSettle = elapsed - 0.4;
+                                mSettle.innerText = (tSettle * 1000).toFixed(0) + " ms";
+                                tracking = false; // stop tracking once settled
+                            }
+                        } else {
+                            settleSteps = 0;
+                            tSettle = null;
+                            mSettle.innerText = "Simulating...";
+                        }
+                    }
+                    
+                    if (elapsed > 6.0) { // timeout
+                        tracking = false;
+                        if (tSettle === null) mSettle.innerText = "Diverged / Osc.";
+                    }
+                }
+                
+                // Steady state error
+                let ess = Math.abs(pos - target);
+                mEss.innerText = ess.toFixed(1) + " mm";
+                
+                // Update visuals
+                renderVisuals(measuredPos);
+                renderChart();
+            }
+            
+            function renderVisuals(mPos) {
+                // Door width: 220px. Opening gap width: 260px.
+                // closed position = 269mm -> left edge is at x=100 (closes gap).
+                // open position = 52mm -> left edge is retracted to x=310 (opens gap).
+                // mapping: x = 100 + (269 - pos) * (210 / 217)
+                let doorX = 100 + (269.0 - mPos) * (210.0 / 217.0);
+                doorX = Math.max(100, Math.min(310, doorX));
+                
+                svgDoor.setAttribute('transform', `translate(${doorX}, 0)`);
+                hudDoorPos.textContent = `Door Distance: ${mPos.toFixed(1)} mm`;
+                
+                // Laser beam: starting from sensor at (355, 57) ending at door left edge
+                svgLaser.setAttribute('x2', doorX);
+            }
+            
+            function renderChart() {
+                chartSvg.innerHTML = '';
+                
+                const width = 400;
+                const height = 210;
+                const padLeft = 35;
+                const padRight = 15;
+                const padTop = 15;
+                const padBottom = 25;
+                
+                const chartW = width - padLeft - padRight;
+                const chartH = height - padTop - padBottom;
+                
+                // Draw grid lines (Position: 0 to 300 mm)
+                const gridVals = [0, 50, 100, 150, 200, 250, 300];
+                gridVals.forEach(val => {
+                    let y = padTop + chartH - (val / 300.0) * chartH;
+                    
+                    // Line
+                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute('x1', padLeft);
+                    line.setAttribute('y1', y);
+                    line.setAttribute('x2', padLeft + chartW);
+                    line.setAttribute('y2', y);
+                    line.setAttribute('stroke', '#151515');
+                    line.setAttribute('stroke-width', '1');
+                    chartSvg.appendChild(line);
+                    
+                    // Text
+                    let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute('x', padLeft - 6);
+                    text.setAttribute('y', y + 3);
+                    text.setAttribute('fill', '#555');
+                    text.setAttribute('font-size', '8');
+                    text.setAttribute('text-anchor', 'end');
+                    text.setAttribute('font-family', 'monospace');
+                    text.textContent = val;
+                    chartSvg.appendChild(text);
+                });
+                
+                // Bottom timeline labels (0 to 3 seconds)
+                const timelineVals = [0, 1, 2, 3];
+                timelineVals.forEach(val => {
+                    let x = padLeft + (val / 3.0) * chartW;
+                    
+                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute('x1', x);
+                    line.setAttribute('y1', padTop);
+                    line.setAttribute('x2', x);
+                    line.setAttribute('y2', padTop + chartH);
+                    line.setAttribute('stroke', '#111');
+                    line.setAttribute('stroke-width', '1');
+                    chartSvg.appendChild(line);
+                    
+                    let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute('x', x);
+                    text.setAttribute('y', padTop + chartH + 15);
+                    text.setAttribute('fill', '#555');
+                    text.setAttribute('font-size', '8');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-family', 'monospace');
+                    text.textContent = val + "s";
+                    chartSvg.appendChild(text);
+                });
+                
+                // Generate Paths
+                let setpointPoints = [];
+                let posPoints = [];
+                let anglePoints = [];
+                
+                for (let i = 0; i < maxHistory; i++) {
+                    let x = padLeft + (i / (maxHistory - 1)) * chartW;
+                    
+                    // Setpoint mapping (0 to 300 mm)
+                    let ySp = padTop + chartH - (history[i].setpoint / 300.0) * chartH;
+                    setpointPoints.push(`${x},${ySp}`);
+                    
+                    // Position mapping (0 to 300 mm)
+                    let yPos = padTop + chartH - (history[i].pos / 300.0) * chartH;
+                    posPoints.push(`${x},${yPos}`);
+                    
+                    // Servo angle mapping: 0 to 180 degrees -> mapped to chart
+                    let yAng = padTop + chartH - (history[i].angle / 180.0) * chartH;
+                    anglePoints.push(`${x},${yAng}`);
+                }
+                
+                // Draw Setpoint Path
+                let pathSp = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathSp.setAttribute('d', 'M ' + setpointPoints.join(' L '));
+                pathSp.setAttribute('fill', 'none');
+                pathSp.setAttribute('stroke', '#ff3366');
+                pathSp.setAttribute('stroke-width', '1.5');
+                chartSvg.appendChild(pathSp);
+                
+                // Draw Actual Position Path
+                let pathPos = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathPos.setAttribute('d', 'M ' + posPoints.join(' L '));
+                pathPos.setAttribute('fill', 'none');
+                pathPos.setAttribute('stroke', '#3366cc');
+                pathPos.setAttribute('stroke-width', '2');
+                chartSvg.appendChild(pathPos);
+                
+                // Draw Servo Angle Path
+                let pathAng = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathAng.setAttribute('d', 'M ' + anglePoints.join(' L '));
+                pathAng.setAttribute('fill', 'none');
+                pathAng.setAttribute('stroke', '#33cc66');
+                pathAng.setAttribute('stroke-width', '1.2');
+                pathAng.setAttribute('opacity', '0.6');
+                chartSvg.appendChild(pathAng);
+                
+                // Draw chart borders
+                let border = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                border.setAttribute('x', padLeft);
+                border.setAttribute('y', padTop);
+                border.setAttribute('width', chartW);
+                border.setAttribute('height', chartH);
+                border.setAttribute('fill', 'none');
+                border.setAttribute('stroke', '#222');
+                border.setAttribute('stroke-width', '1');
+                chartSvg.appendChild(border);
+            }
+            
+            // Start simulation loop
+            simInterval = setInterval(simulationStep, dt * 1000);
+            
+            // Clean up on navigate out
+            window.addEventListener('beforeunload', () => {
+                if (simInterval) clearInterval(simInterval);
+            });
+            
+            // Force dynamic MathJax updates for latex
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        });
+    </script>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/sidebar.js?v=20260623"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

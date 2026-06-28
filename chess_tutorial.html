@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Play Chess - fitran</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <!-- Chessboard CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
+    <style>
+        /* Dark theme tweaks for chessboard */
+        .white-1e1d7 { background-color: #606060; color: #E0E0E0; } /* Dark Gray for light squares */
+        .black-3c85d { background-color: #303030; color: #E0E0E0; } /* Very Dark Gray for dark squares */
+
+        .tutorial-content h2 {
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+        .tutorial-content h3 {
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .tutorial-content p {
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        .tutorial-content ul, .tutorial-content ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .tutorial-content li {
+            margin-bottom: 10px;
+        }
+        .piece {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .emphasis {
+            color: #FFD54F; /* A nice gold/yellow color */
+            font-weight: bold;
+        }
+        table.material-table {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        table.material-table th, table.material-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+        table.material-table th {
+            background-color: #1a1a1a;
+        }
+        /* Styles for mini chessboards */
+        .mini-board {
+            width: 240px; /* Smaller board size */
+            margin-bottom: 15px;
+        }
+        .board-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+        .highlight-move {
+            /* Blue circle in the center of the square */
+            background-image: radial-gradient(circle, rgba(80, 150, 255, 0.5) 25%, transparent 26%);
+            background-position: center;
+        }
+        /* For highlighting the selected piece's square */
+        .highlight-selected {
+            background-color: rgba(173, 216, 230, 0.4); /* light blue */
+        }
+        .board-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .board-wrapper p {
+            font-size: 14px; color: #A0A0A0; margin-top: -10px; font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .tutorial-content h2 {
+                font-size: 19px !important;
+            }
+            .tutorial-content h3 {
+                font-size: 16px !important;
+            }
+            .piece {
+                font-size: 19px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title"> 
+                <span class="rgb-word">How to Play Chess</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <a href="chess.html" class="post-btn" style="text-decoration: none; padding: 6px 12px; font-size: 14px;">Back to Chess</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="box tutorial-content">
+            <h2 class="section-title" style="margin-top: 0;">A Beginner's Guide to Chess</h2>
+            <p>Welcome to the world of chess! This guide will walk you through everything you need to know to start playing, from the basic setup and piece movements to special rules and how to win (or draw) the game.</p>
+
+            <h2 id="setup">1. The Goal and Setup</h2>
+            <p>Chess is a game of strategy played between two opponents on a 64-square board. The goal is simple: <span class="emphasis">checkmate</span> your opponent's King. Checkmate is a situation where a King is under attack (in "check") and has no legal moves to escape.</p>
+            <div class="board-container">
+                <div id="board-setup" style="width: 400px;"></div>
+            </div>
+            <p>The board is set up the same way every time. The player with the light-colored pieces is called "White", and the player with the dark-colored pieces is called "Black". White always moves first.</p>
+            <ul>
+                <li>The second row (or "rank") for each player is filled with eight <span class="piece">♙</span> Pawns.</li>
+                <li>The Rooks <span class="piece">♖</span> go in the corners.</li>
+                <li>The Knights <span class="piece">♘</span> go next to the Rooks.</li>
+                <li>The Bishops <span class="piece">♗</span> go next to the Knights.</li>
+                <li>The Queen <span class="piece">♕</span> goes on her own color (White Queen on a light square, Black Queen on a dark square).</li>
+                <li>The King <span class="piece">♔</span> takes the last remaining square.</li>
+            </ul>
+
+            <h2 id="pieces">2. How the Pieces Move</h2>
+            <p>Each of the 6 different kinds of pieces moves differently. Pieces cannot move through other pieces (though the Knight can jump over them), and can never move onto a square with one of their own pieces. However, they can be moved to take the place of an opponent's piece which is then captured.</p>
+            
+            <h3>The King <span class="piece">♔</span></h3>
+            <p>The King is the most important piece, but also one of the weakest. The King can move one square in any direction (horizontally, vertically, or diagonally). The King can never move into check (where it could be captured).</p>
+            <div class="board-container">
+                <div id="board-king" class="mini-board"></div>
+            </div>
+
+            <h3>The Queen <span class="piece">♕</span></h3>
+            <p>The Queen is the most powerful piece. She can move in any one straight direction - forward, backward, sideways, or diagonally - as far as possible as long as she does not move through any of her own pieces.</p>
+            <div class="board-container">
+                <div id="board-queen" class="mini-board"></div>
+            </div>
+
+            <h3>The Rook <span class="piece">♖</span></h3>
+            <p>The Rook may move as far as it wants, but only forwards, backwards, and to the sides (horizontally and vertically). Rooks are particularly powerful pieces when they are protecting each other and working together!</p>
+            <div class="board-container">
+                <div id="board-rook" class="mini-board"></div>
+            </div>
+
+            <h3>The Bishop <span class="piece">♗</span></h3>
+            <p>The Bishop may move as far as it wants, but only diagonally. Each Bishop starts on one color (light or dark) and must always stay on that color.</p>
+            <div class="board-container">
+                <div id="board-bishop" class="mini-board"></div>
+            </div>
+
+            <h3>The Knight <span class="piece">♘</span></h3>
+            <p>Knights move in a very different way from the other pieces – going two squares in one direction (horizontally or vertically), and then one more move at a 90-degree angle, just like the shape of an “L”. The Knight is also the only piece that can move over other pieces.</p>
+            <div class="board-container">
+                <div id="board-knight" class="mini-board"></div>
+            </div>
+
+            <h3>The Pawn <span class="piece">♙</span></h3>
+            <p>Pawns are unusual because they move and capture in different ways. They move forward, but capture diagonally. Pawns can only move forward one square at a time, with one exception: If it is a pawn's first move, it can move forward one or two squares. Pawns can only capture one square diagonally in front of them. They can never move or capture backwards.</p>
+            <div class="board-container">
+                <div class="board-wrapper">
+                    <div id="board-pawn-move" class="mini-board"></div>
+                    <p>Pawn Movement</p>
+                </div>
+                <div class="board-wrapper">
+                    <div id="board-pawn-capture" class="mini-board"></div>
+                    <p>Pawn Capture</p>
+                </div>
+            </div>
+            <p>There is also a special rule for pawns called <span class="emphasis">Promotion</span>. If a pawn reaches the other side of the board, it can become any other chess piece (except a king). This is a powerful ability!</p>
+            <div class="board-container">
+                <div class="board-wrapper">
+                    <div id="board-promotion" class="mini-board"></div>
+                    <p>A pawn reaches the 8th rank and promotes.</p>
+                </div>
+            </div>
+
+            <h2 id="special-rules">3. Special Rules</h2>
+            <p>There are a few special rules in chess that are important to know.</p>
+
+            <h3>Castling</h3>
+            <p>Castling is a special move that allows you to do two important things in one turn: get your king to safety and get your rook out of the corner and into the game. On a player's turn, they may move their king two squares over to one side and then move the rook from that side's corner to right next to the king on the opposite side.</p>
+            <div class="board-container">
+                <div class="board-wrapper">
+                    <div id="board-castling-before" class="mini-board"></div>
+                    <p>Before Castling</p>
+                </div>
+                <div class="board-wrapper">
+                    <div id="board-castling-after" class="mini-board"></div>
+                    <p>After Kingside Castling</p>
+                </div>
+            </div>
+            <p>However, to castle, the following conditions must be met:</p>
+            <ul>
+                <li>It must be that king's very first move.</li>
+                <li>It must be that rook's very first move.</li>
+                <li>There cannot be any pieces between the king and the rook.</li>
+                <li>The king may not be in check or pass through a square that is under attack by an opponent's piece.</li>
+            </ul>
+
+            <h3>En Passant</h3>
+            <p>En Passant (a French term meaning "in passing") is a special pawn capture. It can only occur immediately after a pawn moves two squares forward from its starting position, and an enemy pawn could have captured it if it had only moved one square forward. In this situation, the opposing pawn has the option to capture the first pawn as it passes by.</p>
+            <div class="board-container">
+                <div class="board-wrapper">
+                    <div id="board-enpassant-before" class="mini-board"></div>
+                    <p>Black moves pawn from d7 to d5.</p>
+                </div>
+                <div class="board-wrapper">
+                    <div id="board-enpassant-after" class="mini-board"></div>
+                    <p>White captures "en passant" on d6.</p>
+                </div>
+            </div>
+
+            <h3>Material Values</h3>
+            <p>Not all pieces are equal. Knowing the value of the pieces can help you make decisions about capturing, trading, or making other moves.</p>
+            <table class="material-table">
+                <thead>
+                    <tr><th>Piece</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Pawn <span class="piece">♙</span></td><td>1 Point</td></tr>
+                    <tr><td>Knight <span class="piece">♘</span></td><td>3 Points</td></tr>
+                    <tr><td>Bishop <span class="piece">♗</span></td><td>3 Points</td></tr>
+                    <tr><td>Rook <span class="piece">♖</span></td><td>5 Points</td></tr>
+                    <tr><td>Queen <span class="piece">♕</span></td><td>9 Points</td></tr>
+                </tbody>
+            </table>
+            <p>The King's value is infinite, as losing the King means losing the game!</p>
+
+            <h2 id="draws">4. Ending the Game: Draws</h2>
+            <p>Sometimes a chess game does not end with a winner, but with a draw. There are 5 reasons why a chess game may end in a draw:</p>
+            <ol>
+                <li><span class="emphasis">Stalemate:</span> This happens when one player is not in check and has no legal moves to make. It's a draw.</li>
+                <li><span class="emphasis">Agreement:</span> The players may simply agree to a draw and stop playing.</li>
+                <li><span class="emphasis">Threefold Repetition:</span> If the exact same position is repeated three times (though not necessarily in a row), a player may claim a draw.</li>
+                <li><span class="emphasis">The 50-Move Rule:</span> If both players have made 50 consecutive moves without a pawn move or a capture, a draw can be claimed.</li>
+                <li><span class="emphasis">Insufficient Material:</span> If neither player has enough pieces to force a checkmate (for example, a king and a bishop against a king), it is a draw.</li>
+            </ol>
+            <p>Now you know the rules! The best way to get better is to play. Good luck!</p>
+        </div>
+    </main>
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <!-- Chessboard Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Helper function to highlight squares on a board
+            function highlightSquares(boardId, squares, selectedSquare) {
+                if (selectedSquare) {
+                    $(`#${boardId} [data-square=${selectedSquare}]`).addClass('highlight-selected');
+                }
+                if (squares) {
+                    squares.forEach(square => {
+                        $(`#${boardId} [data-square=${square}]`).addClass('highlight-move');
+                    });
+                }
+            }
+
+            const miniBoardConfig = {
+                showNotation: false,
+                pieceTheme: 'assets/kosal/{piece}.svg'
+            };
+
+            // 1. Setup
+            Chessboard('board-setup', {
+                position: 'start',
+                pieceTheme: 'assets/kosal/{piece}.svg'
+            });
+
+            // 2. Piece Movements
+            Chessboard('board-king', { ...miniBoardConfig, position: '8/8/8/8/4K3/8/8/8 w - - 0 1' });
+            highlightSquares('board-king', ['d3', 'e3', 'f3', 'd4', 'f4', 'd5', 'e5', 'f5'], 'e4');
+
+            Chessboard('board-queen', { ...miniBoardConfig, position: '8/8/8/8/4Q3/8/8/8 w - - 0 1' });
+            highlightSquares('board-queen', ['e1', 'e2', 'e3', 'e5', 'e6', 'e7', 'e8', 'a4', 'b4', 'c4', 'd4', 'f4', 'g4', 'h4', 'b1', 'c2', 'd3', 'f5', 'g6', 'h7', 'h1', 'g2', 'f3', 'd5', 'c6', 'b7', 'a8'], 'e4');
+
+            Chessboard('board-rook', { ...miniBoardConfig, position: '8/8/8/8/4R3/8/8/8 w - - 0 1' });
+            highlightSquares('board-rook', ['e1', 'e2', 'e3', 'e5', 'e6', 'e7', 'e8', 'a4', 'b4', 'c4', 'd4', 'f4', 'g4', 'h4'], 'e4');
+
+            Chessboard('board-bishop', { ...miniBoardConfig, position: '8/8/8/8/4B3/8/8/8 w - - 0 1' });
+            highlightSquares('board-bishop', ['b1', 'c2', 'd3', 'f5', 'g6', 'h7', 'h1', 'g2', 'f3', 'd5', 'c6', 'b7', 'a8'], 'e4');
+
+            Chessboard('board-knight', { ...miniBoardConfig, position: '8/8/8/8/4N3/8/8/8 w - - 0 1' });
+            highlightSquares('board-knight', ['c3', 'c5', 'd2', 'd6', 'f2', 'f6', 'g3', 'g5'], 'e4');
+
+            // Pawn Boards
+            Chessboard('board-pawn-move', { ...miniBoardConfig, position: '8/8/8/8/8/8/4P3/8 w - - 0 1' });
+            highlightSquares('board-pawn-move', ['e3', 'e4'], 'e2');
+
+            Chessboard('board-pawn-capture', { ...miniBoardConfig, position: '8/8/8/3p1p2/4P3/8/8/8 w - - 0 1' });
+            highlightSquares('board-pawn-capture', ['d5', 'f5'], 'e4');
+
+            Chessboard('board-promotion', { ...miniBoardConfig, position: '8/4P3/8/8/8/8/8/4K3 w - - 0 1' });
+            highlightSquares('board-promotion', ['e8'], 'e7');
+
+            // 3. Special Rules
+            // Castling
+            Chessboard('board-castling-before', { ...miniBoardConfig, position: 'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1' });
+            highlightSquares('board-castling-before', ['g1'], 'e1');
+            Chessboard('board-castling-after', { ...miniBoardConfig, position: 'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R4RK1 b kq - 1 1' });
+
+            // En Passant
+            // State after black moves d7-d5, white to move
+            Chessboard('board-enpassant-before', { ...miniBoardConfig, position: '8/8/8/3pP3/8/8/8/8 w - d6 0 1' });
+            highlightSquares('board-enpassant-before', ['d6'], 'e5');
+            // State after white captures exd6
+            Chessboard('board-enpassant-after', { ...miniBoardConfig, position: '8/8/3P4/8/8/8/8/8 b - - 0 1' });
+        });
+    </script>
+</body>
+</html>

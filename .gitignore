@@ -1,0 +1,6 @@
+.env
+node_modules/
+.gemini/
+.agents/
+.agent/
+supabase-config.json
