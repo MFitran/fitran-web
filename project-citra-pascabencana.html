@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Aerial Disaster Classification | Fitran</title>
+    <meta name="description" content="Generational comparison of lightweight YOLOv8n, YOLOv11n, and YOLOv12n architectures with SiLU activation function micro-optimizations for real-time UAV edge-cloud disaster response on the AIDER dataset.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="assets/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title">
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Top"><img src="assets/top_icon.png" alt="Top" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Bottom"><img src="assets/bottom_icon.png" alt="Bottom" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="assets/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="page-wrap">
+        <main class="container">
+            <style>
+                /* --- PROJECT-SPECIFIC PREMIUM STYLES --- */
+                .project-card {
+                    background: transparent;
+                    border: 1px solid #121212;
+                    border-radius: 20px;
+                    padding: 40px;
+                    margin-top: 40px;
+                    margin-bottom: 40px;
+                }
+                .project-section-title {
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-bottom: 25px;
+                    color: #fff;
+                    border-bottom: 1px solid #222;
+                    padding-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .project-badge-container {
+                    margin: 20px 0;
+                }
+                .tech-badge {
+                    display: inline-block;
+                    background: #111;
+                    border: 1px solid #2a2a2a;
+                    color: #b0b0b0;
+                    padding: 6px 14px;
+                    font-size: 13px;
+                    border-radius: 20px;
+                    margin-right: 8px;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    transition: border-color 0.2s, color 0.2s;
+                }
+                .tech-badge:hover {
+                    border-color: #3366cc;
+                    color: #fff;
+                }
+                .prob-sol-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 30px;
+                    margin-top: 20px;
+                }
+                @media (max-width: 768px) {
+                    .prob-sol-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .ps-card {
+                    background: rgba(10, 10, 10, 0.6);
+                    border: 1px solid #151515;
+                    padding: 24px;
+                    border-radius: 12px;
+                }
+                .ps-card h3 {
+                    font-size: 20px;
+                    margin-bottom: 12px;
+                    color: #fff;
+                }
+                .ps-card p {
+                    font-size: 15px;
+                    color: #b0b0b0;
+                    line-height: 1.6;
+                }
+
+                /* --- RESPONSIVE GRIDS --- */
+                .responsive-grid-2 {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+                @media (max-width: 768px) {
+                    .responsive-grid-2 {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .media-gallery-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 30px;
+                    align-items: center;
+                }
+                @media (max-width: 768px) {
+                    .media-gallery-grid {
+                        grid-template-columns: 1fr;
+                        gap: 20px;
+                    }
+                }
+
+                /* --- SIMULATOR WIDGET STYLING --- */
+                .math-explorer-grid {
+                    display: grid;
+                    grid-template-columns: 1.2fr 1fr;
+                    gap: 30px;
+                }
+                @media (max-width: 900px) {
+                    .math-explorer-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .widget-container {
+                    background: #080808;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 12px;
+                    padding: 24px;
+                    min-height: auto;
+                }
+                .slider-group {
+                    margin-bottom: 18px;
+                }
+                .slider-group label {
+                    display: flex;
+                    justify-content: space-between;
+                    color: #b0b0b0;
+                    font-size: 13px;
+                    margin-bottom: 6px;
+                }
+                .slider-group input[type="range"] {
+                    width: 100%;
+                    accent-color: #3366cc;
+                    background: #222;
+                    height: 6px;
+                    border-radius: 3px;
+                    outline: none;
+                }
+                
+                .select-group {
+                    margin-bottom: 18px;
+                }
+                .select-group label {
+                    display: block;
+                    color: #b0b0b0;
+                    font-size: 13px;
+                    margin-bottom: 6px;
+                }
+                .select-group select {
+                    width: 100%;
+                    background: #111;
+                    border: 1px solid #222;
+                    color: #fff;
+                    padding: 10px;
+                    border-radius: 6px;
+                    outline: none;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: border-color 0.2s;
+                }
+                .select-group select:focus {
+                    border-color: #3366cc;
+                }
+
+                /* Live Canvas & Overlay */
+                #simulator-canvas-container {
+                    background: #020202;
+                    border: 1px solid #121212;
+                    border-radius: 8px;
+                    width: 100%;
+                    aspect-ratio: 1 / 1;
+                    position: relative;
+                    overflow: hidden;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                #simulator-canvas {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+                .canvas-loading {
+                    position: absolute;
+                    inset: 0;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    color: #fff;
+                    gap: 15px;
+                    font-family: monospace;
+                    font-size: 14px;
+                    opacity: 0;
+                    pointer-events: none;
+                    transition: opacity 0.2s ease;
+                }
+                .canvas-loading.active {
+                    opacity: 1;
+                    pointer-events: all;
+                }
+                .spinner {
+                    width: 35px;
+                    height: 35px;
+                    border: 3px solid #222;
+                    border-top: 3px solid #3366cc;
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+
+                /* Virtual Serial Monitor */
+                .serial-monitor {
+                    background: #000;
+                    border: 1px solid #1c1c1c;
+                    border-radius: 8px;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    font-size: 12px;
+                    color: #33ff33;
+                    padding: 12px;
+                    height: 160px;
+                    overflow-y: auto;
+                    margin-top: 15px;
+                    box-shadow: inset 0 0 10px rgba(0,255,0,0.15);
+                    scrollbar-width: thin;
+                    scrollbar-color: #222 transparent;
+                }
+                .serial-line {
+                    line-height: 1.4;
+                    white-space: pre-wrap;
+                    border-bottom: 1px solid rgba(255,255,255,0.02);
+                    padding: 2px 0;
+                }
+                .serial-line .timestamp {
+                    color: #888;
+                    margin-right: 8px;
+                }
+                .serial-line .warning {
+                    color: #ffaa00;
+                    font-weight: bold;
+                }
+                .serial-line .success {
+                    color: #33ff33;
+                }
+                .serial-line .info {
+                    color: #33a6ff;
+                }
+
+                .sim-btn-row {
+                    display: flex;
+                    gap: 12px;
+                    margin-top: 10px;
+                }
+                .sim-btn {
+                    flex: 1;
+                    background: #111;
+                    border: 1px solid #222;
+                    color: #ccc;
+                    padding: 10px 12px;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    text-align: center;
+                }
+                .sim-btn:hover {
+                    border-color: #3366cc;
+                    color: #fff;
+                    background: rgba(51, 102, 204, 0.1);
+                }
+                .sim-btn:active {
+                    transform: scale(0.98);
+                }
+
+                /* --- CODE HIGHLIGHTING BLOCK --- */
+                pre.code-block {
+                    background: #020202;
+                    border: 1px solid #121212;
+                    padding: 18px;
+                    border-radius: 8px;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    font-size: 13px;
+                    overflow-x: auto;
+                    color: #a9b7c6;
+                    margin-top: 15px;
+                    line-height: 1.5;
+                }
+                pre.code-block code {
+                    color: #e0e0e0;
+                }
+                .c-comment { color: #57a64a; }
+                .c-keyword { color: #569cd6; }
+                .c-string { color: #d69d85; }
+                .c-function { color: #dcdcaa; }
+                .c-variable { color: #9cdcfe; }
+                .c-type { color: #4ec9b0; }
+                .c-number { color: #b5cea8; }
+
+                /* Benchmarking Table */
+                .register-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                    font-size: 14px;
+                }
+                .register-table th, .register-table td {
+                    border: 1px solid #222;
+                    padding: 10px 12px;
+                    text-align: left;
+                }
+                .register-table th {
+                    background: #0a0a0a;
+                    color: #fff;
+                    font-weight: 600;
+                }
+                .register-table td code {
+                    background: #111;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #3366cc;
+                }
+                
+                /* Math display styling */
+                .math-display-card {
+                    background: rgba(255,255,255,0.01);
+                    border: 1px solid #1c1c1c;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-top: 10px;
+                    text-align: center;
+                }
+
+                #page-wrap {
+                    overflow-x: hidden;
+                }
+                @media (max-width: 768px) {
+                    .project-card {
+                        padding: 24px 16px;
+                    }
+                }
+            </style>
+
+            <!-- Hero Section -->
+            <section class="project-card">
+                <h1 style="font-size:32px;font-weight:700;margin-bottom:10px;color:#fff;">Comparative YOLO Analysis for UAV Disaster Surveillance</h1>
+                <h2 style="font-size:18px;font-weight:normal;color:#a0a0a0;margin-bottom:20px;line-height:1.5;">Generational comparison of lightweight YOLO nano-scale classification models and activation function micro-optimizations for real-time UAV edge-cloud disaster response on the AIDER dataset.</h2>
+                
+                <div style="margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <a href="assets/projects/citra_pascabencana/icamimia_disaster_migitation_draft.pdf" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 0; padding: 6px 14px; font-size: 13px;">
+                        <img src="assets/profile_picture_t.png" alt="PDF" style="width: 14px; height: 14px; border-radius: 50%;">
+                        View Research Paper Draft (PDF)
+                    </a>
+                </div>
+
+                <div class="responsive-grid-2" style="margin-top: 25px; margin-bottom: 10px;">
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Hardware & Software Stack</h4>
+                        <div class="project-badge-container">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">PyTorch</span>
+                            <span class="tech-badge">YOLOv8 / v11 / v12</span>
+                            <span class="tech-badge">Google Colab</span>
+                            <span class="tech-badge">SiLU & ReLU</span>
+                            <span class="tech-badge">AIDER Dataset</span>
+                            <span class="tech-badge">UAV Edge Computing</span>
+                        </div>
+                    </div>
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Research Publications & Citations</h4>
+                        <div style="font-size: 13px; color: #b0b0b0; line-height: 1.5; margin-top: 15px;">
+                            Currently archived as:
+                            <div style="margin-top: 6px; font-family: monospace; color: #3366cc; font-weight: bold;">"A Comparative Analysis of Image Classification for Disaster Management"</div>
+                            <div style="margin-top: 6px; font-size: 12px; color: #666;">Draft compiled under ICAMIMIA and Roboflow dataset pipelines.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem & Solution Section -->
+            <section class="project-card">
+                <h3 class="project-section-title">Problem & Solution</h3>
+                <div class="prob-sol-grid">
+                    <div class="ps-card">
+                        <h3>The Challenge</h3>
+                        <p>
+                            Deploying deep learning models on Unmanned Aerial Vehicles (UAVs) is highly critical for immediate situational awareness in disaster zones (such as locating flooded areas, fires, or structural collapses). However, UAVs operate under severe edge computing constraints: limited battery life and onboard hardware resources require models with extremely low latency and small parameter footprints.
+                        </p>
+                        <p style="margin-top: 10px;">
+                            While new model architectures like YOLOv11 and YOLOv12 are released regularly, their adoption introduces complex computational layers that may not translate to real-world accuracy gains under aerial constraints, environmental noise, and varying lighting conditions.
+                        </p>
+                    </div>
+                    <div class="ps-card">
+                        <h3>The Approach</h3>
+                        <p>
+                            I designed a quantitative comparative benchmark of three generations of lightweight nano models: <strong>YOLOv8n-cls</strong>, <strong>YOLOv11n-cls</strong>, and <strong>YOLOv12n-cls</strong> on the Aerial Image Database for Emergency Response (AIDER) dataset. 
+                        </p>
+                        <p style="margin-top: 10px;">
+                            Furthermore, I investigated micro-architectural optimization by swapping model activation functions dynamically between <strong>ReLU</strong> and <strong>SiLU (Sigmoid Linear Unit)</strong>.
+                        </p>
+                        <p style="margin-top: 10px;">
+                            The benchmarking revealed a critical counter-intuitive finding: <strong>YOLOv8n-SiLU achieved the highest peak accuracy of 98.37%</strong> (with validation loss of 0.0587), outperforming the newer YOLOv12n (97.82%) and YOLOv11n-SiLU (97.67%), showing that precise activation tuning on stable, older baselines is superior to simply adopting newer generation backbones.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive UAV Inference Simulator -->
+            <section class="project-card">
+                <h3 class="project-section-title">Interactive UAV Inference Simulator</h3>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 25px; line-height: 1.6;">
+                    Select an aerial disaster scene, configure the model backbone and activation optimization, adjust flight variables (altitude, camera tilt, lighting), and run simulated inference to test confidence drops, latency variations, and live terminal logging as it would execute on an onboard UAV computing module.
+                </p>
+
+                <div class="math-explorer-grid">
+                    <!-- Controls Widget -->
+                    <div class="widget-container">
+                        <div class="responsive-grid-2">
+                            <!-- Image Select -->
+                            <div class="select-group">
+                                <label for="sim-image-select">Select Aerial Scene (AIDER Class)</label>
+                                <select id="sim-image-select">
+                                    <option value="collapsed_building">Collapsed Building (Severe Damage)</option>
+                                    <option value="fire">Fire & Smoke Outbreak</option>
+                                    <option value="flood">Flooded Area & Water Logging</option>
+                                    <option value="normal">Normal (Urban Roadways & Buildings)</option>
+                                    <option value="traffic">Traffic Incident (Highway Car Jam/Crash)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Model Select -->
+                            <div class="select-group">
+                                <label for="sim-model-select">YOLO Backbone Generation</label>
+                                <select id="sim-model-select">
+                                    <option value="yolo8n">YOLOv8n (Lightweight Baseline)</option>
+                                    <option value="yolo11n">YOLOv11n (Enhanced Backbone)</option>
+                                    <option value="yolo12n">YOLOv12n (Attention-Enhanced)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="responsive-grid-2">
+                            <!-- Activation Select -->
+                            <div class="select-group">
+                                <label for="sim-activation-select">Activation Optimization</label>
+                                <select id="sim-activation-select">
+                                    <option value="silu">SiLU (Smooth, Non-Monotonic)</option>
+                                    <option value="relu">ReLU (Standard Threshold Linear)</option>
+                                </select>
+                            </div>
+
+                            <!-- Weather Select -->
+                            <div class="select-group">
+                                <label for="sim-weather-select">Environmental Lighting / Gain</label>
+                                <select id="sim-weather-select">
+                                    <option value="sunny">Sunny (High Contrast / Clean)</option>
+                                    <option value="cloudy">Cloudy (Diffused / High Shadow Noise)</option>
+                                    <option value="dusk">Dawn/Dusk (Low Light / High Gain)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Altitude Slider -->
+                        <div class="slider-group">
+                            <label for="slider-altitude">
+                                <span>UAV Altitude (m)</span>
+                                <span id="label-altitude">100m</span>
+                            </label>
+                            <input type="range" id="slider-altitude" min="50" max="200" value="100">
+                        </div>
+
+                        <!-- Camera Tilt Slider -->
+                        <div class="slider-group">
+                            <label for="slider-tilt">
+                                <span>Camera Tilt Angle (°)</span>
+                                <span id="label-tilt">30°</span>
+                            </label>
+                            <input type="range" id="slider-tilt" min="0" max="60" value="30">
+                        </div>
+
+                        <div class="sim-btn-row">
+                            <button id="btn-run-inference" class="sim-btn" style="background: #3366cc; color: #fff; border-color: #3366cc;">Run Onboard Inference</button>
+                            <button id="btn-clear-console" class="sim-btn">Clear UAV Console</button>
+                        </div>
+
+                        <!-- Live Terminal Console -->
+                        <div id="sim-console" class="serial-monitor">
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Onboard Telemetry System Initialized. On Standby.</span></div>
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span>Camera Stream: Ready. Resolution 640x640.</div>
+                        </div>
+                    </div>
+
+                    <!-- Output Canvas & KPIs -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Canvas Container -->
+                        <div id="simulator-canvas-container">
+                            <canvas id="simulator-canvas"></canvas>
+                            <div id="canvas-loader" class="canvas-loading">
+                                <div class="spinner"></div>
+                                <div>ONBOARD TPU FORWARD PASS...</div>
+                            </div>
+                        </div>
+
+                        <!-- KPIs Grid -->
+                        <div class="responsive-grid-2">
+                            <div class="ps-card" style="padding: 15px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Model Max Accuracy</div>
+                                <div id="kpi-accuracy" style="font-size: 26px; font-weight: bold; color: #fff;">98.37%</div>
+                            </div>
+                            <div class="ps-card" style="padding: 15px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Onboard Latency</div>
+                                <div id="kpi-latency" style="font-size: 26px; font-weight: bold; color: #33a6ff;">10.3 ms</div>
+                            </div>
+                        </div>
+                        <div class="responsive-grid-2">
+                            <div class="ps-card" style="padding: 15px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Parameters</div>
+                                <div id="kpi-params" style="font-size: 26px; font-weight: bold; color: #fff;">3.2 M</div>
+                            </div>
+                            <div class="ps-card" style="padding: 15px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">FLOPs</div>
+                                <div id="kpi-flops" style="font-size: 26px; font-weight: bold; color: #fff;">8.7 G</div>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Card -->
+                        <div class="ps-card" style="padding: 18px;">
+                            <h4 style="font-size: 13px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px;">Onboard Logic Analysis</h4>
+                            <p id="sim-analysis-note" style="font-size: 13px; color: #a0a0a0; line-height: 1.5;">
+                                Select an AIDER class and click "Run Onboard Inference" to evaluate.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experimental Methodology Section -->
+            <section class="project-card">
+                <h3 class="project-section-title">Experimental Methodology & Code</h3>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
+                    The research utilized a dataset of 6,433 aerial images from the AIDER database. We split the dataset into <strong>70% training (4,501 images)</strong>, <strong>20% validation (1,286 images)</strong>, and <strong>10% testing (646 images)</strong>. All images were preprocessed and resized to 640x640 pixels to fit the YOLO input graph.
+                </p>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
+                    To evaluate activation micro-optimization, I wrote a recursive modules traversal script in PyTorch. The script descends down the model's computational graph and replaces every occurrence of <code>nn.SiLU</code> with <code>nn.ReLU</code>, creating the modified variants:
+                </p>
+
+                <pre class="code-block"><code><span class="c-keyword">import</span> torch.nn <span class="c-keyword">as</span> nn
+
+<span class="c-keyword">def</span> <span class="c-function">replace_activation</span>(module):
+    <span class="c-keyword">for</span> name, child <span class="c-keyword">in</span> module.named_children():
+        <span class="c-keyword">if</span> <span class="c-function">isinstance</span>(child, nn.SiLU):
+            <span class="c-keyword">setattr</span>(module, name, nn.ReLU()) <span class="c-comment"># Swap SiLU to ReLU</span>
+        <span class="c-keyword">else</span>:
+            replace_activation(child) <span class="c-comment"># Recursively traverse submodules</span>
+
+<span class="c-comment"># Apply the replacement directly to the loaded network</span>
+replace_activation(model.model)
+<span class="c-function">print</span>(<span class="c-string">"Model activations micro-optimized to ReLU."</span>)</code></pre>
+
+                <div class="responsive-grid-2" style="margin-top: 20px;">
+                    <div>
+                        <h4 style="color:#fff; font-size:15px; margin-bottom: 8px;">SiLU (Sigmoid Linear Unit)</h4>
+                        <p style="color: #a0a0a0; font-size: 13.5px; line-height: 1.5;">
+                            SiLU applies a smooth, non-monotonic gating activation: \(f(x) = x \cdot \sigma(x)\) where \(\sigma(x) = \frac{1}{1 + e^{-x}}\). The smooth gradient improves convergence flow but has exponential overhead on edge CPUs.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 style="color:#fff; font-size:15px; margin-bottom: 8px;">ReLU (Rectified Linear Unit)</h4>
+                        <p style="color: #a0a0a0; font-size: 13.5px; line-height: 1.5;">
+                            ReLU applies a simple linear threshold: \(f(x) = \max(0, x)\). It is computationally cheap (zero floating-point operations) but suffers from dead neurons and poor gradient propagation on complex high-resolution aerial datasets.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results & Benchmarking Section -->
+            <section class="project-card">
+                <h3 class="project-section-title">Comparative Performance Benchmarking</h3>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
+                    All models were trained under identical conditions: 50 epochs, Stochastic Gradient Descent (SGD) optimizer, dynamic Automatic Mixed Precision (AMP) enabled, on an NVIDIA T4 GPU. The checkpoint weights yielding the lowest validation loss were selected for final test set evaluation.
+                </p>
+
+                <h4 style="color:#fff; font-size: 16px; margin-top: 25px; margin-bottom: 10px;">Table I: Model Performance Matrix on AIDER</h4>
+                <div style="overflow-x: auto;">
+                    <table class="register-table">
+                        <thead>
+                            <tr>
+                                <th>Model Generation</th>
+                                <th>Activation Function</th>
+                                <th>Top-1 Accuracy</th>
+                                <th>Validation Loss</th>
+                                <th>Best Epoch</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>YOLOv8n (Baseline)</strong></td>
+                                <td>ReLU (Modified)</td>
+                                <td>97.59%</td>
+                                <td>0.1063</td>
+                                <td>41</td>
+                            </tr>
+                            <tr style="background: rgba(51, 102, 204, 0.08);">
+                                <td><strong>YOLOv8n-SiLU (Best)</strong></td>
+                                <td>SiLU (Default)</td>
+                                <td><strong>98.37%</strong></td>
+                                <td><strong>0.0587</strong></td>
+                                <td><strong>47</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv11n</strong></td>
+                                <td>ReLU (Modified)</td>
+                                <td>97.51%</td>
+                                <td>0.0942</td>
+                                <td>41</td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv11n-SiLU</strong></td>
+                                <td>SiLU (Default)</td>
+                                <td>97.67%</td>
+                                <td>0.0988</td>
+                                <td>42</td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv12n</strong></td>
+                                <td>ReLU (Modified)</td>
+                                <td>97.82%</td>
+                                <td>0.0853</td>
+                                <td>37</td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv12n-SiLU</strong></td>
+                                <td>SiLU (Default)</td>
+                                <td>97.05%</td>
+                                <td>0.0999</td>
+                                <td>40</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 style="color:#fff; font-size: 16px; margin-top: 30px; margin-bottom: 10px;">Critical Research Insights</h4>
+                <div class="responsive-grid-2">
+                    <div class="ps-card" style="border-left: 3px solid #3366cc;">
+                        <h4 style="color:#fff; font-size: 14.5px; margin-bottom: 8px;">Ablation: Generational SiLU Impact</h4>
+                        <p style="font-size: 13.5px; color: #a0a0a0; line-height: 1.5;">
+                            Applying the smooth, non-monotonic SiLU activation yielded significant accuracy gains on older backbones: <strong>+0.78%</strong> for YOLOv8n and <strong>+0.16%</strong> for YOLOv11n. However, forcing SiLU on YOLOv12n led to a performance drop of <strong>-0.77%</strong> (down to 97.05%). This suggests that YOLOv12's native attention mechanisms and re-parameterized blocks are highly self-calibrated; adding extra activation gates over-complicates the network.
+                        </p>
+                    </div>
+                    <div class="ps-card" style="border-left: 3px solid #ffaa00;">
+                        <h4 style="color:#fff; font-size: 14.5px; margin-bottom: 8px;">Confusion Matrix Analysis</h4>
+                        <p style="font-size: 13.5px; color: #a0a0a0; line-height: 1.5;">
+                            Across all architectures, class sensitivities remained above 95% except for the <strong>"Traffic Incident"</strong> class, which was consistently capped at 94%, with 6% of cases misclassified as "Normal". This error stems from visual similarities in low-altitude drone perspectives: high-density car flow on highways and road layouts look highly identical to a static car accident scene, requiring higher resolution mapping or temporal video feeds to resolve.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div><!-- /#page-wrap -->
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="assets/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="assets/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="assets/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="assets/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="assets/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="assets/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="assets/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="assets/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="assets/js/sidebar.js?v=20260623"></script>
+    <script src="assets/js/main.js"></script>
+
+    <!-- Simulator Logic Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Assets paths
+            const IMAGE_PATHS = {
+                collapsed_building: 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg',
+                fire: 'assets/projects/citra_pascabencana/fire_sample.jpg',
+                flood: 'assets/projects/citra_pascabencana/flood_sample.jpg',
+                normal: 'assets/projects/citra_pascabencana/normal_sample.jpg',
+                traffic: 'assets/projects/citra_pascabencana/traffic_sample.jpg'
+            };
+
+            // Model Stats Data
+            const MODEL_STATS = {
+                yolo8n: {
+                    relu:   { kpiAcc: '97.59%', baseLat: 9.8,  params: '3.2 M', flops: '8.7 G' },
+                    silu:   { kpiAcc: '98.37%', baseLat: 10.3, params: '3.2 M', flops: '8.7 G' }
+                },
+                yolo11n: {
+                    relu:   { kpiAcc: '97.51%', baseLat: 10.5, params: '2.6 M', flops: '6.5 G' },
+                    silu:   { kpiAcc: '97.67%', baseLat: 11.0, params: '2.6 M', flops: '6.5 G' }
+                },
+                yolo12n: {
+                    relu:   { kpiAcc: '97.82%', baseLat: 12.1, params: '2.8 M', flops: '6.8 G' },
+                    silu:   { kpiAcc: '97.05%', baseLat: 12.7, params: '2.8 M', flops: '6.8 G' }
+                }
+            };
+
+            // Annotation Box Overlay Data (drawn relative to a 640x640 canvas)
+            const ANNOTATIONS = {
+                collapsed_building: [
+                    { x: 120, y: 150, w: 250, h: 220, label: 'Building Structure Collapse', color: '#ff3333' },
+                    { x: 380, y: 280, w: 180, h: 200, label: 'Wall Concrete Debris', color: '#ff3333' }
+                ],
+                fire: [
+                    { x: 200, y: 180, w: 220, h: 180, label: 'Active Fire Flame', color: '#ffaa00' },
+                    { x: 150, y: 80, w: 320, h: 140, label: 'Smoke Plume', color: '#888888' }
+                ],
+                flood: [
+                    { x: 50, y: 220, w: 540, h: 320, label: 'Flooded Surface Area', color: '#33a6ff' },
+                    { x: 180, y: 120, w: 150, h: 100, label: 'Submerged Roadways', color: '#33a6ff' }
+                ],
+                normal: [
+                    { x: 40, y: 40, w: 560, h: 560, label: 'Stable Infrastructure', color: '#33cc66' }
+                ],
+                traffic: [
+                    { x: 220, y: 200, w: 180, h: 140, label: 'Vehicle Crash / Incident', color: '#ffea00' },
+                    { x: 100, y: 80, w: 420, h: 480, label: 'Congested Highway Traffic', color: '#ffea00' }
+                ]
+            };
+
+            // DOM Elements
+            const selectImage = document.getElementById('sim-image-select');
+            const selectModel = document.getElementById('sim-model-select');
+            const selectActivation = document.getElementById('sim-activation-select');
+            const selectWeather = document.getElementById('sim-weather-select');
+            const sliderAltitude = document.getElementById('slider-altitude');
+            const sliderTilt = document.getElementById('slider-tilt');
+            const labelAltitude = document.getElementById('label-altitude');
+            const labelTilt = document.getElementById('label-tilt');
+            
+            const btnRun = document.getElementById('btn-run-inference');
+            const btnClear = document.getElementById('btn-clear-console');
+            const consoleEl = document.getElementById('sim-console');
+            
+            const canvas = document.getElementById('simulator-canvas');
+            const ctx = canvas.getContext('2d');
+            const canvasLoader = document.getElementById('canvas-loader');
+
+            const kpiAccuracy = document.getElementById('kpi-accuracy');
+            const kpiLatency = document.getElementById('kpi-latency');
+            const kpiParams = document.getElementById('kpi-params');
+            const kpiFlops = document.getElementById('kpi-flops');
+            const simAnalysisNote = document.getElementById('sim-analysis-note');
+
+            let currentImg = new Image();
+
+            // Set canvas resolution
+            canvas.width = 640;
+            canvas.height = 640;
+
+            // Load and draw initial image
+            function loadAndDrawImage() {
+                const imgClass = selectImage.value;
+                currentImg.src = IMAGE_PATHS[imgClass];
+                currentImg.onload = () => {
+                    ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+                };
+            }
+
+            // Sync Slider text
+            sliderAltitude.addEventListener('input', () => {
+                labelAltitude.innerText = `${sliderAltitude.value}m`;
+            });
+            sliderTilt.addEventListener('input', () => {
+                labelTilt.innerText = `${sliderTilt.value}°`;
+            });
+
+            selectImage.addEventListener('change', loadAndDrawImage);
+            loadAndDrawImage();
+
+            // Run Simulator
+            btnRun.addEventListener('click', () => {
+                // Show loader on canvas
+                canvasLoader.classList.add('active');
+                
+                // Get configurations
+                const imgClass = selectImage.value;
+                const modelGen = selectModel.value;
+                const activationOpt = selectActivation.value;
+                const weatherVal = selectWeather.value;
+                const altitudeVal = parseInt(sliderAltitude.value);
+                const tiltVal = parseInt(sliderTilt.value);
+
+                // Fetch stats
+                const stats = MODEL_STATS[modelGen][activationOpt];
+
+                // Calculate Simulated Latency
+                let latencyVal = stats.baseLat;
+                if (weatherVal === 'dusk') latencyVal += 0.4; // Low light preprocessing overhead
+                if (altitudeVal > 150) latencyVal += 0.2; // Scaling interpolation overhead
+                latencyVal += (Math.random() * 0.6 - 0.3); // Minor noise
+
+                // Calculate Simulated Confidence
+                let baseConf = 98.2;
+                if (imgClass === 'traffic') baseConf = 94.0; // Harder class
+
+                // Penalties
+                if (altitudeVal > 120) baseConf -= (altitudeVal - 120) * 0.04;
+                if (tiltVal > 30) baseConf -= (tiltVal - 30) * 0.08;
+                if (weatherVal === 'cloudy') baseConf -= 2.1;
+                if (weatherVal === 'dusk') baseConf -= 4.8;
+                
+                // Activation match multiplier
+                if (modelGen === 'yolo8n' && activationOpt === 'silu') baseConf += 0.5;
+                if (modelGen === 'yolo12n' && activationOpt === 'silu') baseConf -= 1.5; // YOLOv12 degraded with SiLU
+
+                if (baseConf > 99.8) baseConf = 99.8;
+                if (baseConf < 50.0) baseConf = 50.0;
+
+                // Log process in Console
+                logToConsole(`Onboard TPU processing request triggered.`, 'info');
+                
+                setTimeout(() => {
+                    logToConsole(`Camera stream frame acquired. Resizing image to [640x640].`);
+                }, 300);
+
+                setTimeout(() => {
+                    logToConsole(`Frame normalisation & preprocessing complete. Image tensor loaded to GPU.`);
+                }, 600);
+
+                setTimeout(() => {
+                    logToConsole(`Loading weights for checkpoint: [${modelGen}_cls_${activationOpt}.pt].`);
+                }, 900);
+
+                setTimeout(() => {
+                    logToConsole(`Running forward pass through network backbone (FP16 mixed precision)...`);
+                }, 1200);
+
+                setTimeout(() => {
+                    // Hide loading spinner
+                    canvasLoader.classList.remove('active');
+
+                    // Redraw image
+                    ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+
+                    // Draw Bounding Boxes / Overlays
+                    const boxes = ANNOTATIONS[imgClass];
+                    ctx.lineWidth = 4;
+                    ctx.font = 'bold 20px monospace';
+                    ctx.textBaseline = 'top';
+
+                    boxes.forEach(box => {
+                        ctx.strokeStyle = box.color;
+                        ctx.strokeRect(box.x, box.y, box.w, box.h);
+
+                        // Draw Tag Label
+                        const labelText = `${box.label} (${baseConf.toFixed(1)}%)`;
+                        const textWidth = ctx.measureText(labelText).width;
+                        
+                        ctx.fillStyle = box.color;
+                        ctx.fillRect(box.x - 2, box.y - 30, textWidth + 12, 30);
+
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText(labelText, box.x + 4, box.y - 25);
+                    });
+
+                    // Update UI Metrics
+                    kpiAccuracy.innerText = stats.kpiAcc;
+                    kpiLatency.innerText = `${latencyVal.toFixed(1)} ms`;
+                    kpiParams.innerText = stats.params;
+                    kpiFlops.innerText = stats.flops;
+
+                    // Log completion
+                    logToConsole(`Inference complete in ${latencyVal.toFixed(1)} ms. Found target class: [${imgClass.toUpperCase()}]`, 'success');
+                    
+                    if (baseConf < 85.0) {
+                        logToConsole(`[WARNING] Target confidence low (${baseConf.toFixed(1)}%). Check UAV altitude or lighting conditions!`, 'warning');
+                    } else {
+                        logToConsole(`Telemetry log package dispatched to Ground Control Station (GCS).`, 'info');
+                    }
+
+                    // Update dynamic analysis note
+                    updateAnalysisNote(imgClass, modelGen, activationOpt, baseConf);
+
+                }, 1500);
+            });
+
+            // Log output generator
+            function logToConsole(message, type = '') {
+                const now = new Date();
+                const ts = now.toTimeString().split(' ')[0];
+                let classType = '';
+                if (type === 'success') classType = 'success';
+                else if (type === 'warning') classType = 'warning';
+                else if (type === 'info') classType = 'info';
+
+                const logLine = `<div class="serial-line"><span class="timestamp">[${ts}]</span><span class="${classType}">${message}</span></div>`;
+                consoleEl.insertAdjacentHTML('beforeend', logLine);
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+
+            btnClear.addEventListener('click', () => {
+                consoleEl.innerHTML = '';
+                logToConsole('Console log buffer cleared.', 'info');
+            });
+
+            function updateAnalysisNote(imgClass, modelGen, activationOpt, conf) {
+                let note = '';
+                if (modelGen === 'yolo8n' && activationOpt === 'silu') {
+                    note = `<strong>Optimal Configuration:</strong> YOLOv8n combined with SiLU optimization achieves the absolute peak accuracy on the AIDER dataset (98.37%). It strikes a perfect gradient flow during backward passes.`;
+                } else if (modelGen === 'yolo12n' && activationOpt === 'silu') {
+                    note = `<strong>Degraded Configuration:</strong> YOLOv12n performs poorly with SiLU (-0.77% drop). Its native attention mechanisms and re-parameterized blocks are already highly self-calibrated; adding extra activation gates over-complicates the network.`;
+                } else if (activationOpt === 'relu') {
+                    note = `<strong>Lower Computing Cost:</strong> The ReLU variant operates slightly faster (~0.5ms reduction in onboard TPU latency) but exhibits lower average Top-1 accuracy due to linear threshold clipping in backpropagation.`;
+                } else {
+                    note = `<strong>Generational Benchmark:</strong> Running YOLOv11n or YOLOv12n shows high stability, but their parameter efficiency does not yield proportional accuracy gains compared to the optimized YOLOv8n baseline on the AIDER dataset.`;
+                }
+
+                if (conf < 85.0) {
+                    note += `<br><span style="color:#ffaa00;"><strong>Alert:</strong> Environmental noise (high altitude/oblique angle/dusk lighting) has degraded the classification confidence to ${conf.toFixed(1)}%. Lower the drone altitude for better pixel density.</span>`;
+                }
+
+                simAnalysisNote.innerHTML = note;
+            }
+        });
+    </script>
+</body>
+</html>
