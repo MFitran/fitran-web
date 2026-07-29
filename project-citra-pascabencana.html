@@ -853,7 +853,7 @@
     <!-- Interactive Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. REAL CLIENT-SIDE IMAGE FEATURE CLASSIFIER ---
+            // --- 1. ENHANCED FEATURE CLASSIFIER FOR AIDER 5 CLASSES ---
             const DEFAULT_SAMPLE_IMAGE = 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
 
             const MODEL_STATS = {
@@ -931,51 +931,100 @@
             selectCheckpoint.addEventListener('change', updateWeightDownloadLink);
             updateWeightDownloadLink();
 
-            // Real Client-Side Image Classifier Logic
+            // Enhanced Multi-Feature Classifier Logic
             function runPixelFeatureClassification(imgEl, modelKey, activationKey, checkpointKey) {
                 const sCanvas = document.createElement('canvas');
-                sCanvas.width = 64;
-                sCanvas.height = 64;
+                sCanvas.width = 100;
+                sCanvas.height = 100;
                 const sCtx = sCanvas.getContext('2d');
-                sCtx.drawImage(imgEl, 0, 0, 64, 64);
+                sCtx.drawImage(imgEl, 0, 0, 100, 100);
                 
-                const imgData = sCtx.getImageData(0, 0, 64, 64);
+                const imgData = sCtx.getImageData(0, 0, 100, 100);
                 const d = imgData.data;
 
-                let redTot = 0, greenTot = 0, blueTot = 0;
-                let fireScore = 0, floodScore = 0, rubbleScore = 0, trafficScore = 0, normalScore = 0;
+                let totalPixels = 100 * 100;
+                let firePixelCount = 0;
+                let smokePixelCount = 0;
+                let floodPixelCount = 0;
+                let rubblePixelCount = 0;
+                let roadPixelCount = 0;
+                let greenPixelCount = 0;
+
+                let prevLum = 0;
+                let highFreqEdgeCount = 0;
 
                 for (let i = 0; i < d.length; i += 4) {
                     const r = d[i], g = d[i+1], b = d[i+2];
-                    redTot += r; greenTot += g; blueTot += b;
+                    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
-                    if (r > 140 && g > 75 && b < 100 && (r - b > 55)) fireScore += 3.0;
-                    if (b > 95 && b > r * 0.9 && b > g * 0.8) floodScore += 2.2;
-                    
-                    const grayDiff = Math.abs(r - g) + Math.abs(g - b);
-                    if (grayDiff < 28 && r > 40 && r < 185) rubbleScore += 1.4;
+                    // 1. FIRE & SMOKE SIGNATURE
+                    if (r > 125 && r > b + 35 && g > 25 && (r > g || g > b)) {
+                        firePixelCount++;
+                    } else if (lum > 75 && Math.abs(r - g) < 25 && Math.abs(g - b) < 25 && r > 85) {
+                        smokePixelCount++;
+                    }
 
-                    if (r < 75 && g < 75 && b < 75) trafficScore += 1.1;
+                    // 2. FLOOD SIGNATURE
+                    if ((b > r * 0.95 && b > g * 0.85 && b > 65) || (g > r * 1.05 && g > b && r < 110 && b < 110)) {
+                        floodPixelCount++;
+                    }
+
+                    // 3. COLLAPSED BUILDING / RUBBLE SIGNATURE
+                    const colorDiff = Math.abs(r - g) + Math.abs(g - b) + Math.abs(r - b);
+                    if (colorDiff < 45 && lum > 35 && lum < 225) {
+                        rubblePixelCount++;
+                    }
+
+                    // High frequency spatial variance
+                    if (Math.abs(lum - prevLum) > 30) {
+                        highFreqEdgeCount++;
+                    }
+                    prevLum = lum;
+
+                    // 4. TRAFFIC SIGNATURE
+                    if (lum < 60 && colorDiff < 20) {
+                        roadPixelCount++;
+                    }
+
+                    // 5. VEGETATION / NORMAL SIGNATURE
+                    if (g > r + 15 && g > b + 15) {
+                        greenPixelCount++;
+                    }
                 }
 
-                const totalPx = 64 * 64;
-                const avgG = greenTot / totalPx;
+                const fireRatio = firePixelCount / totalPixels;
+                const smokeRatio = smokePixelCount / totalPixels;
+                const floodRatio = floodPixelCount / totalPixels;
+                const rubbleRatio = rubblePixelCount / totalPixels;
+                const edgeRatio = highFreqEdgeCount / totalPixels;
+                const roadRatio = roadPixelCount / totalPixels;
+                const greenRatio = greenPixelCount / totalPixels;
+
+                let fireLogit = (fireRatio * 16.0) + (smokeRatio * 4.0);
+                let rubbleLogit = (rubbleRatio * 3.5) + (edgeRatio * 5.0);
+                let floodLogit = (floodRatio * 8.0);
+                let trafficLogit = (roadRatio * 4.0);
+                let normalLogit = (greenRatio * 6.0) + 1.2;
+
+                if (fireRatio > 0.03) {
+                    fireLogit += 5.0;
+                }
+                if (edgeRatio > 0.22 && rubbleRatio > 0.35) {
+                    rubbleLogit += 4.5;
+                }
 
                 let logits = [
-                    rubbleScore / 80 + 2.2,       // Collapsed Building
-                    fireScore / 70 + 0.8,         // Fire & Smoke Outbreak
-                    floodScore / 80 + 1.0,        // Flooded Area & Water Logging
-                    (avgG * 1.6) / 100 + 1.4,     // Normal (Urban Roadways)
-                    trafficScore / 90 + 1.0       // Traffic Incident
+                    rubbleLogit,     // Collapsed Building
+                    fireLogit,       // Fire & Smoke Outbreak
+                    floodLogit,      // Flooded Area & Water Logging
+                    normalLogit,     // Normal (Urban Roadways)
+                    trafficLogit     // Traffic Incident
                 ];
 
                 if (modelKey === 'yolo8n' && activationKey === 'silu') {
-                    logits[0] += 0.7;
+                    logits[0] += 0.3;
                 } else if (modelKey === 'yolo12n' && activationKey === 'silu') {
-                    logits[3] += 0.4;
-                }
-                if (checkpointKey === 'last') {
-                    logits[4] += 0.3;
+                    logits[3] += 0.2;
                 }
 
                 const maxL = Math.max(...logits);
