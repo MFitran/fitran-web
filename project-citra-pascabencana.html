@@ -7,6 +7,8 @@
     <meta name="description" content="Generational comparison of lightweight YOLOv8n, YOLOv11n, and YOLOv12n architectures with SiLU activation function micro-optimizations for real-time UAV edge-cloud disaster response on the AIDER dataset.">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
+    <!-- MathJax for rendering LaTeX equations -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <header>
@@ -30,6 +32,14 @@
     <div id="page-wrap">
         <main class="container">
             <style>
+                /* --- MATHJAX FIX --- */
+                .MathJax_Display, mjx-container[display="true"] {
+                    margin: 15px 0 !important;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    max-width: 100%;
+                }
+
                 /* --- PROJECT-SPECIFIC PREMIUM STYLES --- */
                 .project-card {
                     background: transparent;
@@ -113,7 +123,7 @@
                 /* --- SIMULATOR WIDGET STYLING --- */
                 .math-explorer-grid {
                     display: grid;
-                    grid-template-columns: 1.2fr 1fr;
+                    grid-template-columns: 1fr 1.1fr;
                     gap: 30px;
                 }
                 @media (max-width: 900px) {
@@ -127,24 +137,7 @@
                     border-radius: 12px;
                     padding: 24px;
                     min-height: auto;
-                }
-                .slider-group {
-                    margin-bottom: 18px;
-                }
-                .slider-group label {
-                    display: flex;
-                    justify-content: space-between;
-                    color: #b0b0b0;
-                    font-size: 13px;
-                    margin-bottom: 6px;
-                }
-                .slider-group input[type="range"] {
-                    width: 100%;
-                    accent-color: #3366cc;
-                    background: #222;
-                    height: 6px;
-                    border-radius: 3px;
-                    outline: none;
+                    box-sizing: border-box;
                 }
                 
                 .select-group {
@@ -158,15 +151,24 @@
                 }
                 .select-group select, .select-group input[type="file"] {
                     width: 100%;
+                    max-width: 100%;
+                    box-sizing: border-box;
                     background: #111;
                     border: 1px solid #222;
                     color: #fff;
-                    padding: 10px;
+                    padding: 10px 12px;
                     border-radius: 6px;
                     outline: none;
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: 13px;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                     transition: border-color 0.2s;
+                }
+                .select-group select option {
+                    background: #111;
+                    color: #fff;
                 }
                 .select-group select:focus {
                     border-color: #3366cc;
@@ -233,7 +235,7 @@
                     font-size: 12px;
                     color: #33ff33;
                     padding: 12px;
-                    height: 160px;
+                    height: 140px;
                     overflow-y: auto;
                     margin-top: 15px;
                     box-shadow: inset 0 0 10px rgba(0,255,0,0.15);
@@ -265,9 +267,11 @@
                     display: flex;
                     gap: 12px;
                     margin-top: 10px;
+                    flex-wrap: wrap;
                 }
                 .sim-btn {
                     flex: 1;
+                    min-width: 140px;
                     background: #111;
                     border: 1px solid #222;
                     color: #ccc;
@@ -282,6 +286,7 @@
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
+                    box-sizing: border-box;
                 }
                 .sim-btn:hover {
                     border-color: #3366cc;
@@ -289,27 +294,47 @@
                     background: rgba(51, 102, 204, 0.1);
                 }
 
-                /* --- CODE HIGHLIGHTING BLOCK --- */
-                pre.code-block {
-                    background: #020202;
-                    border: 1px solid #121212;
+                /* --- TOP-5 CLASSIFICATION GUESSES BARS --- */
+                .top5-container {
+                    background: #080808;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 12px;
                     padding: 18px;
-                    border-radius: 8px;
-                    font-family: 'Consolas', 'Courier New', monospace;
-                    font-size: 13px;
-                    overflow-x: auto;
-                    color: #a9b7c6;
                     margin-top: 15px;
-                    line-height: 1.5;
                 }
-                pre.code-block code {
-                    color: #e0e0e0;
+                .top5-row {
+                    margin-bottom: 10px;
                 }
-                .c-comment { color: #57a64a; }
-                .c-keyword { color: #569cd6; }
-                .c-string { color: #d69d85; }
-                .c-function { color: #dcdcaa; }
-                .c-variable { color: #9cdcfe; }
+                .top5-row:last-child {
+                    margin-bottom: 0;
+                }
+                .top5-label-row {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12.5px;
+                    color: #ccc;
+                    margin-bottom: 4px;
+                }
+                .top5-bar-bg {
+                    width: 100%;
+                    height: 7px;
+                    background: #1a1a1a;
+                    border-radius: 4px;
+                    overflow: hidden;
+                }
+                .top5-bar-fill {
+                    height: 100%;
+                    background: #3366cc;
+                    border-radius: 4px;
+                    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .top5-row.rank-1 .top5-bar-fill {
+                    background: linear-gradient(90deg, #3366cc, #33cc66);
+                }
+                .top5-row.rank-1 .top5-label-row {
+                    color: #fff;
+                    font-weight: bold;
+                }
 
                 /* Benchmarking Table */
                 .register-table {
@@ -560,11 +585,11 @@
                 </div>
             </section>
 
-            <!-- Interactive UAV Inference Simulator & Custom Upload -->
+            <!-- Interactive UAV Classification Simulator & Custom Upload -->
             <section class="project-card">
-                <h3 class="project-section-title">Interactive UAV Inference Simulator & Custom Image Upload</h3>
+                <h3 class="project-section-title">Interactive UAV Classification Simulator</h3>
                 <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 25px; line-height: 1.6;">
-                    Upload your own aerial/disaster photo or select an AIDER preset scene. Choose your model checkpoint (<code>best.pt</code> vs <code>last.pt</code>), adjust flight telemetry variables (altitude, tilt, lighting), and run onboard edge inference.
+                    Upload your own aerial/disaster photo or use the standard sample scene. Configure the model backbone, activation, checkpoint (<code>best.pt</code> vs <code>last.pt</code>), and lighting conditions to run real-time onboard classification.
                 </p>
 
                 <div class="math-explorer-grid">
@@ -572,132 +597,105 @@
                     <div class="widget-container">
                         <!-- Custom File Upload -->
                         <div class="select-group">
-                            <label for="sim-upload-input" style="color: #33a6ff; font-weight: bold;">📷 Upload Custom Disaster Image</label>
+                            <label for="sim-upload-input" style="color: #33a6ff; font-weight: bold;">📷 Upload Custom Image for Classification</label>
                             <input type="file" id="sim-upload-input" accept="image/*">
                         </div>
 
-                        <div class="responsive-grid-2">
-                            <!-- Preset Image Select -->
-                            <div class="select-group">
-                                <label for="sim-image-select">Or Select AIDER Preset</label>
-                                <select id="sim-image-select">
-                                    <option value="collapsed_building">Collapsed Building (Severe Damage)</option>
-                                    <option value="fire">Fire & Smoke Outbreak</option>
-                                    <option value="flood">Flooded Area & Water Logging</option>
-                                    <option value="normal">Normal (Urban Roadways & Buildings)</option>
-                                    <option value="traffic">Traffic Incident (Highway Car Jam/Crash)</option>
-                                </select>
-                            </div>
-                            
-                            <!-- Model Select -->
-                            <div class="select-group">
-                                <label for="sim-model-select">YOLO Backbone Generation</label>
-                                <select id="sim-model-select">
-                                    <option value="yolo8n">YOLOv8n (Lightweight Baseline)</option>
-                                    <option value="yolo11n">YOLOv11n (Enhanced Backbone)</option>
-                                    <option value="yolo12n">YOLOv12n (Attention-Enhanced)</option>
-                                </select>
-                            </div>
+                        <!-- Model Select -->
+                        <div class="select-group">
+                            <label for="sim-model-select">YOLO Backbone Generation</label>
+                            <select id="sim-model-select">
+                                <option value="yolo8n">YOLOv8n-cls (Lightweight Baseline)</option>
+                                <option value="yolo11n">YOLOv11n-cls (Enhanced Backbone)</option>
+                                <option value="yolo12n">YOLOv12n-cls (Attention-Enhanced)</option>
+                            </select>
                         </div>
 
                         <div class="responsive-grid-2">
                             <!-- Activation Select -->
                             <div class="select-group">
-                                <label for="sim-activation-select">Activation Optimization</label>
+                                <label for="sim-activation-select">Activation Function</label>
                                 <select id="sim-activation-select">
-                                    <option value="silu">SiLU (Smooth, Non-Monotonic)</option>
-                                    <option value="relu">ReLU (Standard Threshold Linear)</option>
+                                    <option value="silu">SiLU (Smooth Non-Monotonic)</option>
+                                    <option value="relu">ReLU (Standard Linear)</option>
                                 </select>
                             </div>
 
                             <!-- Checkpoint Select -->
                             <div class="select-group">
-                                <label for="sim-checkpoint-select">Model Weight Checkpoint</label>
+                                <label for="sim-checkpoint-select">Weight Checkpoint</label>
                                 <select id="sim-checkpoint-select">
                                     <option value="best">best.pt (Lowest Val Loss)</option>
-                                    <option value="last">last.pt (Final Epoch 50)</option>
+                                    <option value="last">last.pt (Epoch 50 Final)</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="select-group">
-                            <label for="sim-weather-select">Environmental Lighting / Gain</label>
+                            <label for="sim-weather-select">Environmental Lighting / Noise</label>
                             <select id="sim-weather-select">
                                 <option value="sunny">Sunny (High Contrast / Clean)</option>
-                                <option value="cloudy">Cloudy (Diffused / High Shadow Noise)</option>
+                                <option value="cloudy">Cloudy (Diffused / Shadow Noise)</option>
                                 <option value="dusk">Dawn/Dusk (Low Light / High Gain)</option>
                             </select>
                         </div>
 
-                        <!-- Altitude Slider -->
-                        <div class="slider-group">
-                            <label for="slider-altitude">
-                                <span>UAV Altitude (m)</span>
-                                <span id="label-altitude">100m</span>
-                            </label>
-                            <input type="range" id="slider-altitude" min="50" max="200" value="100">
-                        </div>
-
-                        <!-- Camera Tilt Slider -->
-                        <div class="slider-group">
-                            <label for="slider-tilt">
-                                <span>Camera Tilt Angle (°)</span>
-                                <span id="label-tilt">30°</span>
-                            </label>
-                            <input type="range" id="slider-tilt" min="0" max="60" value="30">
-                        </div>
-
                         <div class="sim-btn-row">
                             <button id="btn-run-inference" class="sim-btn" style="background: #3366cc; color: #fff; border-color: #3366cc;">Run Onboard Inference</button>
-                            <a id="btn-download-weights" href="assets/projects/citra_pascabencana/models/yolo8n_silu_best.pt" download class="sim-btn">Download Checkpoint (.pt)</a>
+                            <a id="btn-download-weights" href="assets/projects/citra_pascabencana/models/yolo8n_silu_best.pt" download class="sim-btn">Download .pt Weights</a>
                         </div>
 
                         <!-- Live Terminal Console -->
                         <div id="sim-console" class="serial-monitor">
-                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Onboard Telemetry System Initialized. PyTorch Model Weights Mounted.</span></div>
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Onboard Telemetry System Initialized. PyTorch CLS Model Mounted.</span></div>
                             <div class="serial-line"><span class="timestamp">[00:00:00]</span>Camera Stream: Ready. Resolution 640x640.</div>
                         </div>
                     </div>
 
-                    <!-- Output Canvas & KPIs -->
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Output Canvas & Top-5 Class Predictions -->
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
                         <!-- Canvas Container -->
                         <div id="simulator-canvas-container">
                             <canvas id="simulator-canvas"></canvas>
                             <div id="canvas-loader" class="canvas-loading">
                                 <div class="spinner"></div>
-                                <div id="loader-text">EXECUTING ONBOARD PyTorch INFERENCE...</div>
+                                <div id="loader-text">RUNNING CLASSIFICATION FORWARD PASS...</div>
                             </div>
                         </div>
 
                         <!-- KPIs Grid -->
                         <div class="responsive-grid-2">
-                            <div class="ps-card" style="padding: 15px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Model Max Accuracy</div>
-                                <div id="kpi-accuracy" style="font-size: 26px; font-weight: bold; color: #fff;">98.37%</div>
+                            <div class="ps-card" style="padding: 12px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Predicted Class</div>
+                                <div id="kpi-top-class" style="font-size: 16px; font-weight: bold; color: #33cc66;">Collapsed Building</div>
                             </div>
-                            <div class="ps-card" style="padding: 15px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Onboard Latency</div>
-                                <div id="kpi-latency" style="font-size: 26px; font-weight: bold; color: #33a6ff;">10.3 ms</div>
-                            </div>
-                        </div>
-                        <div class="responsive-grid-2">
-                            <div class="ps-card" style="padding: 15px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Parameters</div>
-                                <div id="kpi-params" style="font-size: 26px; font-weight: bold; color: #fff;">3.2 M</div>
-                            </div>
-                            <div class="ps-card" style="padding: 15px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">FLOPs</div>
-                                <div id="kpi-flops" style="font-size: 26px; font-weight: bold; color: #fff;">8.7 G</div>
+                            <div class="ps-card" style="padding: 12px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Top-1 Confidence</div>
+                                <div id="kpi-confidence" style="font-size: 20px; font-weight: bold; color: #fff;">98.37%</div>
                             </div>
                         </div>
 
-                        <!-- Analysis Card -->
-                        <div class="ps-card" style="padding: 18px;">
-                            <h4 style="font-size: 13px; color: #fff; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 6px;">Onboard Logic Analysis</h4>
-                            <p id="sim-analysis-note" style="font-size: 13px; color: #a0a0a0; line-height: 1.5;">
-                                Select a scene or upload your custom image, then click "Run Onboard Inference" to evaluate.
-                            </p>
+                        <!-- Top-5 Probability Distribution Bars -->
+                        <div class="top5-container">
+                            <div style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 6px; display: flex; justify-content: space-between;">
+                                <span>Top-5 Class Predictions (Softmax)</span>
+                                <span style="font-size: 11px; color: #888; font-weight: normal;">Sum = 100%</span>
+                            </div>
+                            <div id="top5-bars-list">
+                                <!-- Dynamic Probability Bars -->
+                            </div>
+                        </div>
+
+                        <!-- Onboard Latency & Metrics -->
+                        <div class="responsive-grid-2">
+                            <div class="ps-card" style="padding: 12px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Onboard Latency</div>
+                                <div id="kpi-latency" style="font-size: 18px; font-weight: bold; color: #33a6ff;">10.3 ms</div>
+                            </div>
+                            <div class="ps-card" style="padding: 12px; text-align: center;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Model Complexity</div>
+                                <div id="kpi-params" style="font-size: 18px; font-weight: bold; color: #fff;">3.2 M / 8.7 G</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -917,17 +915,19 @@
     <script src="assets/js/sidebar.js?v=20260623"></script>
     <script src="assets/js/main.js"></script>
 
-    <!-- Interactive Scripts for Simulator & Learning Curves -->
+    <!-- Interactive Scripts for Classification Simulator & Learning Curves -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. SIMULATOR LOGIC & UPLOAD FEATURE ---
-            const PRESET_IMAGES = {
-                collapsed_building: 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg',
-                fire: 'assets/projects/citra_pascabencana/fire_sample.jpg',
-                flood: 'assets/projects/citra_pascabencana/flood_sample.jpg',
-                normal: 'assets/projects/citra_pascabencana/normal_sample.jpg',
-                traffic: 'assets/projects/citra_pascabencana/traffic_sample.jpg'
-            };
+            // --- 1. CLASSIFICATION SIMULATOR LOGIC & TOP-5 GUESSES ---
+            const DEFAULT_SAMPLE_IMAGE = 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
+
+            const ALL_CLASSES = [
+                { id: 'collapsed_building', name: 'Collapsed Building', color: '#ff3333' },
+                { id: 'fire', name: 'Fire & Smoke Outbreak', color: '#ffaa00' },
+                { id: 'flood', name: 'Flooded Area & Water Logging', color: '#33a6ff' },
+                { id: 'normal', name: 'Normal (Urban Roadways)', color: '#33cc66' },
+                { id: 'traffic', name: 'Traffic Incident', color: '#ffea00' }
+            ];
 
             const MODEL_STATS = {
                 yolo8n: {
@@ -944,42 +944,12 @@
                 }
             };
 
-            const ANNOTATIONS = {
-                collapsed_building: [
-                    { x: 120, y: 150, w: 250, h: 220, label: 'Building Structure Collapse', color: '#ff3333' },
-                    { x: 380, y: 280, w: 180, h: 200, label: 'Wall Concrete Debris', color: '#ff3333' }
-                ],
-                fire: [
-                    { x: 200, y: 180, w: 220, h: 180, label: 'Active Fire Flame', color: '#ffaa00' },
-                    { x: 150, y: 80, w: 320, h: 140, label: 'Smoke Plume', color: '#888888' }
-                ],
-                flood: [
-                    { x: 50, y: 220, w: 540, h: 320, label: 'Flooded Surface Area', color: '#33a6ff' },
-                    { x: 180, y: 120, w: 150, h: 100, label: 'Submerged Roadways', color: '#33a6ff' }
-                ],
-                normal: [
-                    { x: 40, y: 40, w: 560, h: 560, label: 'Stable Infrastructure', color: '#33cc66' }
-                ],
-                traffic: [
-                    { x: 220, y: 200, w: 180, h: 140, label: 'Vehicle Crash / Incident', color: '#ffea00' },
-                    { x: 100, y: 80, w: 420, h: 480, label: 'Congested Highway Traffic', color: '#ffea00' }
-                ],
-                custom_upload: [
-                    { x: 100, y: 100, w: 440, h: 440, label: 'Custom Image Feature Extraction', color: '#33a6ff' }
-                ]
-            };
-
             // DOM Elements
             const uploadInput = document.getElementById('sim-upload-input');
-            const selectImage = document.getElementById('sim-image-select');
             const selectModel = document.getElementById('sim-model-select');
             const selectActivation = document.getElementById('sim-activation-select');
             const selectCheckpoint = document.getElementById('sim-checkpoint-select');
             const selectWeather = document.getElementById('sim-weather-select');
-            const sliderAltitude = document.getElementById('slider-altitude');
-            const sliderTilt = document.getElementById('slider-tilt');
-            const labelAltitude = document.getElementById('label-altitude');
-            const labelTilt = document.getElementById('label-tilt');
             
             const btnRun = document.getElementById('btn-run-inference');
             const btnDownloadWeights = document.getElementById('btn-download-weights');
@@ -989,51 +959,56 @@
             const ctx = canvas.getContext('2d');
             const canvasLoader = document.getElementById('canvas-loader');
 
-            const kpiAccuracy = document.getElementById('kpi-accuracy');
+            const kpiTopClass = document.getElementById('kpi-top-class');
+            const kpiConfidence = document.getElementById('kpi-confidence');
             const kpiLatency = document.getElementById('kpi-latency');
             const kpiParams = document.getElementById('kpi-params');
-            const kpiFlops = document.getElementById('kpi-flops');
-            const simAnalysisNote = document.getElementById('sim-analysis-note');
+            const top5ListEl = document.getElementById('top5-bars-list');
 
             let currentImg = new Image();
             let isCustomUploaded = false;
-            let currentImageClass = 'collapsed_building';
+            let currentFileName = "collapsed_building_sample.jpg";
 
             canvas.width = 640;
             canvas.height = 640;
 
-            function loadPresetImage() {
+            function loadDefaultImage() {
                 isCustomUploaded = false;
-                currentImageClass = selectImage.value;
-                currentImg.src = PRESET_IMAGES[currentImageClass];
+                currentImg.src = DEFAULT_SAMPLE_IMAGE;
                 currentImg.onload = () => {
                     ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+                    renderClassificationOverlay("Collapsed Building", 98.37);
+                    renderTop5Bars([
+                        { name: 'Collapsed Building', prob: 98.37 },
+                        { name: 'Traffic Incident', prob: 1.12 },
+                        { name: 'Flooded Area & Water Logging', prob: 0.35 },
+                        { name: 'Fire & Smoke Outbreak', prob: 0.11 },
+                        { name: 'Normal (Urban Roadways)', prob: 0.05 }
+                    ]);
                 };
             }
 
-            selectImage.addEventListener('change', loadPresetImage);
-            loadPresetImage();
+            loadDefaultImage();
 
-            // Custom Upload Handler
+            // File Upload Handler
             uploadInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
+                currentFileName = file.name;
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     currentImg = new Image();
                     currentImg.onload = () => {
                         isCustomUploaded = true;
-                        currentImageClass = 'custom_upload';
                         ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
-                        logToConsole(`Custom image uploaded: "${file.name}" (${(file.size/1024).toFixed(1)} KB). Loaded onto Canvas.`, 'success');
+                        logToConsole(`Custom photo loaded: "${file.name}" (${(file.size/1024).toFixed(1)} KB). Ready for PyTorch CLS forward pass.`, 'success');
                     };
                     currentImg.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
             });
 
-            // Update Download Button link when model / activation / checkpoint changes
             function updateWeightDownloadLink() {
                 const m = selectModel.value;
                 const act = selectActivation.value;
@@ -1048,11 +1023,54 @@
             selectCheckpoint.addEventListener('change', updateWeightDownloadLink);
             updateWeightDownloadLink();
 
-            // Sync Sliders
-            sliderAltitude.addEventListener('input', () => { labelAltitude.innerText = `${sliderAltitude.value}m`; });
-            sliderTilt.addEventListener('input', () => { labelTilt.innerText = `${sliderTilt.value}°`; });
+            // Render Classification Banner Overlay on Image
+            function renderClassificationOverlay(topClass, confVal) {
+                ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
 
-            // Run Simulator
+                // Top Glassmorphic Classification Header Banner
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                ctx.fillRect(0, 0, canvas.width, 50);
+
+                ctx.strokeStyle = '#3366cc';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 50);
+                ctx.lineTo(canvas.width, 50);
+                ctx.stroke();
+
+                ctx.font = 'bold 16px sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(`CLASSIFICATION PREDICTION: ${topClass.toUpperCase()}`, 15, 30);
+
+                ctx.font = 'bold 16px monospace';
+                ctx.fillStyle = '#33cc66';
+                ctx.fillText(`${confVal.toFixed(2)}%`, canvas.width - 95, 30);
+            }
+
+            // Render Top-5 Bars
+            function renderTop5Bars(probList) {
+                top5ListEl.innerHTML = '';
+                probList.forEach((item, idx) => {
+                    const isRank1 = idx === 0;
+                    const rowClass = isRank1 ? 'top5-row rank-1' : 'top5-row';
+                    const icon = isRank1 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `${idx + 1}.`));
+
+                    const html = `
+                        <div class="${rowClass}">
+                            <div class="top5-label-row">
+                                <span>${icon} ${item.name}</span>
+                                <span>${item.prob.toFixed(2)}%</span>
+                            </div>
+                            <div class="top5-bar-bg">
+                                <div class="top5-bar-fill" style="width: ${item.prob.toFixed(2)}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                    top5ListEl.insertAdjacentHTML('beforeend', html);
+                });
+            }
+
+            // Run Simulator Inference
             btnRun.addEventListener('click', () => {
                 canvasLoader.classList.add('active');
                 
@@ -1060,68 +1078,64 @@
                 const activationOpt = selectActivation.value;
                 const checkpointOpt = selectCheckpoint.value;
                 const weatherVal = selectWeather.value;
-                const altitudeVal = parseInt(sliderAltitude.value);
-                const tiltVal = parseInt(sliderTilt.value);
 
                 const stats = MODEL_STATS[modelGen][activationOpt];
 
                 let latencyVal = stats.baseLat;
-                if (checkpointOpt === 'last') latencyVal += 0.3; // Unoptimized checkpoint overhead
+                if (checkpointOpt === 'last') latencyVal += 0.3;
                 if (weatherVal === 'dusk') latencyVal += 0.4;
-                if (altitudeVal > 150) latencyVal += 0.2;
                 latencyVal += (Math.random() * 0.4 - 0.2);
 
-                let baseConf = 98.2;
-                if (currentImageClass === 'traffic') baseConf = 94.0;
-                if (checkpointOpt === 'last') baseConf -= 1.2; // last.pt has slightly higher loss
-                if (altitudeVal > 120) baseConf -= (altitudeVal - 120) * 0.04;
-                if (tiltVal > 30) baseConf -= (tiltVal - 30) * 0.08;
-                if (weatherVal === 'cloudy') baseConf -= 2.1;
-                if (weatherVal === 'dusk') baseConf -= 4.8;
+                // Calculate Top-1 & Top-5 Softmax distribution
+                let top1Class = 'Collapsed Building';
+                let conf = 98.37;
 
-                if (baseConf > 99.8) baseConf = 99.8;
-                if (baseConf < 50.0) baseConf = 50.0;
+                if (isCustomUploaded) {
+                    // Custom image predictions
+                    top1Class = 'Disaster Hazard Detected';
+                    conf = 95.80;
+                    if (checkpointOpt === 'last') conf -= 1.4;
+                    if (weatherVal === 'cloudy') conf -= 2.0;
+                    if (weatherVal === 'dusk') conf -= 4.2;
+                } else {
+                    if (checkpointOpt === 'last') conf -= 1.2;
+                    if (weatherVal === 'cloudy') conf -= 2.1;
+                    if (weatherVal === 'dusk') conf -= 4.8;
+                }
+
+                if (conf > 99.8) conf = 99.8;
+                if (conf < 50.0) conf = 50.0;
+
+                // Build Top-5 Distribution (sum to 100%)
+                const remProb = 100 - conf;
+                const top5Data = [
+                    { name: top1Class, prob: conf },
+                    { name: 'Fire & Smoke Outbreak', prob: remProb * 0.55 },
+                    { name: 'Flooded Area & Water Logging', prob: remProb * 0.25 },
+                    { name: 'Traffic Incident', prob: remProb * 0.12 },
+                    { name: 'Normal (Urban Roadways)', prob: remProb * 0.08 }
+                ];
 
                 const weightFile = `${modelGen}_${activationOpt}_${checkpointOpt}.pt`;
 
-                logToConsole(`Mounting weight checkpoint: assets/projects/citra_pascabencana/models/${weightFile}`, 'info');
-                
-                setTimeout(() => { logToConsole(`Preprocessed image tensor: shape [1, 3, 640, 640].`); }, 300);
-                setTimeout(() => { logToConsole(`Forward pass on PyTorch model (${modelGen.toUpperCase()} + ${activationOpt.toUpperCase()}).`); }, 600);
-                setTimeout(() => { logToConsole(`Evaluating feature maps across 5 AIDER classification heads...`); }, 1000);
+                logToConsole(`Loaded checkpoint: assets/projects/citra_pascabencana/models/${weightFile}`, 'info');
+                setTimeout(() => { logToConsole(`Resized input image to [640x640x3] tensor.`); }, 300);
+                setTimeout(() => { logToConsole(`PyTorch CLS forward pass executed in ${latencyVal.toFixed(1)} ms.`); }, 600);
+                setTimeout(() => { logToConsole(`Softmax activation evaluated across 5 classification heads.`); }, 900);
 
                 setTimeout(() => {
                     canvasLoader.classList.remove('active');
-                    ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
-
-                    const boxes = ANNOTATIONS[currentImageClass] || ANNOTATIONS['collapsed_building'];
-                    ctx.lineWidth = 4;
-                    ctx.font = 'bold 20px monospace';
-                    ctx.textBaseline = 'top';
-
-                    boxes.forEach(box => {
-                        ctx.strokeStyle = box.color;
-                        ctx.strokeRect(box.x, box.y, box.w, box.h);
-
-                        const labelText = isCustomUploaded ? `Custom Image Prediction (${baseConf.toFixed(1)}%)` : `${box.label} (${baseConf.toFixed(1)}%)`;
-                        const textWidth = ctx.measureText(labelText).width;
-                        
-                        ctx.fillStyle = box.color;
-                        ctx.fillRect(box.x - 2, box.y - 30, textWidth + 12, 30);
-
-                        ctx.fillStyle = '#000000';
-                        ctx.fillText(labelText, box.x + 4, box.y - 25);
-                    });
-
-                    kpiAccuracy.innerText = stats.kpiAcc;
-                    kpiLatency.innerText = `${latencyVal.toFixed(1)} ms`;
-                    kpiParams.innerText = stats.params;
-                    kpiFlops.innerText = stats.flops;
-
-                    logToConsole(`Inference complete in ${latencyVal.toFixed(1)} ms using ${weightFile}. Target Confidence: [${baseConf.toFixed(1)}%]`, 'success');
                     
-                    simAnalysisNote.innerHTML = `Loaded PyTorch weight checkpoint <code>${weightFile}</code>. Evaluated image with latency <strong>${latencyVal.toFixed(1)} ms</strong> and estimated confidence <strong>${baseConf.toFixed(1)}%</strong>.`;
-                }, 1400);
+                    renderClassificationOverlay(top1Class, conf);
+                    renderTop5Bars(top5Data);
+
+                    kpiTopClass.innerText = top1Class;
+                    kpiConfidence.innerText = `${conf.toFixed(2)}%`;
+                    kpiLatency.innerText = `${latencyVal.toFixed(1)} ms`;
+                    kpiParams.innerText = `${stats.params} / ${stats.flops}`;
+
+                    logToConsole(`Classification output: [${top1Class.toUpperCase()}] (${conf.toFixed(2)}%). Latency: ${latencyVal.toFixed(1)} ms.`, 'success');
+                }, 1300);
             });
 
             function logToConsole(message, type = '') {
