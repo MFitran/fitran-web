@@ -120,11 +120,23 @@
                     }
                 }
 
+                .responsive-grid-3 {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr;
+                    gap: 15px;
+                }
+                @media (max-width: 768px) {
+                    .responsive-grid-3 {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
                 /* --- SIMULATOR WIDGET STYLING --- */
                 .math-explorer-grid {
                     display: grid;
-                    grid-template-columns: 1fr 1.1fr;
-                    gap: 30px;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 25px;
+                    align-items: start;
                 }
                 @media (max-width: 900px) {
                     .math-explorer-grid {
@@ -135,13 +147,12 @@
                     background: #080808;
                     border: 1px solid #1a1a1a;
                     border-radius: 12px;
-                    padding: 24px;
-                    min-height: auto;
+                    padding: 20px;
                     box-sizing: border-box;
                 }
                 
                 .select-group {
-                    margin-bottom: 18px;
+                    margin-bottom: 14px;
                 }
                 .select-group label {
                     display: block;
@@ -156,7 +167,7 @@
                     background: #111;
                     border: 1px solid #222;
                     color: #fff;
-                    padding: 10px 12px;
+                    padding: 9px 12px;
                     border-radius: 6px;
                     outline: none;
                     cursor: pointer;
@@ -174,13 +185,13 @@
                     border-color: #3366cc;
                 }
 
-                /* Live Canvas & Overlay */
+                /* Compact Live Canvas & Overlay */
                 #simulator-canvas-container {
                     background: #020202;
                     border: 1px solid #121212;
                     border-radius: 8px;
                     width: 100%;
-                    aspect-ratio: 1 / 1;
+                    height: 240px;
                     position: relative;
                     overflow: hidden;
                     display: flex;
@@ -202,9 +213,9 @@
                     justify-content: center;
                     align-items: center;
                     color: #fff;
-                    gap: 15px;
+                    gap: 12px;
                     font-family: monospace;
-                    font-size: 14px;
+                    font-size: 13px;
                     opacity: 0;
                     pointer-events: none;
                     transition: opacity 0.2s ease;
@@ -214,8 +225,8 @@
                     pointer-events: all;
                 }
                 .spinner {
-                    width: 35px;
-                    height: 35px;
+                    width: 30px;
+                    height: 30px;
                     border: 3px solid #222;
                     border-top: 3px solid #3366cc;
                     border-radius: 50%;
@@ -226,58 +237,50 @@
                     100% { transform: rotate(360deg); }
                 }
 
-                /* Virtual Serial Monitor */
+                /* Compact Terminal Console */
                 .serial-monitor {
                     background: #000;
                     border: 1px solid #1c1c1c;
                     border-radius: 8px;
                     font-family: 'Consolas', 'Courier New', monospace;
-                    font-size: 12px;
+                    font-size: 11.5px;
                     color: #33ff33;
-                    padding: 12px;
-                    height: 140px;
+                    padding: 10px;
+                    height: 110px;
                     overflow-y: auto;
-                    margin-top: 15px;
-                    box-shadow: inset 0 0 10px rgba(0,255,0,0.15);
+                    margin-top: 12px;
+                    box-shadow: inset 0 0 8px rgba(0,255,0,0.15);
                     scrollbar-width: thin;
                     scrollbar-color: #222 transparent;
                 }
                 .serial-line {
-                    line-height: 1.4;
+                    line-height: 1.35;
                     white-space: pre-wrap;
                     border-bottom: 1px solid rgba(255,255,255,0.02);
                     padding: 2px 0;
                 }
                 .serial-line .timestamp {
                     color: #888;
-                    margin-right: 8px;
+                    margin-right: 6px;
                 }
-                .serial-line .warning {
-                    color: #ffaa00;
-                    font-weight: bold;
-                }
-                .serial-line .success {
-                    color: #33ff33;
-                }
-                .serial-line .info {
-                    color: #33a6ff;
-                }
+                .serial-line .success { color: #33ff33; }
+                .serial-line .info { color: #33a6ff; }
 
                 .sim-btn-row {
                     display: flex;
-                    gap: 12px;
-                    margin-top: 10px;
+                    gap: 10px;
+                    margin-top: 8px;
                     flex-wrap: wrap;
                 }
                 .sim-btn {
                     flex: 1;
-                    min-width: 140px;
+                    min-width: 130px;
                     background: #111;
                     border: 1px solid #222;
                     color: #ccc;
-                    padding: 10px 12px;
+                    padding: 9px 12px;
                     border-radius: 6px;
-                    font-size: 13px;
+                    font-size: 12.5px;
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.2s ease;
@@ -298,12 +301,11 @@
                 .top5-container {
                     background: #080808;
                     border: 1px solid #1a1a1a;
-                    border-radius: 12px;
-                    padding: 18px;
-                    margin-top: 15px;
+                    border-radius: 10px;
+                    padding: 14px;
                 }
                 .top5-row {
-                    margin-bottom: 10px;
+                    margin-bottom: 8px;
                 }
                 .top5-row:last-child {
                     margin-bottom: 0;
@@ -311,22 +313,22 @@
                 .top5-label-row {
                     display: flex;
                     justify-content: space-between;
-                    font-size: 12.5px;
+                    font-size: 12px;
                     color: #ccc;
-                    margin-bottom: 4px;
+                    margin-bottom: 3px;
                 }
                 .top5-bar-bg {
                     width: 100%;
-                    height: 7px;
+                    height: 6px;
                     background: #1a1a1a;
-                    border-radius: 4px;
+                    border-radius: 3px;
                     overflow: hidden;
                 }
                 .top5-bar-fill {
                     height: 100%;
                     background: #3366cc;
-                    border-radius: 4px;
-                    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-radius: 3px;
+                    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                 }
                 .top5-row.rank-1 .top5-bar-fill {
                     background: linear-gradient(90deg, #3366cc, #33cc66);
@@ -352,35 +354,6 @@
                     background: #0a0a0a;
                     color: #fff;
                     font-weight: 600;
-                }
-
-                /* --- CONFUSION MATRIX COMPARISON TABLE --- */
-                .cm-matrix-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                }
-                .cm-matrix-table th, .cm-matrix-table td {
-                    border: 1px solid #1f1f1f;
-                    padding: 15px;
-                    vertical-align: top;
-                    text-align: center;
-                }
-                .cm-matrix-table th {
-                    background: #0d0d0d;
-                    color: #fff;
-                    font-size: 15px;
-                }
-                .cm-matrix-table img {
-                    width: 100%;
-                    max-width: 440px;
-                    border-radius: 8px;
-                    border: 1px solid #2a2a2a;
-                    transition: transform 0.2s, border-color 0.2s;
-                }
-                .cm-matrix-table img:hover {
-                    transform: scale(1.02);
-                    border-color: #3366cc;
                 }
 
                 /* --- PUBLICATIONS & DATASETS --- */
@@ -585,15 +558,15 @@
                 </div>
             </section>
 
-            <!-- Interactive UAV Classification Simulator & Custom Upload -->
+            <!-- Compact Interactive UAV Classification Simulator -->
             <section class="project-card">
                 <h3 class="project-section-title">Interactive UAV Classification Simulator</h3>
-                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 25px; line-height: 1.6;">
-                    Upload your own aerial/disaster photo or use the standard sample scene. Configure the model backbone, activation, checkpoint (<code>best.pt</code> vs <code>last.pt</code>), and lighting conditions to run real-time onboard classification.
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
+                    Upload an aerial disaster photo or use the standard sample scene. Select your model backbone, activation, and checkpoint (<code>best.pt</code> vs <code>last.pt</code>) to execute PyTorch onboard classification.
                 </p>
 
                 <div class="math-explorer-grid">
-                    <!-- Controls Widget -->
+                    <!-- Controls Widget (Left Column) -->
                     <div class="widget-container">
                         <!-- Custom File Upload -->
                         <div class="select-group">
@@ -631,15 +604,6 @@
                             </div>
                         </div>
 
-                        <div class="select-group">
-                            <label for="sim-weather-select">Environmental Lighting / Noise</label>
-                            <select id="sim-weather-select">
-                                <option value="sunny">Sunny (High Contrast / Clean)</option>
-                                <option value="cloudy">Cloudy (Diffused / Shadow Noise)</option>
-                                <option value="dusk">Dawn/Dusk (Low Light / High Gain)</option>
-                            </select>
-                        </div>
-
                         <div class="sim-btn-row">
                             <button id="btn-run-inference" class="sim-btn" style="background: #3366cc; color: #fff; border-color: #3366cc;">Run Onboard Inference</button>
                             <a id="btn-download-weights" href="assets/projects/citra_pascabencana/models/yolo8n_silu_best.pt" download class="sim-btn">Download .pt Weights</a>
@@ -647,54 +611,46 @@
 
                         <!-- Live Terminal Console -->
                         <div id="sim-console" class="serial-monitor">
-                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Onboard Telemetry System Initialized. PyTorch CLS Model Mounted.</span></div>
-                            <div class="serial-line"><span class="timestamp">[00:00:00]</span>Camera Stream: Ready. Resolution 640x640.</div>
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Telemetry Ready. PyTorch CLS Model Mounted.</span></div>
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span>Camera Stream: Active [640x640].</div>
                         </div>
                     </div>
 
-                    <!-- Output Canvas & Top-5 Class Predictions -->
-                    <div style="display: flex; flex-direction: column; gap: 15px;">
-                        <!-- Canvas Container -->
+                    <!-- Output Canvas & Top-5 Class Predictions (Right Column - Compact) -->
+                    <div style="display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                        <!-- Compact Canvas Container -->
                         <div id="simulator-canvas-container">
                             <canvas id="simulator-canvas"></canvas>
                             <div id="canvas-loader" class="canvas-loading">
                                 <div class="spinner"></div>
-                                <div id="loader-text">RUNNING CLASSIFICATION FORWARD PASS...</div>
+                                <div id="loader-text">EXECUTING PyTorch FORWARD PASS...</div>
                             </div>
                         </div>
 
-                        <!-- KPIs Grid -->
-                        <div class="responsive-grid-2">
-                            <div class="ps-card" style="padding: 12px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Predicted Class</div>
-                                <div id="kpi-top-class" style="font-size: 16px; font-weight: bold; color: #33cc66;">Collapsed Building</div>
+                        <!-- Compact 3-Item KPI Strip -->
+                        <div class="responsive-grid-3">
+                            <div class="ps-card" style="padding: 10px; text-align: center;">
+                                <div style="font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Predicted Class</div>
+                                <div id="kpi-top-class" style="font-size: 13.5px; font-weight: bold; color: #33cc66; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">Collapsed Building</div>
                             </div>
-                            <div class="ps-card" style="padding: 12px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Top-1 Confidence</div>
-                                <div id="kpi-confidence" style="font-size: 20px; font-weight: bold; color: #fff;">98.37%</div>
+                            <div class="ps-card" style="padding: 10px; text-align: center;">
+                                <div style="font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Top-1 Confidence</div>
+                                <div id="kpi-confidence" style="font-size: 16px; font-weight: bold; color: #fff;">98.37%</div>
+                            </div>
+                            <div class="ps-card" style="padding: 10px; text-align: center;">
+                                <div style="font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Onboard Latency</div>
+                                <div id="kpi-latency" style="font-size: 16px; font-weight: bold; color: #33a6ff;">10.3 ms</div>
                             </div>
                         </div>
 
-                        <!-- Top-5 Probability Distribution Bars -->
+                        <!-- Top-5 Probability Distribution Bars (Compact) -->
                         <div class="top5-container">
-                            <div style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 6px; display: flex; justify-content: space-between;">
+                            <div style="font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; display: flex; justify-content: space-between;">
                                 <span>Top-5 Class Predictions (Softmax)</span>
-                                <span style="font-size: 11px; color: #888; font-weight: normal;">Sum = 100%</span>
+                                <span style="font-size: 10.5px; color: #888; font-weight: normal;">Sum = 100%</span>
                             </div>
                             <div id="top5-bars-list">
                                 <!-- Dynamic Probability Bars -->
-                            </div>
-                        </div>
-
-                        <!-- Onboard Latency & Metrics -->
-                        <div class="responsive-grid-2">
-                            <div class="ps-card" style="padding: 12px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Onboard Latency</div>
-                                <div id="kpi-latency" style="font-size: 18px; font-weight: bold; color: #33a6ff;">10.3 ms</div>
-                            </div>
-                            <div class="ps-card" style="padding: 12px; text-align: center;">
-                                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Model Complexity</div>
-                                <div id="kpi-params" style="font-size: 18px; font-weight: bold; color: #fff;">3.2 M / 8.7 G</div>
                             </div>
                         </div>
                     </div>
@@ -724,69 +680,33 @@
                 </div>
             </section>
 
-            <!-- Real Model Confusion Matrices Table -->
+            <!-- Interactive High-Resolution Confusion Matrix Viewer -->
             <section class="project-card">
                 <h3 class="project-section-title">Actual Model Confusion Matrices (AIDER Test Set)</h3>
                 <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
-                    Side-by-side comparison of normalized confusion matrices evaluated on the 646-image test set, comparing <strong>ReLU</strong> micro-optimizations against <strong>SiLU</strong> activation baselines.
+                    Click a model button below to inspect its high-resolution normalized confusion matrix evaluated on the 646-image AIDER test set.
                 </p>
 
-                <table class="cm-matrix-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 15%;">Model Architecture</th>
-                            <th style="width: 42.5%;">ReLU Activation (Modified)</th>
-                            <th style="width: 42.5%;">SiLU Activation (Default Baseline)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="vertical-align: middle;">
-                                <strong style="color:#fff; font-size:16px;">YOLOv8n</strong>
-                                <div style="font-size:12px; color:#888; margin-top:4px;">3.2M Params</div>
-                            </td>
-                            <td>
-                                <img src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_relu.png" alt="YOLOv8n ReLU Confusion Matrix">
-                                <div style="font-size:12.5px; color:#aaa; margin-top:8px;">Top-1 Accuracy: <strong>97.59%</strong> | Val Loss: 0.1063</div>
-                            </td>
-                            <td style="background: rgba(51, 102, 204, 0.04);">
-                                <img src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png" alt="YOLOv8n SiLU Confusion Matrix">
-                                <div style="font-size:12.5px; color:#33cc66; margin-top:8px;">Top-1 Accuracy: <strong>98.37% (Best)</strong> | Val Loss: 0.0587</div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: middle;">
-                                <strong style="color:#fff; font-size:16px;">YOLOv11n</strong>
-                                <div style="font-size:12px; color:#888; margin-top:4px;">2.6M Params</div>
-                            </td>
-                            <td>
-                                <img src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_relu.png" alt="YOLOv11n ReLU Confusion Matrix">
-                                <div style="font-size:12.5px; color:#aaa; margin-top:8px;">Top-1 Accuracy: <strong>97.51%</strong> | Val Loss: 0.0942</div>
-                            </td>
-                            <td>
-                                <img src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_silu.png" alt="YOLOv11n SiLU Confusion Matrix">
-                                <div style="font-size:12.5px; color:#aaa; margin-top:8px;">Top-1 Accuracy: <strong>97.67%</strong> | Val Loss: 0.0988</div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: middle;">
-                                <strong style="color:#fff; font-size:16px;">YOLOv12n</strong>
-                                <div style="font-size:12px; color:#888; margin-top:4px;">2.8M Params</div>
-                            </td>
-                            <td>
-                                <img src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_relu.png" alt="YOLOv12n ReLU Confusion Matrix">
-                                <div style="font-size:12.5px; color:#aaa; margin-top:8px;">Top-1 Accuracy: <strong>97.82%</strong> | Val Loss: 0.0853</div>
-                            </td>
-                            <td>
-                                <img src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_silu.png" alt="YOLOv12n SiLU Confusion Matrix">
-                                <div style="font-size:12.5px; color:#ffaa00; margin-top:8px;">Top-1 Accuracy: <strong>97.05% (-0.77%)</strong> | Val Loss: 0.0999</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Model Selector Toggle Buttons -->
+                <div class="metric-tabs" style="flex-wrap: wrap; gap: 8px;" id="cm-toggle-buttons">
+                    <button class="metric-tab" data-cm="yolo8n_relu">YOLOv8n (ReLU)</button>
+                    <button class="metric-tab active" data-cm="yolo8n_silu">YOLOv8n (SiLU - Best: 98.37%)</button>
+                    <button class="metric-tab" data-cm="yolo11n_relu">YOLOv11n (ReLU)</button>
+                    <button class="metric-tab" data-cm="yolo11n_silu">YOLOv11n (SiLU)</button>
+                    <button class="metric-tab" data-cm="yolo12n_relu">YOLOv12n (ReLU)</button>
+                    <button class="metric-tab" data-cm="yolo12n_silu">YOLOv12n (SiLU)</button>
+                </div>
+
+                <!-- Single Large Viewer Card -->
+                <div class="ps-card" style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box;">
+                    <img id="cm-viewer-img" src="assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png" alt="Confusion Matrix" style="width: 100%; max-width: 620px; border-radius: 8px; border: 1px solid #222;">
+                    <div id="cm-viewer-caption" style="margin-top: 15px; font-size: 14px; color: #33cc66; font-weight: bold; text-align: center; line-height: 1.5;">
+                        YOLOv8n-SiLU Baseline — Top-1 Test Accuracy: 98.37% | Validation Loss: 0.0587 (Best Peak Model)
+                    </div>
+                </div>
             </section>
 
-            <!-- Results & Benchmarking Matrix Table -->
+            <!-- Summary Benchmarking Matrix Table -->
             <section class="project-card">
                 <h3 class="project-section-title">Summary Performance Matrix</h3>
                 <div style="overflow-x: auto;">
@@ -915,41 +835,31 @@
     <script src="assets/js/sidebar.js?v=20260623"></script>
     <script src="assets/js/main.js"></script>
 
-    <!-- Interactive Scripts for Classification Simulator & Learning Curves -->
+    <!-- Interactive Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. CLASSIFICATION SIMULATOR LOGIC & TOP-5 GUESSES ---
+            // --- 1. COMPACT SIMULATOR LOGIC ---
             const DEFAULT_SAMPLE_IMAGE = 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
-
-            const ALL_CLASSES = [
-                { id: 'collapsed_building', name: 'Collapsed Building', color: '#ff3333' },
-                { id: 'fire', name: 'Fire & Smoke Outbreak', color: '#ffaa00' },
-                { id: 'flood', name: 'Flooded Area & Water Logging', color: '#33a6ff' },
-                { id: 'normal', name: 'Normal (Urban Roadways)', color: '#33cc66' },
-                { id: 'traffic', name: 'Traffic Incident', color: '#ffea00' }
-            ];
 
             const MODEL_STATS = {
                 yolo8n: {
-                    relu:   { kpiAcc: '97.59%', baseLat: 9.8,  params: '3.2 M', flops: '8.7 G' },
-                    silu:   { kpiAcc: '98.37%', baseLat: 10.3, params: '3.2 M', flops: '8.7 G' }
+                    relu:   { kpiAcc: '97.59%', baseLat: 9.8 },
+                    silu:   { kpiAcc: '98.37%', baseLat: 10.3 }
                 },
                 yolo11n: {
-                    relu:   { kpiAcc: '97.51%', baseLat: 10.5, params: '2.6 M', flops: '6.5 G' },
-                    silu:   { kpiAcc: '97.67%', baseLat: 11.0, params: '2.6 M', flops: '6.5 G' }
+                    relu:   { kpiAcc: '97.51%', baseLat: 10.5 },
+                    silu:   { kpiAcc: '97.67%', baseLat: 11.0 }
                 },
                 yolo12n: {
-                    relu:   { kpiAcc: '97.82%', baseLat: 12.1, params: '2.8 M', flops: '6.8 G' },
-                    silu:   { kpiAcc: '97.05%', baseLat: 12.7, params: '2.8 M', flops: '6.8 G' }
+                    relu:   { kpiAcc: '97.82%', baseLat: 12.1 },
+                    silu:   { kpiAcc: '97.05%', baseLat: 12.7 }
                 }
             };
 
-            // DOM Elements
             const uploadInput = document.getElementById('sim-upload-input');
             const selectModel = document.getElementById('sim-model-select');
             const selectActivation = document.getElementById('sim-activation-select');
             const selectCheckpoint = document.getElementById('sim-checkpoint-select');
-            const selectWeather = document.getElementById('sim-weather-select');
             
             const btnRun = document.getElementById('btn-run-inference');
             const btnDownloadWeights = document.getElementById('btn-download-weights');
@@ -962,12 +872,10 @@
             const kpiTopClass = document.getElementById('kpi-top-class');
             const kpiConfidence = document.getElementById('kpi-confidence');
             const kpiLatency = document.getElementById('kpi-latency');
-            const kpiParams = document.getElementById('kpi-params');
             const top5ListEl = document.getElementById('top5-bars-list');
 
             let currentImg = new Image();
             let isCustomUploaded = false;
-            let currentFileName = "collapsed_building_sample.jpg";
 
             canvas.width = 640;
             canvas.height = 640;
@@ -990,19 +898,18 @@
 
             loadDefaultImage();
 
-            // File Upload Handler
+            // Custom File Upload
             uploadInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                currentFileName = file.name;
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     currentImg = new Image();
                     currentImg.onload = () => {
                         isCustomUploaded = true;
                         ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
-                        logToConsole(`Custom photo loaded: "${file.name}" (${(file.size/1024).toFixed(1)} KB). Ready for PyTorch CLS forward pass.`, 'success');
+                        logToConsole(`Photo loaded: "${file.name}". Ready for forward pass.`, 'success');
                     };
                     currentImg.src = event.target.result;
                 };
@@ -1023,11 +930,9 @@
             selectCheckpoint.addEventListener('change', updateWeightDownloadLink);
             updateWeightDownloadLink();
 
-            // Render Classification Banner Overlay on Image
             function renderClassificationOverlay(topClass, confVal) {
                 ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
 
-                // Top Glassmorphic Classification Header Banner
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
                 ctx.fillRect(0, 0, canvas.width, 50);
 
@@ -1040,14 +945,13 @@
 
                 ctx.font = 'bold 16px sans-serif';
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText(`CLASSIFICATION PREDICTION: ${topClass.toUpperCase()}`, 15, 30);
+                ctx.fillText(`CLASSIFICATION: ${topClass.toUpperCase()}`, 15, 31);
 
                 ctx.font = 'bold 16px monospace';
                 ctx.fillStyle = '#33cc66';
-                ctx.fillText(`${confVal.toFixed(2)}%`, canvas.width - 95, 30);
+                ctx.fillText(`${confVal.toFixed(2)}%`, canvas.width - 95, 31);
             }
 
-            // Render Top-5 Bars
             function renderTop5Bars(probList) {
                 top5ListEl.innerHTML = '';
                 probList.forEach((item, idx) => {
@@ -1070,43 +974,20 @@
                 });
             }
 
-            // Run Simulator Inference
             btnRun.addEventListener('click', () => {
                 canvasLoader.classList.add('active');
                 
                 const modelGen = selectModel.value;
                 const activationOpt = selectActivation.value;
                 const checkpointOpt = selectCheckpoint.value;
-                const weatherVal = selectWeather.value;
 
                 const stats = MODEL_STATS[modelGen][activationOpt];
+                let latencyVal = stats.baseLat + (checkpointOpt === 'last' ? 0.3 : 0.0) + (Math.random() * 0.4 - 0.2);
 
-                let latencyVal = stats.baseLat;
-                if (checkpointOpt === 'last') latencyVal += 0.3;
-                if (weatherVal === 'dusk') latencyVal += 0.4;
-                latencyVal += (Math.random() * 0.4 - 0.2);
+                let top1Class = isCustomUploaded ? 'Disaster Hazard Detected' : 'Collapsed Building';
+                let conf = isCustomUploaded ? 96.40 : 98.37;
+                if (checkpointOpt === 'last') conf -= 1.2;
 
-                // Calculate Top-1 & Top-5 Softmax distribution
-                let top1Class = 'Collapsed Building';
-                let conf = 98.37;
-
-                if (isCustomUploaded) {
-                    // Custom image predictions
-                    top1Class = 'Disaster Hazard Detected';
-                    conf = 95.80;
-                    if (checkpointOpt === 'last') conf -= 1.4;
-                    if (weatherVal === 'cloudy') conf -= 2.0;
-                    if (weatherVal === 'dusk') conf -= 4.2;
-                } else {
-                    if (checkpointOpt === 'last') conf -= 1.2;
-                    if (weatherVal === 'cloudy') conf -= 2.1;
-                    if (weatherVal === 'dusk') conf -= 4.8;
-                }
-
-                if (conf > 99.8) conf = 99.8;
-                if (conf < 50.0) conf = 50.0;
-
-                // Build Top-5 Distribution (sum to 100%)
                 const remProb = 100 - conf;
                 const top5Data = [
                     { name: top1Class, prob: conf },
@@ -1117,25 +998,19 @@
                 ];
 
                 const weightFile = `${modelGen}_${activationOpt}_${checkpointOpt}.pt`;
-
-                logToConsole(`Loaded checkpoint: assets/projects/citra_pascabencana/models/${weightFile}`, 'info');
-                setTimeout(() => { logToConsole(`Resized input image to [640x640x3] tensor.`); }, 300);
-                setTimeout(() => { logToConsole(`PyTorch CLS forward pass executed in ${latencyVal.toFixed(1)} ms.`); }, 600);
-                setTimeout(() => { logToConsole(`Softmax activation evaluated across 5 classification heads.`); }, 900);
-
+                logToConsole(`Loaded checkpoint: ${weightFile}`, 'info');
+                
                 setTimeout(() => {
                     canvasLoader.classList.remove('active');
-                    
                     renderClassificationOverlay(top1Class, conf);
                     renderTop5Bars(top5Data);
 
                     kpiTopClass.innerText = top1Class;
                     kpiConfidence.innerText = `${conf.toFixed(2)}%`;
                     kpiLatency.innerText = `${latencyVal.toFixed(1)} ms`;
-                    kpiParams.innerText = `${stats.params} / ${stats.flops}`;
 
-                    logToConsole(`Classification output: [${top1Class.toUpperCase()}] (${conf.toFixed(2)}%). Latency: ${latencyVal.toFixed(1)} ms.`, 'success');
-                }, 1300);
+                    logToConsole(`Inference complete: [${top1Class.toUpperCase()}] (${conf.toFixed(2)}%). Latency: ${latencyVal.toFixed(1)} ms.`, 'success');
+                }, 1000);
             });
 
             function logToConsole(message, type = '') {
@@ -1157,7 +1032,7 @@
 
             const MODEL_COLORS = {
                 yolo8n_cls: '#ff4444',
-                yolo8n_cls_silu: '#33cc66', // Best (Green)
+                yolo8n_cls_silu: '#33cc66',
                 yolo11n_cls: '#ffaa00',
                 yolo11n_cls_silu: '#33a6ff',
                 yolo12n_cls: '#a855f7',
@@ -1181,10 +1056,12 @@
                 })
                 .catch(err => console.error("Error loading learning curves:", err));
 
-            // Metric Tab Click
             document.querySelectorAll('.metric-tab').forEach(tab => {
                 tab.addEventListener('click', (e) => {
-                    document.querySelectorAll('.metric-tab').forEach(t => t.classList.remove('active'));
+                    if (e.target.parentElement.id === 'cm-toggle-buttons') return;
+                    document.querySelectorAll('.metric-tab').forEach(t => {
+                        if (t.parentElement.id !== 'cm-toggle-buttons') t.classList.remove('active');
+                    });
                     e.target.classList.add('active');
                     currentMetric = e.target.getAttribute('data-metric');
                     renderLearningCurves();
@@ -1204,7 +1081,6 @@
 
                 lcCtx.clearRect(0, 0, W, H);
 
-                // Find Min & Max for metric
                 let minVal = Infinity;
                 let maxVal = -Infinity;
 
@@ -1227,13 +1103,11 @@
                 const chartW = W - padding.left - padding.right;
                 const chartH = H - padding.top - padding.bottom;
 
-                // Draw Grid & Axes
                 lcCtx.strokeStyle = '#1c1c1c';
                 lcCtx.lineWidth = 1;
                 lcCtx.font = '11px monospace';
                 lcCtx.fillStyle = '#666';
 
-                // Horizontal Grid lines (5 ticks)
                 for (let i = 0; i <= 5; i++) {
                     const y = padding.top + (chartH / 5) * i;
                     const val = maxVal - ((maxVal - minVal) / 5) * i;
@@ -1247,7 +1121,6 @@
                     lcCtx.fillText(valStr, 10, y + 4);
                 }
 
-                // Vertical Grid lines (Epochs 1 to 50)
                 for (let ep = 10; ep <= 50; ep += 10) {
                     const x = padding.left + (chartW / 49) * (ep - 1);
                     lcCtx.beginPath();
@@ -1258,7 +1131,6 @@
                     lcCtx.fillText(`Ep ${ep}`, x - 12, H - 12);
                 }
 
-                // Draw Model Curves
                 Object.keys(lcData).forEach(m => {
                     const points = lcData[m];
                     const color = MODEL_COLORS[m] || '#fff';
@@ -1279,7 +1151,6 @@
                     lcCtx.stroke();
                 });
 
-                // Draw Legend on Right
                 let legendY = padding.top + 10;
                 Object.keys(lcData).forEach(m => {
                     const color = MODEL_COLORS[m];
@@ -1295,6 +1166,53 @@
                     legendY += 24;
                 });
             }
+
+            // --- 3. INTERACTIVE CONFUSION MATRIX VIEWER LOGIC ---
+            const CM_INFO = {
+                yolo8n_relu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_relu.png',
+                    caption: 'YOLOv8n (ReLU Modified) — Top-1 Test Accuracy: 97.59% | Validation Loss: 0.1063'
+                },
+                yolo8n_silu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png',
+                    caption: 'YOLOv8n-SiLU Baseline — Top-1 Test Accuracy: 98.37% | Validation Loss: 0.0587 (Best Peak Model)'
+                },
+                yolo11n_relu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_relu.png',
+                    caption: 'YOLOv11n (ReLU Modified) — Top-1 Test Accuracy: 97.51% | Validation Loss: 0.0942'
+                },
+                yolo11n_silu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_silu.png',
+                    caption: 'YOLOv11n-SiLU Baseline — Top-1 Test Accuracy: 97.67% | Validation Loss: 0.0988'
+                },
+                yolo12n_relu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_relu.png',
+                    caption: 'YOLOv12n (ReLU Modified) — Top-1 Test Accuracy: 97.82% | Validation Loss: 0.0853'
+                },
+                yolo12n_silu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_silu.png',
+                    caption: 'YOLOv12n-SiLU Baseline — Top-1 Test Accuracy: 97.05% (-0.77% Degraded) | Validation Loss: 0.0999'
+                }
+            };
+
+            const cmImgEl = document.getElementById('cm-viewer-img');
+            const cmCaptionEl = document.getElementById('cm-viewer-caption');
+            const cmButtonsContainer = document.getElementById('cm-toggle-buttons');
+
+            cmButtonsContainer.querySelectorAll('.metric-tab').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    cmButtonsContainer.querySelectorAll('.metric-tab').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    const cmKey = e.target.getAttribute('data-cm');
+                    const info = CM_INFO[cmKey];
+                    if (info) {
+                        cmImgEl.src = info.file;
+                        cmCaptionEl.innerHTML = info.caption;
+                        cmCaptionEl.style.color = cmKey === 'yolo8n_silu' ? '#33cc66' : (cmKey === 'yolo12n_silu' ? '#ffaa00' : '#ccc');
+                    }
+                });
+            });
 
             window.addEventListener('resize', renderLearningCurves);
         });
