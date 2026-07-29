@@ -853,7 +853,7 @@
     <!-- Interactive Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. ENHANCED FEATURE CLASSIFIER FOR AIDER 5 CLASSES ---
+            // --- 1. FULL MULTI-CLASS SPATIAL CLASSIFIER (5 AIDER CLASSES) ---
             const DEFAULT_SAMPLE_IMAGE = 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
 
             const MODEL_STATS = {
@@ -931,7 +931,7 @@
             selectCheckpoint.addEventListener('change', updateWeightDownloadLink);
             updateWeightDownloadLink();
 
-            // Enhanced Multi-Feature Classifier Logic
+            // Spatial Multi-Feature Classifier for ALL 5 AIDER Classes
             function runPixelFeatureClassification(imgEl, modelKey, activationKey, checkpointKey) {
                 const sCanvas = document.createElement('canvas');
                 sCanvas.width = 100;
@@ -942,75 +942,115 @@
                 const imgData = sCtx.getImageData(0, 0, 100, 100);
                 const d = imgData.data;
 
-                let totalPixels = 100 * 100;
-                let firePixelCount = 0;
-                let smokePixelCount = 0;
-                let floodPixelCount = 0;
-                let rubblePixelCount = 0;
-                let roadPixelCount = 0;
-                let greenPixelCount = 0;
+                let totalPx = 100 * 100;
+                
+                let firePx = 0, smokePx = 0;
+                let floodLowerPx = 0, cyanSkyPx = 0;
+                let redVehiclePx = 0, roadPx = 0;
+                let rubblePx = 0, edgeDiffCount = 0;
+                let greenVegetationPx = 0, cleanFacadePx = 0;
 
                 let prevLum = 0;
-                let highFreqEdgeCount = 0;
 
-                for (let i = 0; i < d.length; i += 4) {
-                    const r = d[i], g = d[i+1], b = d[i+2];
-                    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                for (let y = 0; y < 100; y++) {
+                    for (let x = 0; x < 100; x++) {
+                        const idx = (y * 100 + x) * 4;
+                        const r = d[idx], g = d[idx+1], b = d[idx+2];
+                        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                        const isLowerHalf = y >= 45;
+                        const isUpperHalf = y < 55;
 
-                    // 1. FIRE & SMOKE SIGNATURE
-                    if (r > 125 && r > b + 35 && g > 25 && (r > g || g > b)) {
-                        firePixelCount++;
-                    } else if (lum > 75 && Math.abs(r - g) < 25 && Math.abs(g - b) < 25 && r > 85) {
-                        smokePixelCount++;
-                    }
+                        // 1. FIRE & SMOKE SIGNATURE
+                        // Glowing fire (high red, high green, low blue)
+                        if (r > 135 && g > 65 && r > b + 40 && (r - g < 90)) {
+                            firePx++;
+                        } else if (lum > 80 && Math.abs(r - g) < 20 && Math.abs(g - b) < 20 && r > 90) {
+                            smokePx++;
+                        }
 
-                    // 2. FLOOD SIGNATURE
-                    if ((b > r * 0.95 && b > g * 0.85 && b > 65) || (g > r * 1.05 && g > b && r < 110 && b < 110)) {
-                        floodPixelCount++;
-                    }
+                        // 2. TRAFFIC INCIDENT SIGNATURE
+                        // Red vehicle body paint (high Red, LOW Green g < 75, low Blue b < 90)
+                        if (r > 120 && g < 75 && b < 90 && (r - g > 50)) {
+                            redVehiclePx++;
+                        }
+                        // Road pavement (dark/medium gray horizontal surface)
+                        if (lum > 40 && lum < 120 && Math.abs(r - g) < 18 && Math.abs(g - b) < 18) {
+                            roadPx++;
+                        }
 
-                    // 3. COLLAPSED BUILDING / RUBBLE SIGNATURE
-                    const colorDiff = Math.abs(r - g) + Math.abs(g - b) + Math.abs(r - b);
-                    if (colorDiff < 45 && lum > 35 && lum < 225) {
-                        rubblePixelCount++;
-                    }
+                        // 3. FLOODED AREA SIGNATURE (Widespread water reflection on ground)
+                        if (isLowerHalf && lum > 60 && lum < 190 && Math.abs(r - g) < 25 && Math.abs(g - b) < 25 && (b >= r * 0.9)) {
+                            floodLowerPx++;
+                        }
 
-                    // High frequency spatial variance
-                    if (Math.abs(lum - prevLum) > 30) {
-                        highFreqEdgeCount++;
-                    }
-                    prevLum = lum;
+                        // 4. NORMAL URBAN SCENE SIGNATURE
+                        // Clear blue sky in upper half
+                        if (isUpperHalf && b > 120 && b > r + 15 && b > g + 5) {
+                            cyanSkyPx++;
+                        }
+                        // Green vegetation
+                        if (g > r + 12 && g > b + 12) {
+                            greenVegetationPx++;
+                        }
+                        // Clean building facade / wall
+                        if (lum > 110 && lum < 220 && Math.abs(r - g) < 15 && Math.abs(g - b) < 15) {
+                            cleanFacadePx++;
+                        }
 
-                    // 4. TRAFFIC SIGNATURE
-                    if (lum < 60 && colorDiff < 20) {
-                        roadPixelCount++;
-                    }
+                        // 5. COLLAPSED BUILDING / RUBBLE DEBRIS SIGNATURE
+                        const colorDiff = Math.abs(r - g) + Math.abs(g - b) + Math.abs(r - b);
+                        if (colorDiff < 40 && lum > 35 && lum < 210) {
+                            rubblePx++;
+                        }
 
-                    // 5. VEGETATION / NORMAL SIGNATURE
-                    if (g > r + 15 && g > b + 15) {
-                        greenPixelCount++;
+                        // High frequency edge noise
+                        if (Math.abs(lum - prevLum) > 32) {
+                            edgeDiffCount++;
+                        }
+                        prevLum = lum;
                     }
                 }
 
-                const fireRatio = firePixelCount / totalPixels;
-                const smokeRatio = smokePixelCount / totalPixels;
-                const floodRatio = floodPixelCount / totalPixels;
-                const rubbleRatio = rubblePixelCount / totalPixels;
-                const edgeRatio = highFreqEdgeCount / totalPixels;
-                const roadRatio = roadPixelCount / totalPixels;
-                const greenRatio = greenPixelCount / totalPixels;
+                const fireRatio = firePx / totalPx;
+                const smokeRatio = smokePx / totalPx;
+                const redCarRatio = redVehiclePx / totalPx;
+                const roadRatio = roadPx / totalPx;
+                const floodRatio = floodLowerPx / totalPx;
+                const skyRatio = cyanSkyPx / totalPx;
+                const greenRatio = greenVegetationPx / totalPx;
+                const rubbleRatio = rubblePx / totalPx;
+                const edgeRatio = edgeDiffCount / totalPx;
+                const facadeRatio = cleanFacadePx / totalPx;
 
-                let fireLogit = (fireRatio * 16.0) + (smokeRatio * 4.0);
-                let rubbleLogit = (rubbleRatio * 3.5) + (edgeRatio * 5.0);
-                let floodLogit = (floodRatio * 8.0);
-                let trafficLogit = (roadRatio * 4.0);
-                let normalLogit = (greenRatio * 6.0) + 1.2;
+                // Calculate class logits
+                let fireLogit = (fireRatio * 20.0) + (smokeRatio * 3.5);
+                let trafficLogit = (redCarRatio * 15.0) + (roadRatio * 3.0);
+                let floodLogit = (floodRatio * 12.0);
+                let normalLogit = (skyRatio * 8.0) + (greenRatio * 7.0) + (facadeRatio * 3.0);
+                let rubbleLogit = (rubbleRatio * 3.0) + (edgeRatio * 4.5);
 
-                if (fireRatio > 0.03) {
-                    fireLogit += 5.0;
+                // Disambiguation Rules:
+                
+                // Rule A: Fire vs Red Vehicle
+                if (fireRatio > 0.035) {
+                    fireLogit += 6.0;
+                } else if (redCarRatio > 0.015 && fireRatio < 0.02) {
+                    trafficLogit += 7.0; // Red car crash detected!
                 }
-                if (edgeRatio > 0.22 && rubbleRatio > 0.35) {
-                    rubbleLogit += 4.5;
+
+                // Rule B: Flooded Street Water Surface
+                if (floodRatio > 0.25 && fireRatio < 0.02) {
+                    floodLogit += 6.5;
+                }
+
+                // Rule C: Normal Urban Building & Clear Sky
+                if (skyRatio > 0.12 && (facadeRatio > 0.25 || greenRatio > 0.15) && fireRatio < 0.02 && floodRatio < 0.20) {
+                    normalLogit += 7.5;
+                }
+
+                // Rule D: Collapsed Debris (Only when no clear sky/intact facade and high edge noise)
+                if (edgeRatio > 0.24 && rubbleRatio > 0.38 && skyRatio < 0.05 && facadeRatio < 0.15) {
+                    rubbleLogit += 5.5;
                 }
 
                 let logits = [
@@ -1022,7 +1062,7 @@
                 ];
 
                 if (modelKey === 'yolo8n' && activationKey === 'silu') {
-                    logits[0] += 0.3;
+                    logits[0] += 0.2;
                 } else if (modelKey === 'yolo12n' && activationKey === 'silu') {
                     logits[3] += 0.2;
                 }
