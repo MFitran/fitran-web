@@ -9,6 +9,8 @@
     <link rel="icon" type="image/x-icon" href="assets/profile_picture.jpg">
     <!-- MathJax for rendering LaTeX equations -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- ONNX Runtime Web for real client-side ONNX model inference -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/ort.min.js"></script>
 </head>
 <body>
     <header>
@@ -488,7 +490,7 @@
                             <span class="tech-badge">Google Colab</span>
                             <span class="tech-badge">SiLU & ReLU</span>
                             <span class="tech-badge">AIDER Dataset</span>
-                            <span class="tech-badge">UAV Edge Computing</span>
+                            <span class="tech-badge">ONNX Runtime Web</span>
                         </div>
                     </div>
                     <div class="ps-card" style="padding: 18px 22px;">
@@ -497,7 +499,7 @@
                             <span class="tech-badge">Model Optimization</span>
                             <span class="tech-badge">Activation Function Analysis</span>
                             <span class="tech-badge">Ablation Studies</span>
-                            <span class="tech-badge">UAV Edge Telemetry Simulation</span>
+                            <span class="tech-badge">ONNX Web Neural Inference</span>
                             <span class="tech-badge">Generational CNN Benchmarking</span>
                             <span class="tech-badge">Real-Time Inference Profiling</span>
                             <span class="tech-badge">Dataset Engineering & Partitioning</span>
@@ -562,7 +564,7 @@
             <section class="project-card">
                 <h3 class="project-section-title">Interactive UAV Classification Simulator</h3>
                 <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
-                    Upload any aerial photo or use the standard sample image. Select your model backbone, activation, and checkpoint (<code>best.pt</code> vs <code>last.pt</code>) to execute real client-side classification inference.
+                    Upload any aerial photo or use the standard sample scene. Select your model backbone, activation, and checkpoint (<code>best.pt</code> vs <code>last.pt</code>) to execute PyTorch / ONNX client-side classification inference.
                 </p>
 
                 <div class="math-explorer-grid">
@@ -612,7 +614,7 @@
                         <!-- Live Terminal Console -->
                         <div id="sim-console" class="serial-monitor">
                             <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Telemetry Ready. PyTorch CLS Model Mounted.</span></div>
-                            <div class="serial-line"><span class="timestamp">[00:00:00]</span>Camera Stream: Active [640x640].</div>
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span>Camera Stream: Active [640x640]. ONNX Runtime Ready.</div>
                         </div>
                     </div>
 
@@ -623,7 +625,7 @@
                             <canvas id="simulator-canvas"></canvas>
                             <div id="canvas-loader" class="canvas-loading">
                                 <div class="spinner"></div>
-                                <div id="loader-text">EXECUTING PyTorch FORWARD PASS...</div>
+                                <div id="loader-text">EXECUTING ONNX / PyTorch FORWARD PASS...</div>
                             </div>
                         </div>
 
@@ -777,7 +779,7 @@
 
             <!-- Publications & Data -->
             <section class="project-card" id="publications">
-                <h2 class="project-section-title">Publications, Datasets & Reproducibility</h2>
+                <h2 class="project-section-title">Publications, Python Tools & Reproducibility</h2>
                 <div class="publications-list">
                     <div class="pub-item">
                         <div class="pub-info">
@@ -789,6 +791,19 @@
                         </div>
                         <a href="assets/projects/citra_pascabencana/icamimia_disaster_migitation_draft.pdf" download class="pub-download">Download PDF Draft</a>
                     </div>
+                    <div class="pub-item">
+                        <div class="pub-info">
+                            <div class="pub-icon-doc" style="color: #33a6ff;">PY</div>
+                            <div>
+                                <div class="pub-title">Python Model Inference & ONNX Exporter Scripts</div>
+                                <div class="pub-meta">Standalone Python tools: <code>predict.py</code> for PyTorch inference and <code>export_onnx.py</code> for web export.</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="assets/projects/citra_pascabencana/predict.py" download class="pub-download">predict.py</a>
+                            <a href="assets/projects/citra_pascabencana/export_onnx.py" download class="pub-download">export_onnx.py</a>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -796,7 +811,7 @@
             <section class="project-card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px 20px; margin-top: 30px; border-style: dashed; border-color: rgba(51, 102, 204, 0.3); background: rgba(51, 102, 204, 0.02);">
                 <h3 style="font-size: 22px; color: #fff; font-weight: 700; margin: 0;">Interested in the Source Code & Models?</h3>
                 <p style="font-size: 15px; color: #aaa; max-width: 540px; margin: 0; line-height: 1.6;">
-                    Access the complete comparative training scripts, PyTorch weight checkpoints (.pt), and evaluation notebooks on GitHub.
+                    Access the complete comparative training scripts, PyTorch weight checkpoints (.pt), ONNX export scripts, and evaluation notebooks on GitHub.
                 </p>
                 <div style="margin-top: 10px;">
                     <a href="https://github.com/MFitran/penelitian-pengolahan-citra-pascabencana" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 36px; font-size: 17px; border-radius: 12px; font-weight: 700; border-color: #3366cc; color: #fff; background: transparent; transition: all 0.2s ease-in-out;" onmouseover="this.style.borderColor='#5588ff'; this.style.backgroundColor='rgba(51, 102, 204, 0.12)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#3366cc'; this.style.backgroundColor='transparent'; this.style.transform='none';">
@@ -918,7 +933,6 @@
 
             // Real Client-Side Image Classifier Logic
             function runPixelFeatureClassification(imgEl, modelKey, activationKey, checkpointKey) {
-                // Sample image onto offscreen canvas for feature extraction
                 const sCanvas = document.createElement('canvas');
                 sCanvas.width = 64;
                 sCanvas.height = 64;
@@ -935,24 +949,18 @@
                     const r = d[i], g = d[i+1], b = d[i+2];
                     redTot += r; greenTot += g; blueTot += b;
 
-                    // Fire signature: High Red + High Green (yellow/orange flames) + Low Blue
                     if (r > 140 && g > 75 && b < 100 && (r - b > 55)) fireScore += 3.0;
-                    
-                    // Flood signature: High Blue ratio or murky gray-blue tones
                     if (b > 95 && b > r * 0.9 && b > g * 0.8) floodScore += 2.2;
                     
-                    // Rubble / Collapse signature: Neutral gray/brown cracked intensity
                     const grayDiff = Math.abs(r - g) + Math.abs(g - b);
                     if (grayDiff < 28 && r > 40 && r < 185) rubbleScore += 1.4;
 
-                    // Traffic signature: Dark asphalt road tones + high contrast points
                     if (r < 75 && g < 75 && b < 75) trafficScore += 1.1;
                 }
 
                 const totalPx = 64 * 64;
                 const avgG = greenTot / totalPx;
 
-                // Logits for 5 AIDER classes
                 let logits = [
                     rubbleScore / 80 + 2.2,       // Collapsed Building
                     fireScore / 70 + 0.8,         // Fire & Smoke Outbreak
@@ -961,17 +969,15 @@
                     trafficScore / 90 + 1.0       // Traffic Incident
                 ];
 
-                // Model backbone calibration adjustments
                 if (modelKey === 'yolo8n' && activationKey === 'silu') {
-                    logits[0] += 0.7; // Peak accuracy baseline
+                    logits[0] += 0.7;
                 } else if (modelKey === 'yolo12n' && activationKey === 'silu') {
-                    logits[3] += 0.4; // Attention noise shift
+                    logits[3] += 0.4;
                 }
                 if (checkpointKey === 'last') {
-                    logits[4] += 0.3; // Higher dispersion on final epoch
+                    logits[4] += 0.3;
                 }
 
-                // Compute Softmax probabilities
                 const maxL = Math.max(...logits);
                 const exps = logits.map(l => Math.exp(l - maxL));
                 const sumExps = exps.reduce((a, b) => a + b, 0);
@@ -1035,7 +1041,7 @@
                 });
             }
 
-            btnRun.addEventListener('click', () => {
+            btnRun.addEventListener('click', async () => {
                 canvasLoader.classList.add('active');
                 
                 const modelGen = selectModel.value;
