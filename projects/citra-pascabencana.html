@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Aerial Disaster Classification | Fitran</title>
+    <meta name="description" content="Generational comparison of lightweight YOLOv8n, YOLOv11n, and YOLOv12n architectures with SiLU activation function micro-optimizations for real-time UAV edge-cloud disaster response on the AIDER dataset.">
+    <link rel="stylesheet" href="../assets/shared/css/style.css">
+    <link rel="icon" type="image/x-icon" href="../assets/shared/profile/profile_picture.jpg">
+    <!-- MathJax for rendering LaTeX equations -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="../index.html" class="home-btn-container">
+                <span class="home-text">Home</span>
+                <span class="logo-pic-wrapper"><img src="../assets/shared/profile/profile_picture_t.png" alt="Fitran Profile" class="logo-pic"></span>
+            </a>
+            <div class="nav-title">
+                <span class="rgb-word desktop-title">Muhammad Fitran Ramadhan</span>
+                <span class="rgb-word mobile-title">Fitran</span>
+            </div>
+            <div class="hotkeys-placeholder">
+                <div class="hotkey-circle" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Top"><img src="../assets/shared/icons/top_icon.png" alt="Top" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" style="cursor:pointer;display:flex;justify-content:center;align-items:center;" title="Go to Bottom"><img src="../assets/shared/icons/bottom_icon.png" alt="Bottom" style="width:14px;height:14px;"></div>
+                <div class="hotkey-circle" onclick="location.reload()" style="cursor: pointer; display: flex; justify-content: center; align-items: center;" title="Refresh"><img src="../assets/shared/icons/refresh_icon.png" alt="Refresh" style="width: 12px; height: 12px;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="page-wrap">
+        <main class="container">
+            <style>
+                /* --- MATHJAX FIX --- */
+                .MathJax_Display, mjx-container[display="true"] {
+                    margin: 15px 0 !important;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    max-width: 100%;
+                }
+
+                /* --- PROJECT-SPECIFIC PREMIUM STYLES --- */
+                .project-card {
+                    background: transparent;
+                    border: 1px solid #121212;
+                    border-radius: 20px;
+                    padding: 40px;
+                    margin-top: 40px;
+                    margin-bottom: 40px;
+                }
+                .project-section-title {
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-bottom: 25px;
+                    color: #fff;
+                    border-bottom: 1px solid #222;
+                    padding-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .project-badge-container {
+                    margin: 20px 0;
+                }
+                .tech-badge {
+                    display: inline-block;
+                    background: #111;
+                    border: 1px solid #2a2a2a;
+                    color: #b0b0b0;
+                    padding: 6px 14px;
+                    font-size: 13px;
+                    border-radius: 20px;
+                    margin-right: 8px;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    transition: border-color 0.2s, color 0.2s;
+                }
+                .tech-badge:hover {
+                    border-color: #3366cc;
+                    color: #fff;
+                }
+                .prob-sol-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 30px;
+                    margin-top: 20px;
+                }
+                @media (max-width: 768px) {
+                    .prob-sol-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .ps-card {
+                    background: rgba(10, 10, 10, 0.6);
+                    border: 1px solid #151515;
+                    padding: 24px;
+                    border-radius: 12px;
+                }
+                .ps-card h3 {
+                    font-size: 20px;
+                    margin-bottom: 12px;
+                    color: #fff;
+                }
+                .ps-card p {
+                    font-size: 15px;
+                    color: #b0b0b0;
+                    line-height: 1.6;
+                }
+
+                /* --- RESPONSIVE GRIDS --- */
+                .responsive-grid-2 {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+                @media (max-width: 768px) {
+                    .responsive-grid-2 {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .responsive-grid-3 {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr;
+                    gap: 15px;
+                }
+                @media (max-width: 768px) {
+                    .responsive-grid-3 {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                /* --- SIMULATOR WIDGET STYLING --- */
+                .math-explorer-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 25px;
+                    align-items: start;
+                }
+                @media (max-width: 900px) {
+                    .math-explorer-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .widget-container {
+                    background: #080808;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 12px;
+                    padding: 20px;
+                    box-sizing: border-box;
+                    position: relative;
+                }
+                
+                .select-group {
+                    margin-bottom: 14px;
+                }
+                .select-group label {
+                    display: block;
+                    color: #b0b0b0;
+                    font-size: 13px;
+                    margin-bottom: 6px;
+                }
+                .select-group select, .select-group input[type="file"] {
+                    width: 100%;
+                    max-width: 100%;
+                    box-sizing: border-box;
+                    background: #111;
+                    border: 1px solid #222;
+                    color: #fff;
+                    padding: 9px 12px;
+                    border-radius: 6px;
+                    outline: none;
+                    font-size: 13px;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    transition: border-color 0.2s;
+                }
+
+                /* Coming Soon Upload Badge */
+                .upload-coming-soon-wrapper {
+                    position: relative;
+                    background: #0d0d0d;
+                    border: 1px dashed #333;
+                    border-radius: 8px;
+                    padding: 14px;
+                    text-align: center;
+                    margin-bottom: 14px;
+                    overflow: hidden;
+                }
+                .coming-soon-badge {
+                    display: inline-block;
+                    background: rgba(255, 170, 0, 0.15);
+                    border: 1px solid #ffaa00;
+                    color: #ffaa00;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    padding: 3px 10px;
+                    border-radius: 12px;
+                    margin-bottom: 6px;
+                }
+
+                /* Compact Live Canvas & Overlay */
+                #simulator-canvas-container {
+                    background: #020202;
+                    border: 1px solid #121212;
+                    border-radius: 8px;
+                    width: 100%;
+                    height: 240px;
+                    position: relative;
+                    overflow: hidden;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                #simulator-canvas {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+
+                /* Terminal Console */
+                .serial-monitor {
+                    background: #000;
+                    border: 1px solid #1c1c1c;
+                    border-radius: 8px;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    font-size: 11.5px;
+                    color: #33ff33;
+                    padding: 10px;
+                    height: 110px;
+                    overflow-y: auto;
+                    margin-top: 12px;
+                    box-shadow: inset 0 0 8px rgba(0,255,0,0.15);
+                    scrollbar-width: thin;
+                    scrollbar-color: #222 transparent;
+                }
+                .serial-line {
+                    line-height: 1.35;
+                    white-space: pre-wrap;
+                    border-bottom: 1px solid rgba(255,255,255,0.02);
+                    padding: 2px 0;
+                }
+                .serial-line .timestamp {
+                    color: #888;
+                    margin-right: 6px;
+                }
+                .serial-line .success { color: #33ff33; }
+                .serial-line .info { color: #33a6ff; }
+
+                .sim-btn-row {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 8px;
+                    flex-wrap: wrap;
+                }
+                .sim-btn {
+                    flex: 1;
+                    min-width: 130px;
+                    background: #111;
+                    border: 1px solid #222;
+                    color: #ccc;
+                    padding: 9px 12px;
+                    border-radius: 6px;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-sizing: border-box;
+                }
+                .sim-btn:hover {
+                    border-color: #3366cc;
+                    color: #fff;
+                    background: rgba(51, 102, 204, 0.1);
+                }
+
+                /* --- TOP-5 CLASSIFICATION GUESSES BARS --- */
+                .top5-container {
+                    background: #080808;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 10px;
+                    padding: 14px;
+                }
+                .top5-row {
+                    margin-bottom: 8px;
+                }
+                .top5-row:last-child {
+                    margin-bottom: 0;
+                }
+                .top5-label-row {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                    color: #ccc;
+                    margin-bottom: 3px;
+                }
+                .top5-bar-bg {
+                    width: 100%;
+                    height: 6px;
+                    background: #1a1a1a;
+                    border-radius: 3px;
+                    overflow: hidden;
+                }
+                .top5-bar-fill {
+                    height: 100%;
+                    background: #3366cc;
+                    border-radius: 3px;
+                }
+                .top5-row.rank-1 .top5-bar-fill {
+                    background: linear-gradient(90deg, #3366cc, #33cc66);
+                }
+                .top5-row.rank-1 .top5-label-row {
+                    color: #fff;
+                    font-weight: bold;
+                }
+
+                /* --- UNIFORMED CODE SNIPPET SECTION STYLING --- */
+                .code-tab-container {
+                    background: #080808;
+                    border: 1px solid #1c1c1c;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    margin-top: 15px;
+                }
+                .code-tabs-header {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                    padding: 10px;
+                    background: #040404;
+                    border-bottom: 1px solid #1c1c1c;
+                }
+                .code-tab-btn {
+                    background: #0d0d0d;
+                    border: 1px solid #1c1c1c;
+                    color: #888;
+                    padding: 8px 14px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    transition: all 0.2s ease;
+                }
+                .code-tab-btn:hover {
+                    color: #fff;
+                    border-color: #333;
+                    background: rgba(255,255,255,0.03);
+                }
+                .code-tab-btn.active {
+                    color: #33a6ff;
+                    border-color: #3366cc;
+                    background: rgba(51, 102, 204, 0.12);
+                }
+                .code-panel {
+                    display: none;
+                    padding: 20px;
+                }
+                .code-panel.active {
+                    display: block;
+                }
+                
+                /* Responsive Split View for Code & Line Breakdown */
+                .code-split-grid {
+                    display: grid;
+                    grid-template-columns: 1.15fr 0.85fr;
+                    gap: 20px;
+                    align-items: start;
+                }
+                @media (max-width: 900px) {
+                    .code-split-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .code-block {
+                    background: #020202;
+                    border: 1px solid #151515;
+                    border-radius: 8px;
+                    padding: 16px;
+                    font-family: 'Consolas', 'Courier New', monospace;
+                    font-size: 12.5px;
+                    color: #e6e6e6;
+                    line-height: 1.55;
+                    overflow-x: auto;
+                    margin-top: 10px;
+                    margin-bottom: 25px;
+                }
+                /* Explicit Margin Line Numbers */
+                .ln {
+                    display: inline-block;
+                    width: 22px;
+                    color: #444;
+                    user-select: none;
+                    text-align: right;
+                    margin-right: 10px;
+                    border-right: 1px solid #222;
+                    padding-right: 8px;
+                }
+                
+                .explanation-card {
+                    background: #050505;
+                    border: 1px solid #181818;
+                    border-radius: 8px;
+                    padding: 16px 18px;
+                    font-size: 13px;
+                    color: #b0b0b0;
+                    line-height: 1.5;
+                }
+                .explanation-title {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #fff;
+                    margin-bottom: 12px;
+                    border-bottom: 1px solid #222;
+                    padding-bottom: 6px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .line-explain-item {
+                    margin-bottom: 10px;
+                    padding-bottom: 8px;
+                    border-bottom: 1px dashed rgba(255,255,255,0.04);
+                }
+                .line-explain-item:last-child {
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                    border-bottom: none;
+                }
+                .line-num-badge {
+                    display: inline-block;
+                    background: rgba(51, 166, 255, 0.12);
+                    color: #33a6ff;
+                    border: 1px solid rgba(51, 166, 255, 0.3);
+                    font-family: monospace;
+                    font-size: 11px;
+                    font-weight: bold;
+                    padding: 1px 6px;
+                    border-radius: 4px;
+                    margin-right: 6px;
+                }
+
+                /* Uniform Portfolio Syntax Highlighting Classes */
+                .c-keyword { color: #ff7b72; font-weight: bold; }
+                .c-string { color: #a5d6ff; }
+                .c-comment { color: #8b949e; font-style: italic; }
+                .c-function { color: #d2a8ff; }
+                .c-number { color: #79c0ff; }
+                .c-class { color: #ffa657; }
+
+                /* Benchmarking Table */
+                .register-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 15px;
+                    font-size: 14px;
+                }
+                .register-table th, .register-table td {
+                    border: 1px solid #222;
+                    padding: 12px 14px;
+                    text-align: center;
+                }
+                .register-table th {
+                    background: #0a0a0a;
+                    color: #fff;
+                    font-weight: 600;
+                }
+
+                /* --- PUBLICATIONS & DATASETS --- */
+                .publications-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                    margin-top: 15px;
+                }
+                .pub-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background: rgba(12, 12, 12, 0.8);
+                    border: 1px solid #1c1c1c;
+                    padding: 20px 24px;
+                    border-radius: 10px;
+                    transition: transform 0.2s, border-color 0.2s;
+                }
+                .pub-item:hover {
+                    transform: translateX(6px);
+                    border-color: #333;
+                }
+                .pub-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 18px;
+                }
+                .pub-icon-doc {
+                    width: 38px;
+                    height: 38px;
+                    background: #111;
+                    border: 1px solid #333;
+                    border-radius: 6px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #888;
+                }
+                .pub-title {
+                    font-weight: 600;
+                    color: #fff;
+                    font-size: 16px;
+                    margin-bottom: 4px;
+                }
+                .pub-meta {
+                    font-size: 13px;
+                    color: #888;
+                }
+                .pub-download {
+                    color: #fff;
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 13px;
+                    background: transparent;
+                    border: 1px solid #444;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    transition: all 0.2s;
+                    white-space: nowrap;
+                }
+                .pub-download:hover {
+                    background: #fff;
+                    color: #000;
+                    border-color: #fff;
+                }
+
+                /* Learning Curve Canvas */
+                #lc-chart-container {
+                    background: #040404;
+                    border: 1px solid #1c1c1c;
+                    border-radius: 10px;
+                    padding: 20px;
+                    position: relative;
+                    margin-top: 20px;
+                }
+                #lc-canvas {
+                    width: 100%;
+                    height: 380px;
+                    display: block;
+                }
+                .metric-tabs {
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 15px;
+                }
+                .metric-tab {
+                    background: #111;
+                    border: 1px solid #222;
+                    color: #888;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .metric-tab.active {
+                    background: #3366cc;
+                    color: #fff;
+                    border-color: #3366cc;
+                }
+
+                @media (max-width: 768px) {
+                    .project-card {
+                        padding: 24px 16px;
+                    }
+                }
+            </style>
+
+            <!-- Hero Section -->
+            <section class="project-card">
+                <h1 style="font-size:32px;font-weight:700;margin-bottom:10px;color:#fff;">Comparative YOLO Analysis for UAV Disaster Surveillance</h1>
+                <h2 style="font-size:18px;font-weight:normal;color:#a0a0a0;margin-bottom:20px;line-height:1.5;">Generational comparison of lightweight YOLO nano-scale classification models and activation function micro-optimizations for real-time UAV edge-cloud disaster response on the AIDER dataset.</h2>
+                
+                <div style="margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <a href="https://github.com/MFitran/penelitian-pengolahan-citra-pascabencana" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 0; padding: 6px 14px; font-size: 13px;">
+                        <img src="../assets/shared/icons/github_logo.png" alt="GitHub" style="width: 14px; height: 14px; background: transparent; filter: invert(1);">
+                        Go to GitHub Repository
+                    </a>
+                </div>
+
+                <div class="responsive-grid-2" style="margin-top: 25px; margin-bottom: 10px;">
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Hardware & Software Stack</h4>
+                        <div class="project-badge-container">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">PyTorch</span>
+                            <span class="tech-badge">YOLOv8 / v11 / v12</span>
+                            <span class="tech-badge">Google Colab</span>
+                            <span class="tech-badge">SiLU & ReLU</span>
+                            <span class="tech-badge">AIDER Dataset</span>
+                            <span class="tech-badge">UAV Edge Computing</span>
+                        </div>
+                    </div>
+                    <div class="ps-card" style="padding: 18px 22px;">
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 8px;">Skills & Competencies</h4>
+                        <div class="project-badge-container">
+                            <span class="tech-badge">Data Engineering & ETL</span>
+                            <span class="tech-badge">Dataset Partitioning Ratios</span>
+                            <span class="tech-badge">Model Architecture Optimization</span>
+                            <span class="tech-badge">Activation Function Analysis</span>
+                            <span class="tech-badge">Ablation Studies & Introspection</span>
+                            <span class="tech-badge">Automated Metrics Extraction</span>
+                            <span class="tech-badge">Generational CNN Benchmarking</span>
+                            <span class="tech-badge">Confusion Matrix Diagnostics</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem & Solution Section -->
+            <section class="project-card">
+                <h3 class="project-section-title">Problem & Solution</h3>
+                <div class="prob-sol-grid">
+                    <div class="ps-card">
+                        <h3 class="rgb-word">The Problem</h3>
+                        <p>Deploying deep learning models on UAVs for rapid disaster response (floods, fires, collapses) is constrained by limited onboard CPU/NPU edge-computing resources. Simply adopting newer model architectures (like YOLOv11/v12) increases parameter complexity and GFLOPs without guaranteeing accuracy gains under environmental noise, occlusions, and scale variations.</p>
+                    </div>
+                    <div class="ps-card">
+                        <h3 class="rgb-word">The Solution</h3>
+                        <p>Benchmarking three generations of lightweight nano models (<code>YOLOv8n-cls</code>, <code>YOLOv11n-cls</code>, <code>YOLOv12n-cls</code>) combined with custom activation replacements (SiLU vs ReLU). Our experimental results reveal that micro-optimizing a stable, older model (YOLOv8n-SiLU) yields a peak accuracy of <strong>98.37%</strong> (with validation loss of 0.0587), outperforming standard YOLOv12n (97.82%) and YOLOv11n-SiLU (97.67%).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mathematical Modeling Section -->
+            <section class="project-card" id="math-modeling">
+                <h2 class="project-section-title">Mathematical Membership Functions & Network Loss</h2>
+                <div class="responsive-grid-2">
+                    <div class="ps-card">
+                        <h3 style="font-size: 18px; margin-bottom: 12px; color: #fff;">Softmax and Cross-Entropy Loss</h3>
+                        <p style="font-size: 14.5px; color: #aaa; margin-bottom: 15px; line-height: 1.6;">
+                            Predicted classes are resolved via Softmax probability distributions, and optimized using Cross-Entropy Loss across the 5 target classes:
+                        </p>
+                        <div style="border-left: 3px solid #3366cc; padding-left: 15px; margin-bottom: 15px;">
+                            <span style="font-weight: 600; color: #fff; font-size:14px; display:block; margin-bottom: 4px;">Softmax Class Probability:</span>
+                            \[\hat{y}_i = \frac{e^{z_i}}{\sum_{j=1}^{C} e^{z_j}} \quad \text{for } C = 5\]
+                        </div>
+                        <div style="border-left: 3px solid #3366cc; padding-left: 15px;">
+                            <span style="font-weight: 600; color: #fff; font-size:14px; display:block; margin-bottom: 4px;">Classification Cross-Entropy Loss:</span>
+                            \[\mathcal{L}_{\text{cls}} = -\sum_{i=1}^{C} y_i \log(\hat{y}_i)\]
+                        </div>
+                    </div>
+                    <div class="ps-card">
+                        <h3 style="font-size: 18px; margin-bottom: 12px; color: #fff;">Activation Function Optimization</h3>
+                        <p style="font-size: 14.5px; color: #aaa; margin-bottom: 15px; line-height: 1.6;">
+                            Comparing ReLU's thresholding against SiLU's smooth gating parameter flow during network backpropagation:
+                        </p>
+                        <div style="border-left: 3px solid #ffaa00; padding-left: 15px; margin-bottom: 15px;">
+                            <span style="font-weight: 600; color: #fff; font-size:14px; display:block; margin-bottom: 4px;">SiLU Activation & Derivative:</span>
+                            \[f(x) = x \cdot \sigma(x) = \frac{x}{1 + e^{-x}}\]
+                            \[f'(x) = \sigma(x) \cdot (1 + x \cdot (1 - \sigma(x)))\]
+                        </div>
+                        <div style="border-left: 3px solid #ffaa00; padding-left: 15px;">
+                            <span style="font-weight: 600; color: #fff; font-size:14px; display:block; margin-bottom: 4px;">ReLU Activation & Derivative:</span>
+                            \[f(x) = \max(0, x) \quad \text{and} \quad f'(x) = \begin{cases} 1 & x > 0 \\ 0 & x < 0 \end{cases}\]
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Engineering Pipelines & Code Snippets Section -->
+            <section class="project-card" id="code-snippets">
+                <h3 class="project-section-title">Data Engineering Pipelines & System Code Showcase</h3>
+                <p style="font-size: 16px; color: #ccc; margin-bottom: 30px;">
+                    Below is the structured Python & PyTorch source code separated into logical blocks detailing data partitioning, schema definition, neural graph mutation, layer verification, and model metrics extraction.
+                </p>
+
+                <!-- Part 1: Stratified ETL Split -->
+                <h3 style="font-size: 18px; color: #fff; margin-top: 25px; margin-bottom: 6px;">1. Stratified ETL Split</h3>
+                <p style="font-size: 14px; color: #aaa; margin: 0 0 8px 0;">
+                    Stratified dataset split script for partitioning raw disaster image data (70% training, 20% validation, 10% testing).
+                </p>
+                <pre class="code-block"><code><span class="c-keyword">import</span> os
+<span class="c-keyword">import</span> shutil
+<span class="c-keyword">import</span> random
+
+base_dir = <span class="c-string">'/content/AIDER'</span>
+classes = [<span class="c-string">'collapsed_building'</span>, <span class="c-string">'fire'</span>, <span class="c-string">'flooded_areas'</span>, <span class="c-string">'normal'</span>, <span class="c-string">'traffic_incident'</span>]
+
+<span class="c-comment"># Define dataset partition ratio schema</span>
+train_ratio, valid_ratio, test_ratio = <span class="c-number">0.7</span>, <span class="c-number">0.2</span>, <span class="c-number">0.1</span>
+
+<span class="c-keyword">for</span> cls <span class="c-keyword">in</span> classes:
+    class_dir = os.path.join(base_dir, cls)
+    images = [f <span class="c-keyword">for</span> f <span class="c-keyword">in</span> os.listdir(class_dir) <span class="c-keyword">if</span> os.path.isfile(os.path.join(class_dir, f))]
+    random.<span class="c-function">shuffle</span>(images)
+
+    num_images = <span class="c-function">len</span>(images)
+    num_train = <span class="c-function">int</span>(num_images * train_ratio)
+    num_valid = <span class="c-function">int</span>(num_images * valid_ratio)
+
+    <span class="c-comment"># Partition target file lists</span>
+    splits = {
+        <span class="c-string">'train'</span>: images[:num_train],
+        <span class="c-string">'valid'</span>: images[num_train:num_train + num_valid],
+        <span class="c-string">'test'</span>:  images[num_train + num_valid:]
+    }
+
+    <span class="c-comment"># Execute filesystem transfer ETL</span>
+    <span class="c-keyword">for</span> split_name, split_files <span class="c-keyword">in</span> splits.items():
+        <span class="c-keyword">for</span> img <span class="c-keyword">in</span> split_files:
+            src_path = os.path.join(class_dir, img)
+            dest_path = os.path.join(base_dir, split_name, cls, img)
+            shutil.<span class="c-function">copy</span>(src_path, dest_path)
+
+<span class="c-function">print</span>(<span class="c-string">"ETL Data Partitioning Complete: 70% Train | 20% Valid | 10% Test"</span>)</code></pre>
+
+                <!-- Part 2: Data Schema YAML -->
+                <h3 style="font-size: 18px; color: #fff; margin-top: 30px; margin-bottom: 6px;">2. Data Schema YAML</h3>
+                <p style="font-size: 14px; color: #aaa; margin: 0 0 8px 0;">
+                    Generates dataset YAML metadata configuration file for Ultralytics framework initialization.
+                </p>
+                <pre class="code-block"><code><span class="c-keyword">import</span> yaml
+<span class="c-keyword">import</span> os
+
+<span class="c-comment"># Data dictionary configuration schema</span>
+data_config = {
+    <span class="c-string">'train'</span>: <span class="c-string">'../AIDER/train'</span>,
+    <span class="c-string">'val'</span>:   <span class="c-string">'../AIDER/valid'</span>,
+    <span class="c-string">'test'</span>:  <span class="c-string">'../AIDER/test'</span>,
+    <span class="c-string">'nc'</span>:    <span class="c-number">5</span>,
+    <span class="c-string">'names'</span>: [<span class="c-string">'collapsed_building'</span>, <span class="c-string">'fire'</span>, <span class="c-string">'flooded_areas'</span>, <span class="c-string">'normal'</span>, <span class="c-string">'traffic_incident'</span>]
+}
+
+yaml_file_path = <span class="c-string">'/content/AIDER/data.yaml'</span>
+
+<span class="c-keyword">with</span> <span class="c-function">open</span>(yaml_file_path, <span class="c-string">'w'</span>) <span class="c-keyword">as</span> file:
+    yaml.<span class="c-function">dump</span>(data_config, file, default_flow_style=<span class="c-keyword">False</span>)
+
+<span class="c-function">print</span>(f<span class="c-string">"Data schema configuration written to: {yaml_file_path}"</span>)</code></pre>
+
+                <!-- Part 3: PyTorch Graph Mutation -->
+                <h3 style="font-size: 18px; color: #fff; margin-top: 30px; margin-bottom: 6px;">3. PyTorch Graph Mutation</h3>
+                <p style="font-size: 14px; color: #aaa; margin: 0 0 8px 0;">
+                    Programmatic activation replacement script to recursively modify PyTorch graph layers (swapping SiLU to ReLU).
+                </p>
+                <pre class="code-block"><code><span class="c-keyword">import</span> torch.nn <span class="c-keyword">as</span> nn
+
+<span class="c-keyword">def</span> <span class="c-function">replace_activation</span>(module):
+    <span class="c-string">"""
+    Recursively iterates through PyTorch layer modules to replace
+    SiLU activation functions with ReLU.
+    """</span>
+    <span class="c-keyword">for</span> name, child <span class="c-keyword">in</span> module.<span class="c-function">named_children</span>():
+        <span class="c-keyword">if</span> <span class="c-function">isinstance</span>(child, nn.SiLU):
+            <span class="c-function">setattr</span>(module, name, nn.ReLU())
+        <span class="c-keyword">else</span>:
+            <span class="c-function">replace_activation</span>(child)
+
+<span class="c-comment"># Apply runtime activation replacement on YOLO model backbone</span>
+<span class="c-function">replace_activation</span>(model.model)
+<span class="c-function">print</span>(<span class="c-string">"SiLU activations successfully swapped to ReLU across neural graph."</span>)</code></pre>
+
+                <!-- Part 4: Layer Verification -->
+                <h3 style="font-size: 18px; color: #fff; margin-top: 30px; margin-bottom: 6px;">4. Layer Verification</h3>
+                <p style="font-size: 14px; color: #aaa; margin: 0 0 8px 0;">
+                    Introspection verification helper function to validate active backbone activation layer types.
+                </p>
+                <pre class="code-block"><code><span class="c-keyword">def</span> <span class="c-function">verify_activation_type</span>(model, target_type=<span class="c-string">'SiLU'</span>):
+    <span class="c-string">"""
+    Introspects underlying PyTorch model modules to verify active layer types.
+    """</span>
+    <span class="c-keyword">if</span> <span class="c-function">hasattr</span>(model, <span class="c-string">'model'</span>) <span class="c-keyword">and</span> model.model <span class="c-keyword">is not None</span>:
+        <span class="c-keyword">for</span> module <span class="c-keyword">in</span> model.model.<span class="c-function">modules</span>():
+            <span class="c-keyword">if</span> target_type <span class="c-keyword">in</span> <span class="c-function">str</span>(<span class="c-function">type</span>(module)):
+                <span class="c-keyword">return True</span>
+    <span class="c-keyword">return False</span>
+
+is_silu = <span class="c-function">verify_activation_type</span>(model, <span class="c-string">'SiLU'</span>)
+<span class="c-function">print</span>(f<span class="c-string">"Model Backbone Activation Verification: {'SiLU Active' if is_silu else 'ReLU Active'}"</span>)</code></pre>
+
+                <!-- Part 5: Metrics Extraction ETL -->
+                <h3 style="font-size: 18px; color: #fff; margin-top: 30px; margin-bottom: 6px;">5. Metrics Extraction ETL</h3>
+                <p style="font-size: 14px; color: #aaa; margin: 0 0 8px 0;">
+                    Batch evaluation ETL script for running Ultralytics validation across all trained model checkpoints and logging metrics.
+                </p>
+                <pre class="code-block"><code><span class="c-keyword">from</span> ultralytics <span class="c-keyword">import</span> YOLO
+
+model_folders = [
+    <span class="c-string">'yolo8n_cls'</span>, <span class="c-string">'yolo8n_cls_silu'</span>,
+    <span class="c-string">'yolo11n_cls'</span>, <span class="c-string">'yolo11n_cls_silu'</span>,
+    <span class="c-string">'yolo12n_cls'</span>, <span class="c-string">'yolo12n_cls_silu'</span>
+]
+
+evaluation_results = {}
+
+<span class="c-keyword">for</span> folder <span class="c-keyword">in</span> model_folders:
+    weights_path = f<span class="c-string">'/content/drive/MyDrive/trained_models/{folder}/weights/best.pt'</span>
+    model = <span class="c-class">YOLO</span>(weights_path)
+    
+    <span class="c-comment"># Run test set validation</span>
+    metrics = model.<span class="c-function">val</span>(data=<span class="c-string">'/content/AIDER'</span>)
+    
+    <span class="c-comment"># Extract & log performance metrics</span>
+    evaluation_results[folder] = {
+        <span class="c-string">'top1_acc'</span>: <span class="c-function">float</span>(metrics.top1),
+        <span class="c-string">'top5_acc'</span>: <span class="c-function">float</span>(metrics.top5)
+    }
+    <span class="c-function">print</span>(f<span class="c-string">"[{folder}] Top-1 Acc: {metrics.top1:.4f} | Top-5 Acc: {metrics.top5:.4f}"</span>)</code></pre>
+            </section>
+
+            <!-- Compact UAV Classification Model Performance Showcase -->
+            <section class="project-card">
+                <h3 class="project-section-title">UAV Onboard Classification Showcase</h3>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
+                    Static benchmark showcase evaluating top-performing model checkpoint (<code>yolo8n_silu_best.pt</code>) on sample aerial disaster imagery.
+                </p>
+
+                <div class="math-explorer-grid">
+                    <!-- Controls Panel (Left Column) -->
+                    <div class="widget-container">
+                        <!-- Upload Feature Covered with Coming Soon -->
+                        <div class="upload-coming-soon-wrapper">
+                            <span class="coming-soon-badge">🔒 Coming Soon</span>
+                            <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px;">Custom Image Upload</div>
+                            <div style="font-size: 11.5px; color: #888;">Upload your own aerial disaster photo for real-time model evaluation.</div>
+                        </div>
+
+                        <!-- Model Selection Overview -->
+                        <div class="select-group">
+                            <label>Evaluated Model Architecture</label>
+                            <select disabled style="opacity: 0.85; cursor: default;">
+                                <option selected>YOLOv8n-cls (SiLU - Best: 98.37% Top-1)</option>
+                            </select>
+                        </div>
+
+                        <div class="responsive-grid-2">
+                            <div class="select-group">
+                                <label>Activation Function</label>
+                                <select disabled style="opacity: 0.85; cursor: default;">
+                                    <option selected>SiLU (Default Baseline)</option>
+                                </select>
+                            </div>
+
+                            <div class="select-group">
+                                <label>Weight Checkpoint</label>
+                                <select disabled style="opacity: 0.85; cursor: default;">
+                                    <option selected>best.pt (Epoch 47)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sim-btn-row">
+                            <a href="../assets/projects/citra_pascabencana/models/yolo8n_silu_best.pt" download class="sim-btn" style="background: #3366cc; color: #fff; border-color: #3366cc;">Download yolo8n_silu_best.pt</a>
+                        </div>
+
+                        <!-- Live Terminal Console -->
+                        <div id="sim-console" class="serial-monitor">
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="info">UAV Onboard Telemetry Online. Model Mounted: yolo8n_silu_best.pt</span></div>
+                            <div class="serial-line"><span class="timestamp">[00:00:00]</span><span class="success">Classification Output: COLLAPSED BUILDING (98.37%). Latency: 10.3 ms.</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Output Canvas & Top-5 Class Predictions (Right Column - Compact) -->
+                    <div style="display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                        <!-- Compact Canvas Container -->
+                        <div id="simulator-canvas-container">
+                            <canvas id="simulator-canvas"></canvas>
+                        </div>
+
+                        <!-- Compact 3-Item KPI Strip -->
+                        <div class="responsive-grid-3">
+                            <div class="ps-card" style="padding: 10px; text-align: center;">
+                                <div style="font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Predicted Class</div>
+                                <div style="font-size: 13.5px; font-weight: bold; color: #33cc66; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">Collapsed Building</div>
+                            </div>
+                            <div class="ps-card" style="padding: 10px; text-align: center;">
+                                <div style="font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Top-1 Confidence</div>
+                                <div style="font-size: 16px; font-weight: bold; color: #fff;">98.37%</div>
+                            </div>
+                            <div class="ps-card" style="padding: 10px; text-align: center;">
+                                <div style="font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Onboard Latency</div>
+                                <div style="font-size: 16px; font-weight: bold; color: #33a6ff;">10.3 ms</div>
+                            </div>
+                        </div>
+
+                        <!-- Top-5 Probability Distribution Bars (Static Showcase) -->
+                        <div class="top5-container">
+                            <div style="font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; display: flex; justify-content: space-between;">
+                                <span>Top-5 Class Predictions (Softmax)</span>
+                                <span style="font-size: 10.5px; color: #888; font-weight: normal;">Sum = 100%</span>
+                            </div>
+                            <div id="top5-bars-list">
+                                <div class="top5-row rank-1">
+                                    <div class="top5-label-row">
+                                        <span>🥇 Collapsed Building</span>
+                                        <span>98.37%</span>
+                                    </div>
+                                    <div class="top5-bar-bg">
+                                        <div class="top5-bar-fill" style="width: 98.37%;"></div>
+                                    </div>
+                                </div>
+                                <div class="top5-row">
+                                    <div class="top5-label-row">
+                                        <span>🥈 Traffic Incident</span>
+                                        <span>1.12%</span>
+                                    </div>
+                                    <div class="top5-bar-bg">
+                                        <div class="top5-bar-fill" style="width: 1.12%;"></div>
+                                    </div>
+                                </div>
+                                <div class="top5-row">
+                                    <div class="top5-label-row">
+                                        <span>🥉 Flooded Area & Water Logging</span>
+                                        <span>0.35%</span>
+                                    </div>
+                                    <div class="top5-bar-bg">
+                                        <div class="top5-bar-fill" style="width: 0.35%;"></div>
+                                    </div>
+                                </div>
+                                <div class="top5-row">
+                                    <div class="top5-label-row">
+                                        <span>4. Fire & Smoke Outbreak</span>
+                                        <span>0.11%</span>
+                                    </div>
+                                    <div class="top5-bar-bg">
+                                        <div class="top5-bar-fill" style="width: 0.11%;"></div>
+                                    </div>
+                                </div>
+                                <div class="top5-row">
+                                    <div class="top5-label-row">
+                                        <span>5. Normal (Urban Roadways)</span>
+                                        <span>0.05%</span>
+                                    </div>
+                                    <div class="top5-bar-bg">
+                                        <div class="top5-bar-fill" style="width: 0.05%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Learning Curves Section -->
+            <section class="project-card">
+                <h3 class="project-section-title">Epoch Learning Curves (Epoch 1 – 50)</h3>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 15px; line-height: 1.6;">
+                    Explore real metrics parsed from each model's <code>results.csv</code> log file. Toggle between Top-1 Accuracy, Validation Loss, and Training Loss to compare epoch convergence across all 6 model configurations.
+                </p>
+
+                <div class="metric-tabs">
+                    <button class="metric-tab active" data-metric="top1_acc">Top-1 Accuracy (%)</button>
+                    <button class="metric-tab" data-metric="val_loss">Validation Loss</button>
+                    <button class="metric-tab" data-metric="train_loss">Training Loss</button>
+                </div>
+
+                <div id="lc-chart-container">
+                    <canvas id="lc-canvas"></canvas>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                    <a href="../assets/projects/citra_pascabencana/learning_curves.csv" download class="pub-download">Download learning_curves.csv</a>
+                    <a href="../assets/projects/citra_pascabencana/learning_curves.json" download class="pub-download">Download learning_curves.json</a>
+                </div>
+            </section>
+
+            <!-- Interactive High-Resolution Confusion Matrix Viewer -->
+            <section class="project-card">
+                <h3 class="project-section-title">Actual Model Confusion Matrices (AIDER Test Set)</h3>
+                <p style="color: #a0a0a0; font-size: 14.5px; margin-bottom: 20px; line-height: 1.6;">
+                    Click a model button below to inspect its high-resolution normalized confusion matrix evaluated on the 646-image AIDER test set.
+                </p>
+
+                <!-- Model Selector Toggle Buttons -->
+                <div class="metric-tabs" style="flex-wrap: wrap; gap: 8px;" id="cm-toggle-buttons">
+                    <button class="metric-tab" data-cm="yolo8n_relu">YOLOv8n (ReLU)</button>
+                    <button class="metric-tab active" data-cm="yolo8n_silu">YOLOv8n (SiLU - Best: 98.37%)</button>
+                    <button class="metric-tab" data-cm="yolo11n_relu">YOLOv11n (ReLU)</button>
+                    <button class="metric-tab" data-cm="yolo11n_silu">YOLOv11n (SiLU)</button>
+                    <button class="metric-tab" data-cm="yolo12n_relu">YOLOv12n (ReLU)</button>
+                    <button class="metric-tab" data-cm="yolo12n_silu">YOLOv12n (SiLU)</button>
+                </div>
+
+                <!-- Single Large Viewer Card -->
+                <div class="ps-card" style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box;">
+                    <img id="cm-viewer-img" src="../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png" alt="Confusion Matrix" style="width: 100%; max-width: 620px; border-radius: 8px; border: 1px solid #222;">
+                    <div id="cm-viewer-caption" style="margin-top: 15px; font-size: 14px; color: #33cc66; font-weight: bold; text-align: center; line-height: 1.5;">
+                        YOLOv8n-SiLU Baseline — Top-1 Test Accuracy: 98.37% | Validation Loss: 0.0587 (Best Peak Model)
+                    </div>
+                </div>
+            </section>
+
+            <!-- Summary Benchmarking Matrix Table -->
+            <section class="project-card">
+                <h3 class="project-section-title">Summary Performance Matrix</h3>
+                <div style="overflow-x: auto;">
+                    <table class="register-table">
+                        <thead>
+                            <tr>
+                                <th>Model Generation</th>
+                                <th>Activation Function</th>
+                                <th>Top-1 Accuracy</th>
+                                <th>Validation Loss</th>
+                                <th>Best Epoch</th>
+                                <th>Model Weights</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>YOLOv8n (Baseline)</strong></td>
+                                <td>ReLU (Modified)</td>
+                                <td>97.59%</td>
+                                <td>0.1063</td>
+                                <td>41</td>
+                                <td><a href="../assets/projects/citra_pascabencana/models/yolo8n_relu_best.pt" download style="color:#3366cc;">best.pt</a></td>
+                            </tr>
+                            <tr style="background: rgba(51, 102, 204, 0.08);">
+                                <td><strong>YOLOv8n-SiLU (Best)</strong></td>
+                                <td>SiLU (Default)</td>
+                                <td><strong>98.37%</strong></td>
+                                <td><strong>0.0587</strong></td>
+                                <td><strong>47</strong></td>
+                                <td><a href="../assets/projects/citra_pascabencana/models/yolo8n_silu_best.pt" download style="color:#33cc66; font-weight:bold;">best.pt</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv11n</strong></td>
+                                <td>ReLU (Modified)</td>
+                                <td>97.51%</td>
+                                <td>0.0942</td>
+                                <td>41</td>
+                                <td><a href="../assets/projects/citra_pascabencana/models/yolo11n_relu_best.pt" download style="color:#3366cc;">best.pt</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv11n-SiLU</strong></td>
+                                <td>SiLU (Default)</td>
+                                <td>97.67%</td>
+                                <td>0.0988</td>
+                                <td>42</td>
+                                <td><a href="../assets/projects/citra_pascabencana/models/yolo11n_silu_best.pt" download style="color:#3366cc;">best.pt</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv12n</strong></td>
+                                <td>ReLU (Modified)</td>
+                                <td>97.82%</td>
+                                <td>0.0853</td>
+                                <td>37</td>
+                                <td><a href="../assets/projects/citra_pascabencana/models/yolo12n_relu_best.pt" download style="color:#3366cc;">best.pt</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>YOLOv12n-SiLU</strong></td>
+                                <td>SiLU (Default)</td>
+                                <td>97.05% (-0.77% Degraded)</td>
+                                <td>0.0999</td>
+                                <td>40</td>
+                                <td><a href="../assets/projects/citra_pascabencana/models/yolo12n_silu_best.pt" download style="color:#3366cc;">best.pt</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Publications & Data -->
+            <section class="project-card" id="publications">
+                <h2 class="project-section-title">Publications, Python Tools & Reproducibility</h2>
+                <div class="publications-list">
+                    <div class="pub-item">
+                        <div class="pub-info">
+                            <div class="pub-icon-doc">PDF</div>
+                            <div>
+                                <div class="pub-title">A Comparative Analysis of Image Classification for Disaster Management</div>
+                                <div class="pub-meta">Draft compiled for ICAMIMIA disaster mitigation paper pipelines, 2026.</div>
+                            </div>
+                        </div>
+                        <a href="../assets/projects/citra_pascabencana/icamimia_disaster_migitation_draft.pdf" download class="pub-download">Download PDF Draft</a>
+                    </div>
+                    <div class="pub-item">
+                        <div class="pub-info">
+                            <div class="pub-icon-doc" style="color: #33a6ff;">PY</div>
+                            <div>
+                                <div class="pub-title">Python Model Inference & ONNX Exporter Scripts</div>
+                                <div class="pub-meta">Standalone Python tools: <code>predict.py</code> for PyTorch inference and <code>export_onnx.py</code> for web export.</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="../assets/projects/citra_pascabencana/predict.py" download class="pub-download">predict.py</a>
+                            <a href="../assets/projects/citra_pascabencana/export_onnx.py" download class="pub-download">export_onnx.py</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom GitHub Section -->
+            <section class="project-card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px 20px; margin-top: 30px; border-style: dashed; border-color: rgba(51, 102, 204, 0.3); background: rgba(51, 102, 204, 0.02);">
+                <h3 style="font-size: 22px; color: #fff; font-weight: 700; margin: 0;">Interested in the Source Code & Models?</h3>
+                <p style="font-size: 15px; color: #aaa; max-width: 540px; margin: 0; line-height: 1.6;">
+                    Access the complete comparative training scripts, PyTorch weight checkpoints (.pt), ONNX export scripts, and evaluation notebooks on GitHub.
+                </p>
+                <div style="margin-top: 10px;">
+                    <a href="https://github.com/MFitran/penelitian-pengolahan-citra-pascabencana" target="_blank" class="post-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 36px; font-size: 17px; border-radius: 12px; font-weight: 700; border-color: #3366cc; color: #fff; background: transparent; transition: all 0.2s ease-in-out;" onmouseover="this.style.borderColor='#5588ff'; this.style.backgroundColor='rgba(51, 102, 204, 0.12)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#3366cc'; this.style.backgroundColor='transparent'; this.style.transform='none';">
+                        <img src="../assets/shared/icons/github_logo.png" alt="GitHub" style="width: 20px; height: 20px; background: transparent; filter: invert(1);">
+                        Go to GitHub Repository
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div><!-- /#page-wrap -->
+
+    <footer class="contact-footer">
+        <div class="footer-sections">
+            <div class="footer-section">
+                <h3 class="footer-title">My Contacts</h3>
+                <div class="footer-links">
+                    <a href="https://wa.me/6281398575252" target="_blank" title="WhatsApp"><img src="../assets/shared/icons/whatsapp_logo.png" alt="WhatsApp"></a>
+                    <a href="mailto:fitranhp@gmail.com" title="Email"><img src="../assets/shared/icons/gmail_logo.png" alt="Email" class="logo-gmail"></a>
+                    <a href="https://www.linkedin.com/in/muhammad-fitran-ramadhan/?locale=en_US" target="_blank" title="LinkedIn"><img src="../assets/shared/icons/linkedin_logo.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/m._fitran/" target="_blank" title="Instagram"><img src="../assets/shared/icons/instagram_logo.jpeg" alt="Instagram"></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Professional Profiles</h3>
+                <div class="footer-links">
+                    <a href="https://github.com/MFitran" target="_blank" title="GitHub"><img src="../assets/shared/icons/github_logo.png" alt="GitHub" class="logo-github"></a>
+                    <a href="https://leetcode.com/u/Fitran/" target="_blank" title="LeetCode"><img src="../assets/shared/icons/leetcode_logo.png" alt="LeetCode"></a>
+                    <a href="https://scholar.google.com/citations?user=GgtQvKgAAAAJ&hl=en" target="_blank" title="Google Scholar"><img src="../assets/shared/icons/google_scholar_logo.png" alt="Google Scholar"></a>
+                    <a href="https://www.researchgate.net/profile/Muhammad-Ramadhan-207" target="_blank" title="ResearchGate"><img src="../assets/shared/icons/researchgate_logo.png" alt="ResearchGate"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">Muhammad Fitran Ramadhan &copy; 2026</div>
+    </footer>
+
+    <script src="../assets/shared/js/sidebar.js?v=20260623"></script>
+    <script src="../assets/shared/js/main.js"></script>
+
+    <!-- Interactive Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 0. CODE SNIPPETS TAB CONTROLLER ---
+            const codeTabHeader = document.getElementById('code-snippets-tabs');
+            if (codeTabHeader) {
+                const tabBtns = codeTabHeader.querySelectorAll('.code-tab-btn');
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        tabBtns.forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+                        
+                        btn.classList.add('active');
+                        const targetId = btn.getAttribute('data-tab');
+                        const targetPanel = document.getElementById(targetId);
+                        if (targetPanel) targetPanel.classList.add('active');
+                    });
+                });
+            }
+
+            // --- 1. STATIC SHOWCASE CANVAS ENGINE ---
+            const DEFAULT_SAMPLE_IMAGE = 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
+
+            const canvas = document.getElementById('simulator-canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = 640;
+            canvas.height = 640;
+
+            const sampleImg = new Image();
+            sampleImg.src = DEFAULT_SAMPLE_IMAGE;
+            sampleImg.onload = () => {
+                ctx.drawImage(sampleImg, 0, 0, canvas.width, canvas.height);
+
+                // Static Banner Overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                ctx.fillRect(0, 0, canvas.width, 45);
+
+                ctx.strokeStyle = '#3366cc';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 45);
+                ctx.lineTo(canvas.width, 45);
+                ctx.stroke();
+
+                ctx.font = 'bold 15px sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText('PREDICTED CLASS: COLLAPSED BUILDING', 12, 28);
+
+                ctx.font = 'bold 15px monospace';
+                ctx.fillStyle = '#33cc66';
+                ctx.fillText('98.37%', canvas.width - 90, 28);
+            };
+
+            // --- 2. LEARNING CURVES CANVAS ENGINE ---
+            let lcData = null;
+            let currentMetric = 'top1_acc';
+
+            const lcCanvas = document.getElementById('lc-canvas');
+            const lcCtx = lcCanvas.getContext('2d');
+
+            const MODEL_COLORS = {
+                yolo8n_cls: '#ff4444',
+                yolo8n_cls_silu: '#33cc66',
+                yolo11n_cls: '#ffaa00',
+                yolo11n_cls_silu: '#33a6ff',
+                yolo12n_cls: '#a855f7',
+                yolo12n_cls_silu: '#00f2fe'
+            };
+
+            const MODEL_LABELS = {
+                yolo8n_cls: 'YOLOv8n ReLU',
+                yolo8n_cls_silu: 'YOLOv8n SiLU (Best)',
+                yolo11n_cls: 'YOLOv11n ReLU',
+                yolo11n_cls_silu: 'YOLOv11n SiLU',
+                yolo12n_cls: 'YOLOv12n ReLU',
+                yolo12n_cls_silu: 'YOLOv12n SiLU'
+            };
+
+            fetch('../assets/projects/citra_pascabencana/learning_curves.json')
+                .then(res => res.json())
+                .then(data => {
+                    lcData = data;
+                    renderLearningCurves();
+                })
+                .catch(err => console.error("Error loading learning curves:", err));
+
+            document.querySelectorAll('.metric-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    if (e.target.parentElement.id === 'cm-toggle-buttons') return;
+                    document.querySelectorAll('.metric-tab').forEach(t => {
+                        if (t.parentElement.id !== 'cm-toggle-buttons') t.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    currentMetric = e.target.getAttribute('data-metric');
+                    renderLearningCurves();
+                });
+            });
+
+            function renderLearningCurves() {
+                if (!lcData) return;
+
+                const rect = lcCanvas.parentNode.getBoundingClientRect();
+                lcCanvas.width = rect.width;
+                lcCanvas.height = 380;
+
+                const W = lcCanvas.width;
+                const H = lcCanvas.height;
+                const padding = { top: 40, right: 180, bottom: 40, left: 60 };
+
+                lcCtx.clearRect(0, 0, W, H);
+
+                let minVal = Infinity;
+                let maxVal = -Infinity;
+
+                Object.keys(lcData).forEach(m => {
+                    lcData[m].forEach(row => {
+                        let val = currentMetric === 'top1_acc' ? row.accuracy_top1 * 100 : row[currentMetric];
+                        if (val < minVal) minVal = val;
+                        if (val > maxVal) maxVal = val;
+                    });
+                });
+
+                if (currentMetric === 'top1_acc') {
+                    minVal = Math.floor(minVal - 2);
+                    maxVal = 100;
+                } else {
+                    minVal = 0;
+                    maxVal = Math.ceil(maxVal * 10) / 10 + 0.05;
+                }
+
+                const chartW = W - padding.left - padding.right;
+                const chartH = H - padding.top - padding.bottom;
+
+                lcCtx.strokeStyle = '#1c1c1c';
+                lcCtx.lineWidth = 1;
+                lcCtx.font = '11px monospace';
+                lcCtx.fillStyle = '#666';
+
+                for (let i = 0; i <= 5; i++) {
+                    const y = padding.top + (chartH / 5) * i;
+                    const val = maxVal - ((maxVal - minVal) / 5) * i;
+                    
+                    lcCtx.beginPath();
+                    lcCtx.moveTo(padding.left, y);
+                    lcCtx.lineTo(padding.left + chartW, y);
+                    lcCtx.stroke();
+
+                    const valStr = currentMetric === 'top1_acc' ? `${val.toFixed(1)}%` : val.toFixed(3);
+                    lcCtx.fillText(valStr, 10, y + 4);
+                }
+
+                for (let ep = 10; ep <= 50; ep += 10) {
+                    const x = padding.left + (chartW / 49) * (ep - 1);
+                    lcCtx.beginPath();
+                    lcCtx.moveTo(x, padding.top);
+                    lcCtx.lineTo(x, padding.top + chartH);
+                    lcCtx.stroke();
+
+                    lcCtx.fillText(`Ep ${ep}`, x - 12, H - 12);
+                }
+
+                Object.keys(lcData).forEach(m => {
+                    const points = lcData[m];
+                    const color = MODEL_COLORS[m] || '#fff';
+                    const isBest = m === 'yolo8n_cls_silu';
+
+                    lcCtx.strokeStyle = color;
+                    lcCtx.lineWidth = isBest ? 3 : 1.8;
+
+                    lcCtx.beginPath();
+                    points.forEach((pt, idx) => {
+                        let val = currentMetric === 'top1_acc' ? pt.accuracy_top1 * 100 : pt[currentMetric];
+                        const x = padding.left + (chartW / 49) * idx;
+                        const y = padding.top + chartH - ((val - minVal) / (maxVal - minVal)) * chartH;
+
+                        if (idx === 0) lcCtx.moveTo(x, y);
+                        else lcCtx.lineTo(x, y);
+                    });
+                    lcCtx.stroke();
+                });
+
+                let legendY = padding.top + 10;
+                Object.keys(lcData).forEach(m => {
+                    const color = MODEL_COLORS[m];
+                    const label = MODEL_LABELS[m];
+
+                    lcCtx.fillStyle = color;
+                    lcCtx.fillRect(W - padding.right + 20, legendY, 14, 10);
+
+                    lcCtx.fillStyle = m === 'yolo8n_cls_silu' ? '#33cc66' : '#aaa';
+                    lcCtx.font = m === 'yolo8n_cls_silu' ? 'bold 12px sans-serif' : '11px sans-serif';
+                    lcCtx.fillText(label, W - padding.right + 42, legendY + 9);
+
+                    legendY += 24;
+                });
+            }
+
+            // --- 3. INTERACTIVE CONFUSION MATRIX VIEWER LOGIC ---
+            const CM_INFO = {
+                yolo8n_relu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_relu.png',
+                    caption: 'YOLOv8n (ReLU Modified) — Top-1 Test Accuracy: 97.59% | Validation Loss: 0.1063'
+                },
+                yolo8n_silu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png',
+                    caption: 'YOLOv8n-SiLU Baseline — Top-1 Test Accuracy: 98.37% | Validation Loss: 0.0587 (Best Peak Model)'
+                },
+                yolo11n_relu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_relu.png',
+                    caption: 'YOLOv11n (ReLU Modified) — Top-1 Test Accuracy: 97.51% | Validation Loss: 0.0942'
+                },
+                yolo11n_silu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_silu.png',
+                    caption: 'YOLOv11n-SiLU Baseline — Top-1 Test Accuracy: 97.67% | Validation Loss: 0.0988'
+                },
+                yolo12n_relu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_relu.png',
+                    caption: 'YOLOv12n (ReLU Modified) — Top-1 Test Accuracy: 97.82% | Validation Loss: 0.0853'
+                },
+                yolo12n_silu: {
+                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_silu.png',
+                    caption: 'YOLOv12n-SiLU Baseline — Top-1 Test Accuracy: 97.05% (-0.77% Degraded) | Validation Loss: 0.0999'
+                }
+            };
+
+            const cmImgEl = document.getElementById('cm-viewer-img');
+            const cmCaptionEl = document.getElementById('cm-viewer-caption');
+            const cmButtonsContainer = document.getElementById('cm-toggle-buttons');
+
+            cmButtonsContainer.querySelectorAll('.metric-tab').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    cmButtonsContainer.querySelectorAll('.metric-tab').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    const cmKey = e.target.getAttribute('data-cm');
+                    const info = CM_INFO[cmKey];
+                    if (info) {
+                        cmImgEl.src = info.file;
+                        cmCaptionEl.innerHTML = info.caption;
+                        cmCaptionEl.style.color = cmKey === 'yolo8n_silu' ? '#33cc66' : (cmKey === 'yolo12n_silu' ? '#ffaa00' : '#ccc');
+                    }
+                });
+            });
+
+            window.addEventListener('resize', renderLearningCurves);
+        });
+    </script>
+</body>
+</html>
