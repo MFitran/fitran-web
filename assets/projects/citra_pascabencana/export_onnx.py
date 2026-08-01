@@ -1,5 +1,5 @@
 """
-ONNX Model Exporter for UAV Disaster Classification Models
+ONNX Model Exporter for UAV Disaster Classification Models (Opset 17)
 
 Usage:
   pip install ultralytics onnx
@@ -20,7 +20,7 @@ model_files = [
     "yolo12n_relu_best.pt"
 ]
 
-print("=== Starting ONNX Model Export ===")
+print("=== Starting ONNX Model Export (Opset 17) ===")
 
 for pt_file in model_files:
     pt_path = os.path.join(MODELS_DIR, pt_file)
@@ -28,10 +28,11 @@ for pt_file in model_files:
         print(f"[SKIP] Model file not found: {pt_path}")
         continue
     
-    print(f"Exporting {pt_file} to ONNX...")
+    print(f"Exporting {pt_file} to ONNX (opset=17)...")
     try:
         model = YOLO(pt_path)
-        onnx_path = model.export(format="onnx", imgsz=640, simplify=True)
+        # Force opset=17 for ONNX Runtime Web compatibility
+        onnx_path = model.export(format="onnx", imgsz=640, opset=17, simplify=True)
         print(f"[SUCCESS] Exported -> {onnx_path}")
     except Exception as e:
         print(f"[ERROR] Failed to export {pt_file}: {e}")
