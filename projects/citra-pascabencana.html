@@ -1082,7 +1082,7 @@ evaluation_results = {}
                                 <div class="pub-meta">Draft compiled for ICAMIMIA disaster mitigation paper pipelines, 2026.</div>
                             </div>
                         </div>
-                        <a href="../assets/projects/citra_pascabencana/icamimia_disaster_migitation_draft.pdf" download class="pub-download">Download PDF Draft</a>
+                        <a href="../assets/projects/citra_pascabencana/icamimia_disaster_migitation_draft.pdf" target="_blank" class="pub-download">Open PDF Draft</a>
                     </div>
                     <div class="pub-item">
                         <div class="pub-info">
@@ -1164,7 +1164,7 @@ evaluation_results = {}
             }
 
             // --- 1. STATIC SHOWCASE CANVAS ENGINE ---
-            const DEFAULT_SAMPLE_IMAGE = 'assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
+            const DEFAULT_SAMPLE_IMAGE = '../assets/projects/citra_pascabencana/collapsed_building_sample.jpg';
 
             const canvas = document.getElementById('simulator-canvas');
             const ctx = canvas.getContext('2d');
@@ -1344,27 +1344,27 @@ evaluation_results = {}
             // --- 3. INTERACTIVE CONFUSION MATRIX VIEWER LOGIC ---
             const CM_INFO = {
                 yolo8n_relu: {
-                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_relu.png',
+                    file: '../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_relu.png',
                     caption: 'YOLOv8n (ReLU Modified) — Top-1 Test Accuracy: 97.59% | Validation Loss: 0.1063'
                 },
                 yolo8n_silu: {
-                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png',
+                    file: '../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo8n_silu.png',
                     caption: 'YOLOv8n-SiLU Baseline — Top-1 Test Accuracy: 98.37% | Validation Loss: 0.0587 (Best Peak Model)'
                 },
                 yolo11n_relu: {
-                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_relu.png',
+                    file: '../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_relu.png',
                     caption: 'YOLOv11n (ReLU Modified) — Top-1 Test Accuracy: 97.51% | Validation Loss: 0.0942'
                 },
                 yolo11n_silu: {
-                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_silu.png',
+                    file: '../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo11n_silu.png',
                     caption: 'YOLOv11n-SiLU Baseline — Top-1 Test Accuracy: 97.67% | Validation Loss: 0.0988'
                 },
                 yolo12n_relu: {
-                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_relu.png',
+                    file: '../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_relu.png',
                     caption: 'YOLOv12n (ReLU Modified) — Top-1 Test Accuracy: 97.82% | Validation Loss: 0.0853'
                 },
                 yolo12n_silu: {
-                    file: 'assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_silu.png',
+                    file: '../assets/projects/citra_pascabencana/confusion_matrices/cm_yolo12n_silu.png',
                     caption: 'YOLOv12n-SiLU Baseline — Top-1 Test Accuracy: 97.05% (-0.77% Degraded) | Validation Loss: 0.0999'
                 }
             };

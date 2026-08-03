@@ -104,12 +104,7 @@ async function fetchAndRenderSupabasePosts(container) { // This function remains
             const card = document.createElement('div');
             card.className = 'box update-box';
             
-            // Limit content length for preview
             const textContent = post.content || '';
-            const previewLength = 150;
-            let contentHtml = '';
-
-            // Escape HTML and format newlines to <br> safely
             const escapeHTML = str => str.replace(/[&<>'"]/g, 
                 tag => ({
                     '&': '&amp;',
@@ -120,13 +115,7 @@ async function fetchAndRenderSupabasePosts(container) { // This function remains
                 }[tag])
             );
             const safeText = escapeHTML(textContent);
-
-            if (safeText.length > previewLength) {
-                const fullText = safeText.replace(/\n/g, '<br>');
-                contentHtml = `<div class="post-text-content">${fullText}</div><button class="read-more-btn">Read more</button>`;
-            } else {
-                contentHtml = `<div>${safeText.replace(/\n/g, '<br>')}</div>`;
-            }
+            const contentHtml = safeText.replace(/\n/g, '<br>');
 
             const dateStr = post.posted_at ? new Date(post.posted_at).toLocaleDateString() : 'N/A';
             const defaultImg = `${assetPrefix}updates/images/default_linkedin_post_image.jpeg`;
@@ -147,7 +136,7 @@ async function fetchAndRenderSupabasePosts(container) { // This function remains
                     <span>🔄 ${post.shares_count || 0}</span>
                     <span style="margin-left: auto;">📅 ${dateStr}</span>
                 </div>
-                <a href="${post.post_url || '#'}" target="_blank" class="post-btn">View on LinkedIn</a>
+                <a href="${post.post_url || '#'}" target="_blank" class="post-btn"><img src="${assetPrefix}shared/icons/linkedin_logo.png" alt="LinkedIn" class="post-btn-icon"><span>View on LinkedIn</span></a>
             `;
 
             // Download private image asynchronously and replace src once loaded
@@ -170,27 +159,6 @@ async function fetchAndRenderSupabasePosts(container) { // This function remains
                             }
                         });
                 }
-            }
-
-            // Add event listener for 'Read more' toggle
-            const readMoreLink = card.querySelector('.read-more-btn');
-            if (readMoreLink) {
-                readMoreLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const textContent = card.querySelector('.post-text-content');
-                    const isExpanded = textContent.classList.contains('expanded');
-                    
-                    if (isExpanded) {
-                        textContent.classList.remove('expanded');
-                        readMoreLink.textContent = 'Read more';
-                    } else {
-                        textContent.classList.add('expanded');
-                        readMoreLink.textContent = 'Read less';
-                    }
-
-                    // Force the card to adapt its height to the new content
-                    card.style.height = 'auto';
-                });
             }
             
             container.appendChild(card);

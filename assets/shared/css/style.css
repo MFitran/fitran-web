@@ -297,37 +297,31 @@ header {
 }
 
 .post-desc {
-    font-size: 0.9em;
+    font-size: 0.82em;
+    line-height: 1.5;
+    max-height: calc(6 * 1.5em);
+    overflow-y: auto;
     margin: 0;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #333333 transparent;
 }
 
-.post-text-content {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.post-desc::-webkit-scrollbar {
+    width: 4px;
 }
 
-.post-text-content.expanded {
-    -webkit-line-clamp: unset;
+.post-desc::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.read-more-btn {
-    background: none;
-    border: none;
-    color: #B0B0B0;
-    cursor: pointer;
-    padding: 0;
-    font-size: 0.9em;
-    text-decoration: underline;
-    text-align: left;
-    align-self: flex-start;
-    margin-top: 8px;
+.post-desc::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 4px;
 }
 
-.read-more-btn:hover {
-    color: #E0E0E0;
+.post-desc::-webkit-scrollbar-thumb:hover {
+    background: #555555;
 }
 
 .post-stats {
@@ -340,34 +334,42 @@ header {
 
 .post-btn {
     margin-top: auto;
-    text-align: center;
-    background: #E0E0E0;
-    color: #000000;
-    padding: 10px;
-    background: transparent;
-    color: #B0B0B0;
-    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid #222222;
     border-radius: 8px;
+    background-color: transparent;
+    color: #666666;
+    font-size: 13px;
+    font-weight: 500;
     text-decoration: none;
-    font-weight: bold;
-    transition: transform 0.2s, background-color 0.2s, color 0.2s;
-    border: none;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    border: 1px solid #333;
     cursor: pointer;
-    font-family: inherit; /* Ensure consistent font family */
-    font-size: 16px;
-    font-size: 14px;
+    font-family: inherit;
+    transition: transform 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .post-btn:hover {
-    background-color: #B0B0B0;
-    transform: translateY(-5px);
-    background-color: #1a1a1a;
-    border-color: #555;
+    background-color: #111111;
+    border-color: #121212;
     color: #E0E0E0;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+}
+
+.post-btn-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    background-color: transparent;
+    filter: grayscale(100%) opacity(0.6);
+    flex-shrink: 0;
+    transition: filter 0.2s;
+}
+
+.post-btn:hover .post-btn-icon {
+    filter: none;
 }
 
 .grid-2x2 {
@@ -377,41 +379,36 @@ header {
 }
 
 .hub-box {
-    padding: 16px;
+    padding: 16px 20px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 14px;
     text-decoration: none;
     color: inherit;
-    transition: transform 0.2s, background-color 0.2s;
+    transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
 }
 
 .hub-box:hover {
     background-color: #111111;
-    transform: translateY(-5px);
+    transform: translateY(-3px);
 }
 
 .hub-box img {
-    width: 50px;
-    height: 50px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
     background-color: #E0E0E0;
-    border-radius: 12px;
-    padding: 8px;
+    border-radius: 8px;
+    padding: 6px;
+    flex-shrink: 0;
 }
 
-.hub-box h3 {
-    font-size: 20px;
+.hub-box-title {
+    font-size: 15px;
+    font-weight: 600;
     color: #E0E0E0;
-    margin: 0;
-}
-
-.hub-box p {
-    font-size: 0.9em;
-    color: #A0A0A0;
-    text-align: left;
-    margin: 0;
 }
 
 /* --- FOOTER LAYOUT --- */
@@ -554,8 +551,8 @@ img.logo-github {
     .section-title {
         font-size: 26px !important;
     }
-    .hub-box h3 {
-        font-size: 17px !important;
+    .hub-box-title {
+        font-size: 14px !important;
     }
     .footer-title {
         font-size: 17px !important;
@@ -1494,10 +1491,10 @@ body.dashboard-sidebar-closed .dashboard-sidebar-toggle__arrow {
     gap: 12px;
     padding: 10px 14px;
     margin: 0 16px;
-    background: #0c0c0c;
-    border: 1px solid #1a1a1a;
+    background: transparent;
+    border: 1px solid #121212;
     color: #aaa;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -1527,9 +1524,9 @@ body.dashboard-sidebar-closed .dashboard-sidebar-toggle__arrow {
 
 /* Accordion Rules Component */
 .accordion-rules {
-    background: #0c0c0c;
-    border: 1px solid #1a1a1a;
-    border-radius: 12px;
+    background: transparent;
+    border: 1px solid #121212;
+    border-radius: 20px;
     margin-top: 10px;
     overflow: hidden;
     transition: border-color 0.2s;
