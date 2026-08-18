@@ -157,7 +157,9 @@ Published Scopus-indexed research paper:
             degreeName: "Bachelor of Engineering - BE, Teknik Komputer",
             dates: "2022 - 2026",
             logo: "../assets/updates/telkom_university_img.jpg",
-            description: "Summa Cum Laude • Wisudawan dengan Indeks Prestasi Kumulatif Tertinggi Tingkat S1 Teknik Komputer Wisuda Periode II Tahun Akademik 2025/2026"
+            description: `- With Honors of Summa Cum Laude
+- Graduated in 3.5 years (7 semesters)
+- Graduates with the highest GPA in the Bachelor of Computer Engineering major in 2026 graduation period II`
         }
     ],
 
