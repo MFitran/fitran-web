@@ -27,34 +27,48 @@
         },
         {
             num: '04',
-            title: 'Projects & Work',
+            title: 'Education',
+            subtitle: 'Academic Background',
+            target: '#profile-education',
+            tag: 'Edu'
+        },
+        {
+            num: '05',
+            title: 'Projects & Publications',
             subtitle: 'Key Highlights',
             target: '#profile-projects',
             tag: 'Work'
         },
         {
-            num: '05',
+            num: '06',
+            title: 'Honors & Awards',
+            subtitle: 'Achievements & Recognition',
+            target: '#profile-honors',
+            tag: 'Award'
+        },
+        {
+            num: '07',
             title: 'Certifications',
             subtitle: 'Credentials & Licences',
             target: '#profile-certifications',
             tag: 'Docs'
         },
         {
-            num: '06',
+            num: '08',
             title: 'Skills & Tech',
             subtitle: 'Core Competencies',
             target: '#profile-skills',
             tag: 'Tech'
         },
         {
-            num: '07',
+            num: '09',
             title: 'Languages',
             subtitle: 'Communication Skills',
             target: '#profile-languages',
             tag: 'Info'
         },
         {
-            num: '08',
+            num: '10',
             title: 'All Updates',
             subtitle: 'LinkedIn Feed',
             target: '#all-updates',
@@ -352,7 +366,9 @@
             { id: 'profile-header', el: document.getElementById('linkedin-profile-section') },
             { id: 'profile-about', el: document.getElementById('profile-about') },
             { id: 'profile-experience', el: document.getElementById('profile-experience') },
+            { id: 'profile-education', el: document.getElementById('profile-education') },
             { id: 'profile-projects', el: document.getElementById('profile-projects') },
+            { id: 'profile-honors', el: document.getElementById('profile-honors') },
             { id: 'profile-certifications', el: document.getElementById('profile-certifications') },
             { id: 'profile-skills', el: document.getElementById('profile-skills') },
             { id: 'profile-languages', el: document.getElementById('profile-languages') },

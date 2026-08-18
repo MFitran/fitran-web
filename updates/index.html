@@ -37,7 +37,48 @@
         }
         .item-details { display: flex; flex-direction: column; gap: 2px; }
         .item-title { font-size: 16px; font-weight: bold; margin: 0; color: #E0E0E0; }
-        .item-subtitle, .item-meta { font-size: 14px; color: #A0A0A0; margin: 0; }
+        .item-subtitle, .item-meta { font-size: 14px; color: #A0A0A0; margin: 0; white-space: pre-wrap; }
+        .exp-desc-container { margin-top: 8px; }
+        .exp-desc-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            color: #4da6ff;
+            font-size: 12.5px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .exp-desc-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #4da6ff;
+            color: #80c1ff;
+        }
+        .exp-desc-toggle-btn .chevron-icon {
+            transition: transform 0.2s ease;
+        }
+        .exp-desc-toggle-btn.expanded .chevron-icon {
+            transform: rotate(180deg);
+        }
+        .exp-desc-content {
+            margin-top: 8px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid #4da6ff;
+            border-radius: 0 6px 6px 0;
+            font-size: 13.5px;
+            color: #b0b0b0;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .exp-desc-content.collapsed {
+            display: none;
+        }
         .skill-container { display: flex; flex-wrap: wrap; gap: 8px; }
         .skill-tag {
             background-color: #222;
@@ -136,32 +177,100 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/updates/static-profile.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const supabase = await window.getSupabaseClient();
-            if (!supabase) {
-                console.error('Supabase client not available for profile loading.');
-                return;
-            }
-
             // --- Helper functions for rendering profile sections ---
             function renderExperiences(experiences) {
                 if (!experiences || experiences.length === 0) return '';
                 const limit = 3;
                 const isCollapsible = experiences.length > limit;
-                const items = experiences.map(exp => `
-                    <div class="profile-item">
-                        <img src="${exp.companyLogo?.sizes?.[2]?.url || exp.companyLogo?.url || ''}" alt="${exp.companyName}" class="item-logo" onerror="this.style.display='none'">
-                        <div class="item-details">
-                            <h4 class="item-title">${exp.position}</h4>
-                            <p class="item-subtitle">${exp.companyName} &bull; ${exp.employmentType || ''}</p>
-                            <p class="item-meta">${exp.startDate?.text} - ${exp.endDate?.text} &bull; ${exp.duration}</p>
-                            <p class="item-meta">${exp.location}</p>
+                const items = experiences.map(exp => {
+                    const title = exp.title || exp.position || '';
+                    let companyName = exp.companyName || '';
+                    if (!companyName && exp.companyLink1) {
+                        const slug = exp.companyLink1.replace(/\/$/, '').split('/').pop();
+                        if (slug) {
+                            companyName = slug === 'rnest-laboratory' 
+                                ? 'RNest Laboratory' 
+                                : slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                        }
+                    }
+                    const logoUrl = exp.logo || exp.companyLogo?.sizes?.[2]?.url || exp.companyLogo?.url || '';
+                    let description = (exp.jobDescription || exp.description || exp.summary || '').trim();
+                    
+                    let dateRange = '';
+                    if (exp.jobStartedOn) {
+                        const endText = exp.jobStillWorking ? 'Present' : (exp.jobEndedOn || 'Present');
+                        const durationText = exp.currentJobDuration ? ` &bull; ${exp.currentJobDuration}` : '';
+                        dateRange = `${exp.jobStartedOn} - ${endText}${durationText}`;
+                    } else if (exp.startDate?.text) {
+                        const durationText = exp.duration ? ` &bull; ${exp.duration}` : '';
+                        dateRange = `${exp.startDate.text} - ${exp.endDate?.text || 'Present'}${durationText}`;
+                    }
+
+                    const location = exp.jobLocation || exp.location || '';
+                    const empType = exp.employmentType ? ` &bull; ${exp.employmentType}` : '';
+                    const subtitle = companyName ? `${companyName}${empType}` : (empType ? empType.replace(/^ &bull; /, '') : '');
+
+                    const descHtml = description ? `
+                        <div class="exp-desc-container">
+                            <span class="exp-desc-toggle-text" style="cursor: pointer; color: #4da6ff; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; user-select: none;">
+                                <span class="toggle-label">See description</span> <span class="chevron-icon" style="font-size: 10px;">▾</span>
+                            </span>
+                            <div class="exp-desc-content collapsed" style="margin-top: 8px; padding: 10px 12px; background: rgba(0, 0, 0, 0.3); border-left: 2px solid #4da6ff; border-radius: 0 6px 6px 0; font-size: 13.5px; color: #b0b0b0; line-height: 1.6; white-space: pre-wrap;">${description}</div>
                         </div>
-                    </div>
-                `).join('');
+                    ` : '';
+
+                    return `
+                        <div class="profile-item">
+                            ${logoUrl ? `<img src="${logoUrl}" alt="${companyName || title}" class="item-logo" onerror="this.style.display='none'">` : ''}
+                            <div class="item-details" style="flex: 1; min-width: 0;">
+                                <h4 class="item-title">${title}</h4>
+                                ${subtitle ? `<p class="item-subtitle">${subtitle}</p>` : ''}
+                                ${dateRange ? `<p class="item-meta">${dateRange}</p>` : ''}
+                                ${location ? `<p class="item-meta">${location}</p>` : ''}
+                                ${descHtml}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
                 const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${experiences.length - limit})</button>` : '';
                 return `<div id="profile-experience" class="profile-section"><h3>Experience</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+            }
+
+            function renderEducation(educations) {
+                if (!educations || educations.length === 0) return '';
+                const limit = 3;
+                const isCollapsible = educations.length > limit;
+                const items = educations.map(edu => {
+                    const schoolName = edu.title || edu.schoolName || '';
+                    const degree = edu.subtitle || edu.degreeName || '';
+                    const description = (edu.description || '').trim();
+                    const logoUrl = edu.logo || edu.schoolLogo?.url || '';
+                    let dateRange = '';
+                    if (edu.period) {
+                        if (edu.period.startedOn || edu.period.endedOn) {
+                            dateRange = `${edu.period.startedOn || ''} - ${edu.period.endedOn || 'Present'}`;
+                        }
+                    } else if (edu.dates) {
+                        dateRange = edu.dates;
+                    }
+
+                    return `
+                        <div class="profile-item">
+                            ${logoUrl ? `<img src="${logoUrl}" alt="${schoolName}" class="item-logo" onerror="this.style.display='none'">` : ''}
+                            <div class="item-details" style="flex: 1; min-width: 0;">
+                                <h4 class="item-title">${schoolName}</h4>
+                                ${degree ? `<p class="item-subtitle">${degree}</p>` : ''}
+                                ${dateRange ? `<p class="item-meta">${dateRange}</p>` : ''}
+                                ${description ? `<p class="item-desc" style="white-space: pre-wrap; margin-top: 6px; color: #B0B0B0; font-size: 13.5px; line-height: 1.6;">${description}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${educations.length - limit})</button>` : '';
+                return `<div id="profile-education" class="profile-section"><h3>Education</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
             }
 
             function renderProjects(projects) {
@@ -171,29 +280,52 @@
                 const items = projects.map(proj => `
                     <div class="profile-item">
                         <div class="item-details">
-                            <h4 class="item-title">${proj.title}</h4>
-                            <p class="item-meta">${proj.duration}</p>
+                            <h4 class="item-title">${proj.title || ''}</h4>
+                            ${proj.duration ? `<p class="item-meta">${proj.duration}</p>` : ''}
                         </div>
                     </div>
                 `).join('');
                 const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${projects.length - limit})</button>` : '';
-                return `<div id="profile-projects" class="profile-section"><h3>Projects</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+                return `<div id="profile-projects" class="profile-section"><h3>Projects & Publications</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+            }
+
+            function renderHonors(honors) {
+                if (!honors || honors.length === 0) return '';
+                const limit = 3;
+                const isCollapsible = honors.length > limit;
+                const items = honors.map(item => `
+                    <div class="profile-item">
+                        <div class="item-details">
+                            <h4 class="item-title">${item.title || ''}</h4>
+                            ${item.issuer ? `<p class="item-subtitle">${item.issuer}</p>` : ''}
+                            ${item.date ? `<p class="item-meta">${item.date}</p>` : ''}
+                            ${item.description ? `<p class="item-desc" style="white-space: pre-wrap; margin-top: 6px; color: #B0B0B0; font-size: 13.5px; line-height: 1.6;">${item.description}</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${honors.length - limit})</button>` : '';
+                return `<div id="profile-honors" class="profile-section"><h3>Honors & Awards</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
             }
 
             function renderCertifications(certifications) {
                 if (!certifications || certifications.length === 0) return '';
                 const limit = 3;
                 const isCollapsible = certifications.length > limit;
-                const items = certifications.map(cert => `
-                    <div class="profile-item">
-                        ${cert.issuedByLogo?.url ? `<img src="${cert.issuedByLogo.url}" alt="${cert.issuedBy}" class="item-logo" onerror="this.style.display='none'">` : '<div class="item-logo" style="visibility: hidden;"></div>'}
-                        <div class="item-details">
-                            <h4 class="item-title">${cert.title}</h4>
-                            <p class="item-subtitle">${cert.issuedBy}</p>
-                            <p class="item-meta">${cert.issuedAt}</p>
+                const items = certifications.map(cert => {
+                    const title = cert.title || '';
+                    const issuer = cert.subtitle || cert.issuedBy || '';
+                    const date = cert.issued || cert.issuedAt || '';
+
+                    return `
+                        <div class="profile-item">
+                            <div class="item-details">
+                                <h4 class="item-title">${title}</h4>
+                                ${issuer ? `<p class="item-subtitle">${issuer}</p>` : ''}
+                                ${date ? `<p class="item-meta">${date}</p>` : ''}
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${certifications.length - limit})</button>` : '';
                 return `<div id="profile-certifications" class="profile-section"><h3>Certifications</h3><div class="item-list ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
             }
@@ -203,25 +335,69 @@
                 const limit = 20;
                 const isCollapsible = skills.length > limit;
                 const items = skills.map(skill => {
+                    const name = skill.title || skill.name || '';
+                    if (!name) return '';
                     const hasPositions = skill.positions && skill.positions.length > 0;
                     const titleAttr = hasPositions ? `title="Endorsed for: ${skill.positions.join(', ')}"` : '';
-                    return `<span class="skill-tag" ${titleAttr}>${skill.name}</span>`;
-                }).join('');
+                    return `<span class="skill-tag" ${titleAttr}>${name}</span>`;
+                }).filter(Boolean).join('');
                 const seeMoreButton = isCollapsible ? `<button class="see-more-btn">See more (${skills.length - limit})</button>` : '';
-                return `<div id="profile-skills" class="profile-section"><h3>Skills</h3><div class="skill-container ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
+                return `<div id="profile-skills" class="profile-section"><h3>Skills (${skills.length})</h3><div class="skill-container ${isCollapsible ? 'collapsed' : ''}" data-limit="${limit}">${items}</div>${seeMoreButton}</div>`;
             }
 
             function renderLanguages(languages) {
                 if (!languages || languages.length === 0) return '';
-                const uniqueLanguages = [...new Map(languages.map(item => [item.name, item])).values()]; // Remove duplicates like "English"
-                const items = uniqueLanguages.map(lang => `
-                    <div class="profile-item" style="align-items: center;"><div class="item-details"><h4 class="item-title">${lang.name}</h4><p class="item-meta">${lang.proficiency}</p></div></div>`).join('');
+                const uniqueLanguages = [...new Map(languages.map(item => [item.name, item])).values()];
+                const items = uniqueLanguages.map(lang => {
+                    let name = lang.name || '';
+                    if (name.toLowerCase() === 'bahasa indonesia') name = 'Indonesian';
+                    else if (name.toLowerCase() === 'bahasa inggris') name = 'English';
+                    else if (name.toLowerCase() === 'bahasa jerman') name = 'German';
+
+                    const profRaw = lang.proficiency || '';
+                    const profFormatted = profRaw.includes('_') 
+                        ? profRaw.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')
+                        : profRaw;
+                    return `
+                        <div class="profile-item" style="align-items: center;">
+                            <div class="item-details">
+                                <h4 class="item-title">${name}</h4>
+                                ${profFormatted ? `<p class="item-meta">${profFormatted}</p>` : ''}
+                            </div>
+                        </div>`;
+                }).join('');
                 return `<div id="profile-languages" class="profile-section"><h3>Languages</h3><div class="item-list">${items}</div></div>`;
             }
 
             const profileSection = document.getElementById('linkedin-profile-section');
 
             profileSection.addEventListener('click', (e) => {
+                const expBtn = e.target.closest('.exp-desc-toggle-text, .exp-desc-toggle-btn');
+                if (expBtn) {
+                    const container = expBtn.closest('.exp-desc-container');
+                    const content = container.querySelector('.exp-desc-content');
+                    const isCollapsed = content.classList.contains('collapsed');
+                    const label = expBtn.querySelector('.toggle-label') || expBtn.querySelector('span');
+                    const chevron = expBtn.querySelector('.chevron-icon');
+
+                    if (isCollapsed) {
+                        content.classList.remove('collapsed');
+                        expBtn.classList.add('expanded');
+                        if (label) label.textContent = 'Hide description';
+                        if (chevron) chevron.textContent = '▴';
+                    } else {
+                        content.classList.add('collapsed');
+                        expBtn.classList.remove('expanded');
+                        if (label) label.textContent = 'See description';
+                        if (chevron) chevron.textContent = '▾';
+                    }
+
+                    if (window.initUpdatesSidebarScrollspy) {
+                        setTimeout(window.initUpdatesSidebarScrollspy, 50);
+                    }
+                    return;
+                }
+
                 if (!e.target.classList.contains('see-more-btn')) return;
                 
                 const section = e.target.closest('.profile-section');
@@ -250,10 +426,19 @@
             const FILE_NAME = 'profile.json';
 
             async function loadLinkedInProfile() {
+                // Statically render static profile immediately for fast & reliable display
+                if (window.STATIC_LINKEDIN_PROFILE) {
+                    renderProfile(window.STATIC_LINKEDIN_PROFILE);
+                }
+
+                // Attempt to load live profile data if available from Supabase Storage, fallback silently to static profile
                 try {
+                    const config = await window.fetchEnvConfig?.();
+                    if (!config || !window.supabase) return;
+
                     const client = window.supabase.createClient(
-                        window.envConfig.SUPABASE_URL,
-                        window.envConfig.SUPABASE_KEY,
+                        config.SUPABASE_URL,
+                        config.SUPABASE_KEY,
                         { 
                             auth: { 
                                 persistSession: false,
@@ -262,29 +447,41 @@
                         }
                     );
                     const { data, error } = await client.storage.from(BUCKET_NAME).download(FILE_NAME);
-                    if (error) throw error;
-                    
-                    const text = await data.text();
-                    const profile = JSON.parse(text);
-                    renderProfile(profile);
-
+                    if (!error && data) {
+                        const text = await data.text();
+                        const profile = JSON.parse(text);
+                        if (profile && profile.fullName) {
+                            renderProfile(profile);
+                        }
+                    }
                 } catch (error) {
-                    console.error('Error loading LinkedIn profile:', error.message);
-                    profileSection.innerHTML = `<p style="color: #ff6b6b; text-align: center;">Could not load LinkedIn profile data.</p>`;
-                    profileSection.style.display = 'block';
+                    console.log('Using static LinkedIn profile data:', error.message);
                 }
             }
 
             function renderProfile(profile) {
                 if (!profile) return;
 
-                const profilePicUrl = profile.profilePicture?.sizes?.[1]?.url || profile.profilePicture?.url || 'assets/shared/profile/profile_picture.jpg';
-                const coverPicUrl = profile.coverPicture?.sizes?.[0]?.url;
+                const profilePicUrl = profile.profilePicHighQuality || profile.profilePic || profile.profilePicture?.sizes?.[1]?.url || profile.profilePicture?.url || '../assets/shared/profile/profile_picture.jpg';
+                const coverPicUrl = profile.backgroundPic || profile.coverPicture?.sizes?.[0]?.url;
 
-                // Generate HTML for the new sections
-                const experiencesHtml = renderExperiences(profile.experience);
+                const fullName = profile.fullName || `${profile.firstName || ''} ${profile.lastName || ''}`.trim();
+                const locationText = profile.addressWithCountry || profile.addressWithoutCountry || profile.location?.linkedinText || '';
+
+                const metaParts = [];
+                if (locationText) metaParts.push(`<span>${locationText}</span>`);
+                if (profile.connectionsCount || profile.connections) metaParts.push(`<span>${profile.connectionsCount || profile.connections} connections</span>`);
+                if (profile.followerCount || profile.followers) metaParts.push(`<span>${profile.followerCount || profile.followers} followers</span>`);
+
+                const metaHtml = metaParts.length > 0 ? metaParts.join(' &bull; ') : '<span>LinkedIn Member</span>';
+                const linkedinUrl = profile.linkedinUrl || profile.linkedinPublicUrl || 'https://www.linkedin.com/in/muhammad-fitran-ramadhan/';
+
+                // Generate HTML for all sections
+                const experiencesHtml = renderExperiences(profile.experiences || profile.experience);
+                const educationHtml = renderEducation(profile.educations || profile.education);
                 const projectsHtml = renderProjects(profile.projects);
-                const certificationsHtml = renderCertifications(profile.certifications);
+                const honorsHtml = renderHonors(profile.honors || profile.honorsAndAwards);
+                const certificationsHtml = renderCertifications(profile.licenseAndCertificates || profile.certifications);
                 const skillsHtml = renderSkills(profile.skills);
                 const languagesHtml = renderLanguages(profile.languages);
 
@@ -292,27 +489,27 @@
                     <div id="profile-header" style="position: relative; margin-bottom: 80px;">
                         ${coverPicUrl ? `<img src="${coverPicUrl}" alt="Cover Photo" style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;">` : '<div style="height: 70px;"></div>'}
                         <div style="position: absolute; left: 24px; bottom: -60px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
-                            <img src="${profilePicUrl}" alt="${profile.firstName}" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #000; background-color: #111;">
+                            <img src="${profilePicUrl}" alt="${fullName}" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #000; background-color: #111; object-fit: cover;">
                             <div>
-                                <h2 style="margin: 0; font-size: 28px;">${profile.firstName} ${profile.lastName}</h2>
-                                <p style="margin: 5px 0 0 0; color: #A0A0A0; font-size: 16px;">${profile.headline}</p>
+                                <h2 style="margin: 0; font-size: 28px;">${fullName}</h2>
+                                <p style="margin: 5px 0 0 0; color: #A0A0A0; font-size: 16px;">${profile.headline || ''}</p>
                             </div>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 20px;">
                         <div style="font-size: 15px; color: #888;">
-                            <span>${profile.location?.linkedinText || ''}</span> &bull;
-                            <span>${profile.connectionsCount || 0} connections</span> &bull;
-                            <span>${profile.followerCount || 0} followers</span>
+                            ${metaHtml}
                         </div>
-                        <a href="${profile.linkedinUrl}" target="_blank" class="post-btn" style="text-decoration: none;"><img src="../assets/shared/icons/linkedin_logo.png" alt="LinkedIn" class="post-btn-icon"><span>View on LinkedIn</span></a>
+                        <a href="${linkedinUrl}" target="_blank" class="post-btn" style="text-decoration: none;"><img src="../assets/shared/icons/linkedin_logo.png" alt="LinkedIn" class="post-btn-icon"><span>View on LinkedIn</span></a>
                     </div>
                     <div id="profile-about">
                         <h3 style="margin-bottom: 10px;">About</h3>
                         <p style="white-space: pre-wrap; font-size: 16px; color: #C0C0C0; line-height: 1.5;">${profile.about || 'No about section provided.'}</p>
                     </div>
                     ${experiencesHtml}
+                    ${educationHtml}
                     ${projectsHtml}
+                    ${honorsHtml}
                     ${certificationsHtml}
                     ${skillsHtml}
                     ${languagesHtml}
