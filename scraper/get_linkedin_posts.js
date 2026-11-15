@@ -77,9 +77,14 @@ if (!response.ok) {
   const errText = await response.text();
   throw new Error(`Failed to fetch from Apify: ${response.status} ${errText}`);
 }
-const posts = await response.json();
-if (!Array.isArray(posts)) {
-  throw new TypeError(`Expected an array of posts from Apify, but got ${typeof posts}`);
+const result = await response.json();
+let posts;
+if (Array.isArray(result)) {
+  posts = result;
+} else if (result && Array.isArray(result.items)) {
+  posts = result.items;
+} else {
+  throw new TypeError(`Expected an array of posts from Apify, but got ${typeof result}`);
 }
         
         console.log(`Fetched ${posts.length} posts. Processing...`);
