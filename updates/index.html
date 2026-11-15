@@ -435,7 +435,11 @@
 
                 // Attempt to load live profile data if available from Supabase Storage, fallback silently to static profile
                 try {
-                    const config = await window.fetchEnvConfig?.();
+                    let config = null;
+                    if (typeof window.fetchEnvConfig === 'function') {
+                        config = await window.fetchEnvConfig();
+                    }
+                    if (!config || !window.supabase) return;
                     if (!config || !window.supabase) return;
 
                     const client = window.supabase.createClient(
