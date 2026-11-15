@@ -435,11 +435,7 @@
 
                 // Attempt to load live profile data if available from Supabase Storage, fallback silently to static profile
                 try {
-                    let config = null;
-                    if (typeof window.fetchEnvConfig === 'function') {
-                        config = await window.fetchEnvConfig();
-                    }
-                    if (!config || !window.supabase) return;
+                    const config = await window.fetchEnvConfig?.();
                     if (!config || !window.supabase) return;
 
                     const client = window.supabase.createClient(
@@ -493,7 +489,7 @@
 
                 const html = `
                     <div id="profile-header" style="position: relative; margin-bottom: 80px;">
-                        ${coverPicUrl ? `<img src="${coverPicUrl}" alt="Cover Photo" style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;">` : '<div style="height: 70px;"></div>'}
+                        ${coverPicUrl ? '<img src="' + coverPicUrl + '" alt="Cover Photo" style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;">' : '<div style="height: 70px;"></div>'}
                         <div style="position: absolute; left: 24px; bottom: -60px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
                             <img src="${profilePicUrl}" alt="${fullName}" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #000; background-color: #111; object-fit: cover;">
                             <div>
@@ -534,7 +530,6 @@
         });
     </script>
     <script src="../assets/shared/js/updates-sidebar.js"></script>
-    <script src="../assets/updates/static-profile.js"></script>
 
 <script src="../assets/shared/js/main.js"></script>
 </body>
