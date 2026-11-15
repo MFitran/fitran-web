@@ -72,9 +72,15 @@ async function main() {
         console.log('Table cleared successfully.');
 
         console.log("\nFetching new LinkedIn posts from Apify...");
-        const response = await fetch(APIFY_API_GET_LAST);
-        if (!response.ok) throw new Error(`Failed to fetch from Apify: ${response.statusText}`);
-        const posts = await response.json();
+const response = await fetch(APIFY_API_GET_LAST);
+if (!response.ok) {
+  const errText = await response.text();
+  throw new Error(`Failed to fetch from Apify: ${response.status} ${errText}`);
+}
+const posts = await response.json();
+if (!Array.isArray(posts)) {
+  throw new TypeError(`Expected an array of posts from Apify, but got ${typeof posts}`);
+}
         
         console.log(`Fetched ${posts.length} posts. Processing...`);
 
