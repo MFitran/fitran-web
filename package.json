@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "dev": "npx -y http-server@latest ./ -p 3000",
     "generate-config": "node generate-config.js"
   },
   "dependencies": {
