@@ -177,7 +177,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/updates/static-profile.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             // --- Helper functions for rendering profile sections ---
@@ -422,14 +422,16 @@
                 }
             });
 
-            const BUCKET_NAME = 'linkedin-profile';
+
             const FILE_NAME = 'profile.json';
 
-            async function loadLinkedInProfile() {
-                // Statically render static profile immediately for fast & reliable display
-                if (window.STATIC_LINKEDIN_PROFILE) {
-                    renderProfile(window.STATIC_LINKEDIN_PROFILE);
-                }
+
+
+
+                    if (window.STATIC_LINKEDIN_PROFILE) {
+                        renderProfile(window.STATIC_LINKEDIN_PROFILE);
+                    }
+
 
                 // Attempt to load live profile data if available from Supabase Storage, fallback silently to static profile
                 try {
@@ -524,10 +526,11 @@
                 }
             }
 
-            loadLinkedInProfile();
+
         });
     </script>
     <script src="../assets/shared/js/updates-sidebar.js"></script>
-    <script src="../assets/shared/js/main.js"></script>
+    <script src="../assets/updates/static-profile.js"></script>
+<script src="../assets/shared/js/main.js"></script>
 </body>
 </html>

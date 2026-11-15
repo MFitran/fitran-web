@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure the Supabase SDK is accessible via window.supabase for legacy code
+    if (typeof supabase !== 'undefined') {
+        window.supabase = supabase;
+    }
     const container = document.getElementById('linkedin-posts-container');
     if (container) {
         fetchAndRenderSupabasePosts(container);
@@ -54,8 +58,13 @@ window.getSupabaseClient = async function(customOptions = null) {
 }
 
 async function fetchAndRenderSupabasePosts(container) { // This function remains async due to the database call
-    const config = await fetchEnvConfig();
-    if (!window.supabase || !config?.SUPABASE_URL || !config?.SUPABASE_KEY) {
+    // Load config, fallback to hardcoded values if fetch fails
+    const fetchedConfig = await fetchEnvConfig();
+    const config = fetchedConfig || {
+        SUPABASE_URL: "https://wwapndvliynmdeejtryz.supabase.co",
+        SUPABASE_KEY: "sb_publishable_h2mFkHzvYdG9YJxh83FrRQ_w2KkTCtb"
+    };
+    if (!window.supabase || !config.SUPABASE_URL || !config.SUPABASE_KEY) {
         console.error("Supabase client or configuration not found.");
         container.innerHTML = '<div style="text-align: center; width: 100%; grid-column: 1 / -1; color: red;">Error loading updates.</div>';
         return;

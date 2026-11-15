@@ -29,10 +29,4 @@ jobs:
         run: |
           node scraper/get_linkedin_posts.js
 
-      - name: Execute Profile Sync Script
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          APIFY_API_GET_PROFILE: ${{ secrets.APIFY_API_GET_PROFILE }}
-        run: |
-          node scraper/update_linkedin_profile.js
+
